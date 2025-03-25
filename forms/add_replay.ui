@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>389</width>
+    <height>301</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>260</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Orientation::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>361</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Добавить повтор</string>
+   </property>
+   <widget class="QTreeWidget" name="treeWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>141</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="alternatingRowColors">
+     <bool>true</bool>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+    </property>
+    <property name="animated">
+     <bool>true</bool>
+    </property>
+    <property name="allColumnsShowFocus">
+     <bool>true</bool>
+    </property>
+    <property name="headerHidden">
+     <bool>true</bool>
+    </property>
+    <column>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </column>
+    <item>
+     <property name="text">
+      <string>Месяц</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>9</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>10</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>11</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>12</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>13</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>14</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>15</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>16</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>17</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>18</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>19</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>20</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>21</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>22</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>23</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>24</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>25</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>26</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>27</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>28</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>29</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>31</string>
+      </property>
+     </item>
+    </item>
+    <item>
+     <property name="text">
+      <string>Неделя</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>Пн</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Вт</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ср</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Чт</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Пт</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Сб</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Вс</string>
+      </property>
+     </item>
+    </item>
+    <item>
+     <property name="text">
+      <string>День</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>00:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>01:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>02:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>03:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>04:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>05:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>06:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>07:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>08:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>09:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>10:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>11:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>12:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>13:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>14:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>15:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>16:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>17:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>18:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>19:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>20:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>21:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>22:00</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>23:00</string>
+      </property>
+     </item>
+    </item>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>30</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Задача будет повторяться:
+</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>50</y>
+      <width>191</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
