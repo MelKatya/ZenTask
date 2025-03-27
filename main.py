@@ -1,45 +1,61 @@
+import copy
 from datetime import datetime
 import psycopg2
 import os
+import time
 from dotenv import load_dotenv
 load_dotenv()
-
 
 
 conn = psycopg2.connect(database=os.getenv('database'), user=os.getenv('user'), password=os.getenv('password'))
 
 
 class Task:
-    __task_status_categories = ('Запланировано', 'Делаю', 'Сделано')
-    __task_priorities = ('Низкий', 'Средний', 'Высокий')
-    __task_category = ('Общее', 'Учеба', 'Работа', 'Дом', 'Здоровье', 'Хобби', 'Финансы', 'Проекты')
-
-    def __init__(self, name, description="", priority_id=1, deadline=None, category_id=0):
+    def __init__(self, name, description="", priority_id=1, category_id=1, deadline=None, repeat=None):
+        self.id = None
         self.name = name
         self.priority = priority_id
-        self.task_category = category_id
+        self.category = category_id
         self.description = description
-        self.task_status = 1
+        self.status = 1
         self.deadline = datetime.strptime(deadline, "%Y-%m-%d") if deadline else None
-        self.repeat = None
+        self.repeat = repeat
         self.timer = None
 
     def __str__(self):
-        return f"{self.name} ({self.priority}) - {self.task_status}"
-
-    def copy_task(self):
-        ...
-
-    # def __deepcopy__
+        return (f"Задача: {self.name} ({task_priority_dict[self.priority]} {task_status_dict[self.status]}, " 
+                f"{task_category_dict[self.category]}) - {self.description}")
 
     def start_timer(self):
-        ...
+        self.timer = time.time()
 
-    def save_task(self):
-        ...
+    def stop_timer(self):
+        self.timer = round(time.time() - self.timer, 2)
 
-    def change_task(self):
-        ...
+    def save_task(self, cur):
+        cur.execute("""
+        INSERT INTO task 
+        (name, priority_id, category_id, description, status_id, deadline, repeat, timer)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
+        """, (self.name, self.priority, self.category, self.description,
+              self.status, self.deadline, self.repeat, self.timer))
+        self.id = cur.fetchone()[0]
+
+    def change_task(self, cur):
+        cur.execute("""
+        UPDATE task SET
+        name = %s, priority_id = %s, category_id = %s, description = %s, 
+        status_id = %s, deadline = %s, repeat = %s, timer = %s
+        WHERE id = %s
+        """, (self.name, self.priority, self.category, self.description,
+              self.status, self.deadline, self.repeat, self.timer, self.id))
+
+    def delete_task(self, cur):
+        cur.execute("""
+                DELETE FROM task
+                WHERE id = %s
+                """, (self.id,))
 
 
 def crete_tables(cur):
@@ -47,11 +63,13 @@ def crete_tables(cur):
     CREATE TABLE IF NOT EXISTS task (
     id SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    description TEXT,
     priority_id INTEGER REFERENCES task_priority(id),
-    status_id INTEGER REFERENCES task_status(id),
     category_id INTEGER REFERENCES task_category(id),
-    deadline DATE);
+    description TEXT,
+    status_id INTEGER REFERENCES task_status(id),
+    deadline DATE,
+    repeat DATE,
+    timer NUMERIC);
     """)
 
     cur.execute("""
@@ -114,16 +132,14 @@ def get_dict_tables(cur):
 
 
 if __name__ == '__main__':
-    task_1 = Task('walk')
-    print(task_1)
-    if task_1:
-        print('here')
-
     cur = conn.cursor()
-
     crete_tables(cur)
     task_status_dict, task_priority_dict, task_category_dict = get_dict_tables(cur)
-    print(task_status_dict, task_priority_dict, task_category_dict)
+
+    task_1 = Task('check time', 'walk in the park')
+
+
+
 
     conn.commit()
 
