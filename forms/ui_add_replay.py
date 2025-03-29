@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'add_replay.ui'
-##
-## Created by: Qt User Interface Compiler version 6.8.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -19,99 +9,75 @@ from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication,
     QDialogButtonBox, QGroupBox, QHeaderView, QLabel,
     QSizePolicy, QTreeWidget, QTreeWidgetItem, QWidget)
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        if not Dialog.objectName():
-            Dialog.setObjectName(u"Dialog")
+
+class UiDialog(object):
+    def setup_ui(self, Dialog):
+        Dialog.setWindowTitle('Повтор')
         Dialog.resize(389, 301)
+
         self.buttonBox = QDialogButtonBox(Dialog)
-        self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setGeometry(QRect(30, 260, 341, 32))
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
         self.groupBox = QGroupBox(Dialog)
-        self.groupBox.setObjectName(u"groupBox")
+        self.groupBox.setTitle('Добавить повтор')
         self.groupBox.setGeometry(QRect(10, 10, 361, 241))
+
         self.treeWidget_3 = QTreeWidget(self.groupBox)
+
         __qtreewidgetitem = QTreeWidgetItem(self.treeWidget_3)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
-        QTreeWidgetItem(__qtreewidgetitem)
+        for i in range(31):
+            QTreeWidgetItem(__qtreewidgetitem)
+
+
         __qtreewidgetitem1 = QTreeWidgetItem(self.treeWidget_3)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
-        QTreeWidgetItem(__qtreewidgetitem1)
+        for i in range(7):
+            QTreeWidgetItem(__qtreewidgetitem1)
+
+        ___week = self.treeWidget_3.topLevelItem(1)
+        ___week.setText(0, 'Неделя')
+        for i, day in zip(range(7), ('Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс')):
+            ___qt = ___week.child(i)
+            ___qt.setText(0, day)
+        # ___qtreewidgetitem34 = ___week.child(0)
+        # ___qtreewidgetitem34.setText(0, 'Пн')
+        # ___qtreewidgetitem35 = ___week.child(1)
+        # ___qtreewidgetitem35.setText(0, 'Вт')
+
+        # # Добавляем 3 корневых элемента
+        # root1 = QTreeWidgetItem(self.treeWidget_3, ["Корень 1"])
+        # root2 = QTreeWidgetItem(self.treeWidget_3, ["Корень 2"])
+        # root3 = QTreeWidgetItem(self.treeWidget_3, ["Неделя"])  # Третий корневой элемент (нужный вам)
+        #
+        # # Добавляем root3 в self.treeWidget_3 (это уже сделано выше, но можно явно)
+        # self.treeWidget_3.addTopLevelItem(root3)
+        #
+        # # Добавляем 7 дочерних элементов к root3 (дни недели)
+        # for day in ("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"):
+        #     child = QTreeWidgetItem(root3, [day])  # Создаем дочерний элемент
+
         __qtreewidgetitem2 = QTreeWidgetItem(self.treeWidget_3)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        QTreeWidgetItem(__qtreewidgetitem2)
-        self.treeWidget_3.setObjectName(u"treeWidget_3")
+        for i in range(24):
+            QTreeWidgetItem(__qtreewidgetitem2)
+
+
         self.treeWidget_3.setGeometry(QRect(10, 30, 141, 201))
         self.treeWidget_3.setAlternatingRowColors(True)
         self.treeWidget_3.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.treeWidget_3.setAnimated(True)
         self.treeWidget_3.setAllColumnsShowFocus(True)
         self.treeWidget_3.setHeaderHidden(True)
+        ## клики
+        self.treeWidget_3.itemClicked.connect(self.the_button_was_clicked)
+
         self.label = QLabel(self.groupBox)
-        self.label.setObjectName(u"label")
+        self.label.setText("Задача будет повторяться:")
         self.label.setGeometry(QRect(160, 30, 151, 31))
         self.label_2 = QLabel(self.groupBox)
-        self.label_2.setObjectName(u"label_2")
+
         self.label_2.setGeometry(QRect(160, 50, 191, 41))
-        self.label_2.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
+        # self.label_2.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
+        self.label_2.setText('ggg')
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
@@ -120,9 +86,10 @@ class Ui_Dialog(object):
         QMetaObject.connectSlotsByName(Dialog)
     # setupUi
 
+    def the_button_was_clicked(self):
+        print('ckck')
+
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
-        self.groupBox.setTitle(QCoreApplication.translate("Dialog", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043f\u043e\u0432\u0442\u043e\u0440", None))
         ___qtreewidgetitem = self.treeWidget_3.headerItem()
         ___qtreewidgetitem.setText(0, QCoreApplication.translate("Dialog", u"1", None));
 
@@ -191,29 +158,15 @@ class Ui_Dialog(object):
         ___qtreewidgetitem31 = ___qtreewidgetitem1.child(29)
         ___qtreewidgetitem31.setText(0, QCoreApplication.translate("Dialog", u"30", None));
         ___qtreewidgetitem32 = ___qtreewidgetitem1.child(30)
-        ___qtreewidgetitem32.setText(0, QCoreApplication.translate("Dialog", u"31", None));
-        ___qtreewidgetitem33 = self.treeWidget_3.topLevelItem(1)
-        ___qtreewidgetitem33.setText(0, QCoreApplication.translate("Dialog", u"\u041d\u0435\u0434\u0435\u043b\u044f", None));
-        ___qtreewidgetitem34 = ___qtreewidgetitem33.child(0)
-        ___qtreewidgetitem34.setText(0, QCoreApplication.translate("Dialog", u"\u041f\u043d", None));
-        ___qtreewidgetitem35 = ___qtreewidgetitem33.child(1)
-        ___qtreewidgetitem35.setText(0, QCoreApplication.translate("Dialog", u"\u0412\u0442", None));
-        ___qtreewidgetitem36 = ___qtreewidgetitem33.child(2)
-        ___qtreewidgetitem36.setText(0, QCoreApplication.translate("Dialog", u"\u0421\u0440", None));
-        ___qtreewidgetitem37 = ___qtreewidgetitem33.child(3)
-        ___qtreewidgetitem37.setText(0, QCoreApplication.translate("Dialog", u"\u0427\u0442", None));
-        ___qtreewidgetitem38 = ___qtreewidgetitem33.child(4)
-        ___qtreewidgetitem38.setText(0, QCoreApplication.translate("Dialog", u"\u041f\u0442", None));
-        ___qtreewidgetitem39 = ___qtreewidgetitem33.child(5)
-        ___qtreewidgetitem39.setText(0, QCoreApplication.translate("Dialog", u"\u0421\u0431", None));
-        ___qtreewidgetitem40 = ___qtreewidgetitem33.child(6)
-        ___qtreewidgetitem40.setText(0, QCoreApplication.translate("Dialog", u"\u0412\u0441", None));
+        ___qtreewidgetitem32.setText(0, QCoreApplication.translate("Dialog", u"31", None))
+
+
         ___qtreewidgetitem41 = self.treeWidget_3.topLevelItem(2)
-        ___qtreewidgetitem41.setText(0, QCoreApplication.translate("Dialog", u"\u0414\u0435\u043d\u044c", None));
+        ___qtreewidgetitem41.setText(0, QCoreApplication.translate("Dialog", u"\u0414\u0435\u043d\u044c", None))
         ___qtreewidgetitem42 = ___qtreewidgetitem41.child(0)
-        ___qtreewidgetitem42.setText(0, QCoreApplication.translate("Dialog", u"00:00", None));
+        ___qtreewidgetitem42.setText(0, QCoreApplication.translate("Dialog", u"00:00", None))
         ___qtreewidgetitem43 = ___qtreewidgetitem41.child(1)
-        ___qtreewidgetitem43.setText(0, QCoreApplication.translate("Dialog", u"01:00", None));
+        ___qtreewidgetitem43.setText(0, QCoreApplication.translate("Dialog", u"01:00", None))
         ___qtreewidgetitem44 = ___qtreewidgetitem41.child(2)
         ___qtreewidgetitem44.setText(0, QCoreApplication.translate("Dialog", u"02:00", None));
         ___qtreewidgetitem45 = ___qtreewidgetitem41.child(3)
@@ -259,9 +212,4 @@ class Ui_Dialog(object):
         ___qtreewidgetitem65 = ___qtreewidgetitem41.child(23)
         ___qtreewidgetitem65.setText(0, QCoreApplication.translate("Dialog", u"23:00", None));
         self.treeWidget_3.setSortingEnabled(__sortingEnabled)
-
-        self.label.setText(QCoreApplication.translate("Dialog", u"\u0417\u0430\u0434\u0430\u0447\u0430 \u0431\u0443\u0434\u0435\u0442 \u043f\u043e\u0432\u0442\u043e\u0440\u044f\u0442\u044c\u0441\u044f:\n"
-"", None))
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"TextLabel", None))
-    # retranslateUi
 

@@ -58,6 +58,25 @@ class Task:
                 """, (self.id,))
 
 
+class Notes:
+    def __init__(self, text):
+        self.id = None
+        self.text = text
+        self.attach = False
+        self.page = None
+
+    def save_note(self, cur):
+        ...
+
+    def delete_note(self, cur):
+        cur.execute("""
+                DELETE FROM task
+                WHERE id = %s
+                """, (self.id,))
+
+    def attach_note(self, cur):
+        ...
+
 def crete_tables(cur):
     cur.execute("""
     CREATE TABLE IF NOT EXISTS task (
@@ -70,6 +89,14 @@ def crete_tables(cur):
     deadline DATE,
     repeat DATE,
     timer NUMERIC);
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS notes (
+    id SERIAL PRIMARY KEY,
+    text TEXT,
+    attach BOOL,
+    page INTEGER);
     """)
 
     cur.execute("""
