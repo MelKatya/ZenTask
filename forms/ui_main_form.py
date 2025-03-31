@@ -40,6 +40,7 @@ class MainForm:
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3 = QVBoxLayout()
         self.label_4 = QLabel(self.gridLayoutWidget)
+        self.label_4.setText('Описание:')
 
 
         self.verticalLayout_3.addWidget(self.label_4)
@@ -52,6 +53,7 @@ class MainForm:
         self.gridLayout.addLayout(self.verticalLayout_3, 3, 0, 1, 1)
 
         self.label_2 = QLabel(self.gridLayoutWidget)
+        self.label_2.setText('Название:')
 
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
 
@@ -64,6 +66,7 @@ class MainForm:
         self.gridLayout.addWidget(self.textEdit_nt_description, 3, 1, 1, 1)
 
         self.label_3 = QLabel(self.gridLayoutWidget)
+        self.label_3.setText('Приоритет:')
 
         self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
 
@@ -81,6 +84,7 @@ class MainForm:
         self.checkBox_nt_add_time = QCheckBox(self.gridLayoutWidget)
         self.checkBox_nt_add_time.setEnabled(False)
         self.checkBox_nt_add_time.setMinimumSize(QSize(137, 0))
+        self.checkBox_nt_add_time.setText('Добавить срок')
 
         self.horizontalLayout_50.addWidget(self.checkBox_nt_add_time)
 
@@ -88,6 +92,7 @@ class MainForm:
         self.gridLayout.addLayout(self.horizontalLayout_50, 4, 1, 1, 1)
 
         self.label = QLabel(self.gridLayoutWidget)
+        self.label.setText('Категория:')
 
         self.gridLayout.addWidget(self.label, 2, 0, 1, 1)
 
@@ -95,6 +100,7 @@ class MainForm:
         self.label_nt_repeat = QLabel(self.gridLayoutWidget)
         self.label_nt_repeat.setEnabled(False)
         self.label_nt_repeat.setMinimumSize(QSize(150, 0))
+        self.label_nt_repeat.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
 
         self.horizontalLayout_53.addWidget(self.label_nt_repeat)
 
@@ -105,6 +111,7 @@ class MainForm:
         self.checkBox_nt_repeat = QCheckBox(self.gridLayoutWidget)
         self.checkBox_nt_repeat.setEnabled(False)
         self.checkBox_nt_repeat.setMinimumSize(QSize(137, 0))
+        self.checkBox_nt_repeat.setText('Повторяемая задача')
 
         self.horizontalLayout_53.addWidget(self.checkBox_nt_repeat)
 
@@ -133,6 +140,7 @@ class MainForm:
         sizePolicy.setHeightForWidth(self.pushButton_nt_new_cat.sizePolicy().hasHeightForWidth())
         self.pushButton_nt_new_cat.setSizePolicy(sizePolicy)
         self.pushButton_nt_new_cat.setMaximumSize(QSize(110, 16777215))
+        self.pushButton_nt_new_cat.setText('Новая категория')
 
         self.horizontalLayout.addWidget(self.pushButton_nt_new_cat)
 
@@ -141,6 +149,8 @@ class MainForm:
 
         self.pushButton_nt_create_task = QPushButton(self.groupBox_new_task)
         self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
+        self.pushButton_nt_create_task.setText('Создать задачу')
+
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
@@ -148,12 +158,20 @@ class MainForm:
         self.pushButton_nt_create_task.setSizePolicy(sizePolicy1)
         self.pushButton_nt_my_task = QPushButton(self.page)
         self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
+        self.pushButton_nt_my_task.setText('Мои задачи')
+        self.pushButton_nt_my_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+
         self.pushButton_nt_not = QPushButton(self.page)
         self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
+        self.pushButton_nt_not.setText('Заметки')
+        self.pushButton_nt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+
         self.stackedWidget.addWidget(self.page)
         self.page_2 = QWidget()
         self.groupBox_mt = QGroupBox(self.page_2)
         self.groupBox_mt.setGeometry(QRect(10, 10, 531, 501))
+        self.groupBox_mt.setTitle('Мои задачи:')
+
         self.tabWidget = QTabWidget(self.groupBox_mt)
         self.tabWidget.setGeometry(QRect(10, 20, 501, 471))
         self.tabWidget.setMinimumSize(QSize(125, 0))
@@ -164,6 +182,7 @@ class MainForm:
         self.verticalLayout_6.setSpacing(6)
         self.verticalLayout_6.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
         self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+
         self.comboBox_mt_plan_all = QComboBox(self.verticalLayoutWidget_4)
 
         self.verticalLayout_6.addWidget(self.comboBox_mt_plan_all)
@@ -178,8 +197,9 @@ class MainForm:
         self.gridLayout_3 = QGridLayout(self.gridLayoutWidget_3)
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_7 = QVBoxLayout()
-        self.label_15 = QLabel(self.gridLayoutWidget_3)
 
+        self.label_15 = QLabel(self.gridLayoutWidget_3)
+        self.label_15.setText('Описание:')
         self.verticalLayout_7.addWidget(self.label_15)
 
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
@@ -193,6 +213,7 @@ class MainForm:
         self.label_mt_plan_repeat = QLabel(self.gridLayoutWidget_3)
         self.label_mt_plan_repeat.setEnabled(False)
         self.label_mt_plan_repeat.setMinimumSize(QSize(150, 0))
+        self.label_mt_plan_repeat.setText("TextLabel")
 
         self.horizontalLayout_26.addWidget(self.label_mt_plan_repeat)
 
@@ -203,6 +224,7 @@ class MainForm:
         self.checkBox_mt_plan_add_repet = QCheckBox(self.gridLayoutWidget_3)
         self.checkBox_mt_plan_add_repet.setEnabled(False)
         self.checkBox_mt_plan_add_repet.setMinimumSize(QSize(137, 0))
+        self.checkBox_mt_plan_add_repet.setText('Повторяемая задача')
 
         self.horizontalLayout_26.addWidget(self.checkBox_mt_plan_add_repet)
 
@@ -225,6 +247,7 @@ class MainForm:
         sizePolicy.setHeightForWidth(self.pushButton_mt_plan_new_cat.sizePolicy().hasHeightForWidth())
         self.pushButton_mt_plan_new_cat.setSizePolicy(sizePolicy)
         self.pushButton_mt_plan_new_cat.setMaximumSize(QSize(100, 16777215))
+        self.pushButton_mt_plan_new_cat.setText('Новая категория')
 
         self.horizontalLayout_11.addWidget(self.pushButton_mt_plan_new_cat)
 
@@ -232,10 +255,12 @@ class MainForm:
         self.gridLayout_3.addLayout(self.horizontalLayout_11, 2, 1, 1, 1)
 
         self.label_13 = QLabel(self.gridLayoutWidget_3)
+        self.label_13.setText('Название:')
 
         self.gridLayout_3.addWidget(self.label_13, 0, 0, 1, 1)
 
         self.label_17 = QLabel(self.gridLayoutWidget_3)
+        self.label_17.setText('Приоритет:')
 
         self.gridLayout_3.addWidget(self.label_17, 1, 0, 1, 1)
 
@@ -250,6 +275,7 @@ class MainForm:
         self.gridLayout_3.addWidget(self.lineEdit__mt_plan_name, 0, 1, 1, 1)
 
         self.label_14 = QLabel(self.gridLayoutWidget_3)
+        self.label_14.setText('Категория:')
 
         self.gridLayout_3.addWidget(self.label_14, 2, 0, 1, 1)
 
@@ -276,6 +302,7 @@ class MainForm:
         self.checkBox_mt_plan_add_timer = QCheckBox(self.gridLayoutWidget_3)
         self.checkBox_mt_plan_add_timer.setEnabled(False)
         self.checkBox_mt_plan_add_timer.setMinimumSize(QSize(137, 0))
+        self.checkBox_mt_plan_add_timer.setText('Добавить срок')
 
         self.horizontalLayout_27.addWidget(self.checkBox_mt_plan_add_timer)
 
@@ -297,16 +324,19 @@ class MainForm:
         self.pushButton_mt_plan_change_task = QPushButton(self.horizontalLayoutWidget_6)
         self.pushButton_mt_plan_change_task.setMinimumSize(QSize(125, 0))
         self.pushButton_mt_plan_change_task.setMaximumSize(QSize(120, 16777215))
+        self.pushButton_mt_plan_change_task.setText('Изменить задачу')
 
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
 
         self.pushButton_mt_plan_start = QPushButton(self.horizontalLayoutWidget_6)
         self.pushButton_mt_plan_start.setMinimumSize(QSize(125, 0))
         self.pushButton_mt_plan_start.setMaximumSize(QSize(120, 16777215))
+        self.pushButton_mt_plan_start.setText('Начать выполнение')
 
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_start)
 
         self.pushButton_mt_plan_del = QPushButton(self.horizontalLayoutWidget_6)
+        self.pushButton_mt_plan_del.setText('Удалить задачу')
 
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_del)
 
@@ -335,10 +365,12 @@ class MainForm:
         self.gridLayout_2 = QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.label_6 = QLabel(self.gridLayoutWidget_2)
+        self.label_6.setText('Название:')
 
         self.gridLayout_2.addWidget(self.label_6, 0, 0, 1, 1)
 
         self.label_10 = QLabel(self.gridLayoutWidget_2)
+        self.label_10.setText('Категория:')
 
         self.gridLayout_2.addWidget(self.label_10, 2, 0, 1, 1)
 
@@ -351,6 +383,7 @@ class MainForm:
         self.label_mt_proc_repeat = QLabel(self.gridLayoutWidget_2)
         self.label_mt_proc_repeat.setEnabled(False)
         self.label_mt_proc_repeat.setMinimumSize(QSize(150, 0))
+        self.label_mt_proc_repeat.setText("TextLabel")
 
         self.horizontalLayout_23.addWidget(self.label_mt_proc_repeat)
 
@@ -361,6 +394,7 @@ class MainForm:
         self.checkBox_mt_proc_add_repeat = QCheckBox(self.gridLayoutWidget_2)
         self.checkBox_mt_proc_add_repeat.setEnabled(False)
         self.checkBox_mt_proc_add_repeat.setMinimumSize(QSize(137, 0))
+        self.checkBox_mt_proc_add_repeat.setText('Повторяемая задача')
 
         self.horizontalLayout_23.addWidget(self.checkBox_mt_proc_add_repeat)
 
@@ -383,6 +417,7 @@ class MainForm:
         sizePolicy.setHeightForWidth(self.pushButton_mt_proc_new_cat.sizePolicy().hasHeightForWidth())
         self.pushButton_mt_proc_new_cat.setSizePolicy(sizePolicy)
         self.pushButton_mt_proc_new_cat.setMaximumSize(QSize(100, 16777215))
+        self.pushButton_mt_proc_new_cat.setText('Новая категория')
 
         self.horizontalLayout_5.addWidget(self.pushButton_mt_proc_new_cat)
 
@@ -391,6 +426,7 @@ class MainForm:
 
         self.verticalLayout_4 = QVBoxLayout()
         self.label_5 = QLabel(self.gridLayoutWidget_2)
+        self.label_5.setText('Описание:')
 
         self.verticalLayout_4.addWidget(self.label_5)
 
@@ -416,6 +452,7 @@ class MainForm:
         self.gridLayout_2.addLayout(self.horizontalLayout_7, 1, 1, 1, 1)
 
         self.label_7 = QLabel(self.gridLayoutWidget_2)
+        self.label_7.setText('Приоритет:')
 
         self.gridLayout_2.addWidget(self.label_7, 1, 0, 1, 1)
 
@@ -433,6 +470,7 @@ class MainForm:
         self.checkBox_mt_proc_add_time = QCheckBox(self.gridLayoutWidget_2)
         self.checkBox_mt_proc_add_time.setEnabled(False)
         self.checkBox_mt_proc_add_time.setMinimumSize(QSize(137, 0))
+        self.checkBox_mt_proc_add_time.setText('Добавить срок')
 
         self.horizontalLayout_25.addWidget(self.checkBox_mt_proc_add_time)
 
@@ -446,10 +484,12 @@ class MainForm:
         self.horizontalLayoutWidget_4.setGeometry(QRect(10, 350, 471, 91))
         self.horizontalLayout_9 = QHBoxLayout(self.horizontalLayoutWidget_4)
         self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
-        self.groupBox_mt_proc__timer = QGroupBox(self.horizontalLayoutWidget_4)
-        self.groupBox_mt_proc__timer.setMinimumSize(QSize(260, 0))
-        self.groupBox_mt_proc__timer.setMaximumSize(QSize(260, 16777215))
-        self.verticalLayoutWidget_2 = QWidget(self.groupBox_mt_proc__timer)
+        self.groupBox_mt_proc_timer = QGroupBox(self.horizontalLayoutWidget_4)
+        self.groupBox_mt_proc_timer.setMinimumSize(QSize(260, 0))
+        self.groupBox_mt_proc_timer.setMaximumSize(QSize(260, 16777215))
+        self.groupBox_mt_proc_timer.setTitle('Таймер работы над задачей')
+
+        self.verticalLayoutWidget_2 = QWidget(self.groupBox_mt_proc_timer)
         self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 71))
         self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setSpacing(2)
@@ -457,14 +497,17 @@ class MainForm:
         self.horizontalLayout_10 = QHBoxLayout()
         self.pushButton_mt_proc_start_timer = QPushButton(self.verticalLayoutWidget_2)
         self.pushButton_mt_proc_start_timer.setMaximumSize(QSize(110, 16777215))
+        self.pushButton_mt_proc_start_timer.setText('Запустить')
 
         self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_start_timer)
 
         self.pushButton_mt_proc_stop_timer = QPushButton(self.verticalLayoutWidget_2)
+        self.pushButton_mt_proc_stop_timer.setText('Остановить')
 
         self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_stop_timer)
 
         self.pushButton_mt_proc_rem_timer = QPushButton(self.verticalLayoutWidget_2)
+        self.pushButton_mt_proc_rem_timer.setText('Обновить')
 
         self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_rem_timer)
 
@@ -473,10 +516,12 @@ class MainForm:
 
         self.horizontalLayout_8 = QHBoxLayout()
         self.label_12 = QLabel(self.verticalLayoutWidget_2)
+        self.label_12.setText('Время:')
 
         self.horizontalLayout_8.addWidget(self.label_12)
 
         self.label_mt_proc_timer = QLabel(self.verticalLayoutWidget_2)
+        self.label_mt_proc_timer.setText("TextLabel")
 
         self.horizontalLayout_8.addWidget(self.label_mt_proc_timer)
 
@@ -484,7 +529,7 @@ class MainForm:
         self.verticalLayout_2.addLayout(self.horizontalLayout_8)
 
 
-        self.horizontalLayout_9.addWidget(self.groupBox_mt_proc__timer)
+        self.horizontalLayout_9.addWidget(self.groupBox_mt_proc_timer)
 
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -494,16 +539,19 @@ class MainForm:
         self.pushButton_mt_proc_change_task = QPushButton(self.horizontalLayoutWidget_4)
         self.pushButton_mt_proc_change_task.setMinimumSize(QSize(125, 0))
         self.pushButton_mt_proc_change_task.setMaximumSize(QSize(110, 16777215))
+        self.pushButton_mt_proc_change_task.setText('Изменить задачу')
 
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
 
         self.pushButton_mt_proc_finish = QPushButton(self.horizontalLayoutWidget_4)
         self.pushButton_mt_proc_finish.setMinimumSize(QSize(125, 0))
         self.pushButton_mt_proc_finish.setMaximumSize(QSize(110, 16777215))
+        self.pushButton_mt_proc_finish.setText('Завершить задачу')
 
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_finish)
 
         self.pushButton_mt_proc_del_task = QPushButton(self.horizontalLayoutWidget_4)
+        self.pushButton_mt_proc_del_task.setText('Удалить задачу')
 
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_del_task)
 
@@ -547,6 +595,7 @@ class MainForm:
         sizePolicy.setHeightForWidth(self.pushButton_mt_done_new_cat.sizePolicy().hasHeightForWidth())
         self.pushButton_mt_done_new_cat.setSizePolicy(sizePolicy)
         self.pushButton_mt_done_new_cat.setMaximumSize(QSize(100, 16777215))
+        self.pushButton_mt_done_new_cat.setText('Новая категория')
 
         self.horizontalLayout_18.addWidget(self.pushButton_mt_done_new_cat)
 
@@ -567,6 +616,7 @@ class MainForm:
         self.checkBox_mt_done_add_timer = QCheckBox(self.gridLayoutWidget_4)
         self.checkBox_mt_done_add_timer.setEnabled(False)
         self.checkBox_mt_done_add_timer.setMinimumSize(QSize(137, 0))
+        self.checkBox_mt_done_add_timer.setText('Добавить срок')
 
         self.horizontalLayout_19.addWidget(self.checkBox_mt_done_add_timer)
 
@@ -574,10 +624,12 @@ class MainForm:
         self.gridLayout_4.addLayout(self.horizontalLayout_19, 4, 1, 1, 1)
 
         self.label_20 = QLabel(self.gridLayoutWidget_4)
+        self.label_20.setText('Название')
 
         self.gridLayout_4.addWidget(self.label_20, 0, 0, 1, 1)
 
         self.label_24 = QLabel(self.gridLayoutWidget_4)
+        self.label_24.setText('Приоритет:')
 
         self.gridLayout_4.addWidget(self.label_24, 1, 0, 1, 1)
 
@@ -592,6 +644,7 @@ class MainForm:
 
         self.verticalLayout_11 = QVBoxLayout()
         self.label_22 = QLabel(self.gridLayoutWidget_4)
+        self.label_22.setText('Описание:')
 
         self.verticalLayout_11.addWidget(self.label_22)
 
@@ -606,6 +659,7 @@ class MainForm:
         self.label_mt_done_repeat = QLabel(self.gridLayoutWidget_4)
         self.label_mt_done_repeat.setEnabled(False)
         self.label_mt_done_repeat.setMinimumSize(QSize(150, 0))
+        self.label_mt_done_repeat.setText("TextLabel")
 
         self.horizontalLayout_20.addWidget(self.label_mt_done_repeat)
 
@@ -616,6 +670,7 @@ class MainForm:
         self.checkBox_mt_done_add_repeat = QCheckBox(self.gridLayoutWidget_4)
         self.checkBox_mt_done_add_repeat.setEnabled(False)
         self.checkBox_mt_done_add_repeat.setMinimumSize(QSize(137, 0))
+        self.checkBox_mt_done_add_repeat.setText('Повторяемая задача')
 
         self.horizontalLayout_20.addWidget(self.checkBox_mt_done_add_repeat)
 
@@ -633,6 +688,7 @@ class MainForm:
         self.gridLayout_4.addWidget(self.textEdit_mt_done_description, 3, 1, 1, 1)
 
         self.label_21 = QLabel(self.gridLayoutWidget_4)
+        self.label_21.setText('Категория:')
 
         self.gridLayout_4.addWidget(self.label_21, 2, 0, 1, 1)
 
@@ -642,6 +698,7 @@ class MainForm:
         self.horizontalLayout_17.addItem(self.horizontalSpacer_8)
 
         self.label_task_fire = QLabel(self.gridLayoutWidget_4)
+        self.label_task_fire.setText('Задача просрочена! ')
 
         self.horizontalLayout_17.addWidget(self.label_task_fire)
 
@@ -659,9 +716,12 @@ class MainForm:
         self.horizontalLayoutWidget_7.setGeometry(QRect(10, 370, 471, 71))
         self.horizontalLayout_22 = QHBoxLayout(self.horizontalLayoutWidget_7)
         self.horizontalLayout_22.setContentsMargins(0, 0, 0, 0)
+
         self.groupBox_5 = QGroupBox(self.horizontalLayoutWidget_7)
         self.groupBox_5.setMinimumSize(QSize(260, 0))
         self.groupBox_5.setMaximumSize(QSize(260, 16777215))
+        self.groupBox_5.setTitle('Таймер работы над задачей ')
+
         self.verticalLayoutWidget_7 = QWidget(self.groupBox_5)
         self.verticalLayoutWidget_7.setGeometry(QRect(10, 20, 241, 41))
         self.verticalLayout_12 = QVBoxLayout(self.verticalLayoutWidget_7)
@@ -669,10 +729,12 @@ class MainForm:
         self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_24 = QHBoxLayout()
         self.label_25 = QLabel(self.verticalLayoutWidget_7)
+        self.label_25.setText('Время: ')
 
         self.horizontalLayout_24.addWidget(self.label_25)
 
         self.label_mt_done_timer = QLabel(self.verticalLayoutWidget_7)
+        self.label_mt_done_timer.setText("TextLabel")
 
         self.horizontalLayout_24.addWidget(self.label_mt_done_timer)
 
@@ -690,10 +752,12 @@ class MainForm:
         self.pushButton_mt_done_recover_task = QPushButton(self.horizontalLayoutWidget_7)
         self.pushButton_mt_done_recover_task.setMinimumSize(QSize(125, 0))
         self.pushButton_mt_done_recover_task.setMaximumSize(QSize(120, 16777215))
+        self.pushButton_mt_done_recover_task.setText('Восстановить задачу')
 
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
 
         self.pushButton_mt_done_del_task = QPushButton(self.horizontalLayoutWidget_7)
+        self.pushButton_mt_done_del_task.setText('Удалить задачу ')
 
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_del_task)
 
@@ -703,8 +767,16 @@ class MainForm:
         self.tabWidget.addTab(self.tab_3, "")
         self.pushButton_mt_crete_task = QPushButton(self.page_2)
         self.pushButton_mt_crete_task.setGeometry(QRect(550, 20, 101, 31))
+        self.pushButton_mt_crete_task.setText('Создать задачу')
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! переключение страниц
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! переключение страниц
+        self.pushButton_mt_crete_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! переключение страниц
         self.pushButton_mt_not = QPushButton(self.page_2)
         self.pushButton_mt_not.setGeometry(QRect(550, 60, 101, 31))
+        self.pushButton_mt_not.setText('Заметки')
+        self.pushButton_mt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+
         self.progressBar = QProgressBar(self.page_2)
         self.progressBar.setGeometry(QRect(550, 470, 111, 23))
         self.progressBar.setValue(24)
@@ -713,15 +785,24 @@ class MainForm:
         self.label_63.setWordWrap(False)
         self.label_63.setMargin(0)
         self.label_63.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        self.label_63.setText('Процес\nвыполнения:')
+
         self.stackedWidget.addWidget(self.page_2)
         self.page_5 = QWidget()
         self.groupBox_notices = QGroupBox(self.page_5)
         self.groupBox_notices.setGeometry(QRect(10, 10, 531, 471))
+        self.groupBox_notices.setTitle('Заметки')
+
         self.toolBox_not = QToolBox(self.groupBox_notices)
         self.toolBox_not.setGeometry(QRect(10, 20, 501, 441))
+
         self.page_6 = QWidget()
+        self.page_6.setObjectName(u"page_6")
         self.page_6.setGeometry(QRect(0, 0, 501, 411))
+        self.toolBox_not.setItemText(self.toolBox_not.indexOf(self.page_6), "Page 1")
+
         self.verticalLayoutWidget_5 = QWidget(self.page_6)
+        self.verticalLayoutWidget_5.setObjectName(u"verticalLayoutWidget_5")
         self.verticalLayoutWidget_5.setGeometry(QRect(0, 0, 501, 161))
         self.verticalLayout_14 = QVBoxLayout(self.verticalLayoutWidget_5)
         self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
@@ -731,14 +812,17 @@ class MainForm:
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.pushButton_attach_not = QPushButton(self.verticalLayoutWidget_5)
+        self.pushButton_attach_not.setText('Заметки')
 
         self.horizontalLayout_2.addWidget(self.pushButton_attach_not)
 
         self.pushButton_del_not = QPushButton(self.verticalLayoutWidget_5)
+        self.pushButton_del_not.setText('Удалить ')
 
         self.horizontalLayout_2.addWidget(self.pushButton_del_not)
 
         self.pushButton_save_not = QPushButton(self.verticalLayoutWidget_5)
+        self.pushButton_save_not.setText('Сохранить ')
 
         self.horizontalLayout_2.addWidget(self.pushButton_save_not)
 
@@ -747,36 +831,49 @@ class MainForm:
 
         self.pushButton_cret_tsk_not = QPushButton(self.page_5)
         self.pushButton_cret_tsk_not.setGeometry(QRect(550, 20, 101, 31))
+        self.pushButton_cret_tsk_not.setText('Создать задачу')
+
         self.pushButton_my_task_not = QPushButton(self.page_5)
         self.pushButton_my_task_not.setGeometry(QRect(550, 60, 101, 31))
+        self.pushButton_my_task_not.setText('Мои задачи')
+
         self.stackedWidget.addWidget(self.page_5)
         self.dockWidget_notice = QDockWidget(Widget)
         self.dockWidget_notice.setGeometry(QRect(700, 10, 211, 121))
         self.dockWidgetContents = QWidget()
+
         self.label_atached_note = QLabel(self.dockWidgetContents)
         self.label_atached_note.setGeometry(QRect(10, 10, 191, 71))
+        self.label_atached_note.setText("TextLabel")
+
         self.dockWidget_notice.setWidget(self.dockWidgetContents)
         self.groupBox_main_timer = QGroupBox(Widget)
         self.groupBox_main_timer.setGeometry(QRect(700, 180, 211, 181))
+        self.groupBox_main_timer.setTitle('Время работы')
+
         self.formLayoutWidget = QWidget(self.groupBox_main_timer)
         self.formLayoutWidget.setGeometry(QRect(10, 20, 191, 51))
         self.formLayout = QFormLayout(self.formLayoutWidget)
         self.formLayout.setContentsMargins(0, 0, 0, 0)
         self.label_8 = QLabel(self.formLayoutWidget)
+        self.label_8.setText('Прошло: ')
 
         self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label_8)
 
         self.label_59 = QLabel(self.formLayoutWidget)
         self.label_59.setFrameShape(QFrame.Shape.NoFrame)
         self.label_59.setFrameShadow(QFrame.Shadow.Plain)
+        self.label_59.setText('Осталось:')
 
         self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_59)
 
         self.label_main_timer_passed = QLabel(self.formLayoutWidget)
+        self.label_main_timer_passed.setText("TextLabel")
 
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.label_main_timer_passed)
 
         self.label_main_timer_last = QLabel(self.formLayoutWidget)
+        self.label_main_timer_last.setText('TextLabel')
 
         self.formLayout.setWidget(1, QFormLayout.FieldRole, self.label_main_timer_last)
 
@@ -785,15 +882,17 @@ class MainForm:
         self.verticalLayout_8 = QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
         self.pushButton_19 = QPushButton(self.verticalLayoutWidget_3)
+        self.pushButton_19.setText('Установить таймер')
 
         self.verticalLayout_8.addWidget(self.pushButton_19)
 
         self.pushButton_20 = QPushButton(self.verticalLayoutWidget_3)
+        self.pushButton_20.setText('Отключить таймер ')
 
         self.verticalLayout_8.addWidget(self.pushButton_20)
 
         self.pushButton_21 = QPushButton(self.verticalLayoutWidget_3)
-
+        self.pushButton_21.setText('Посмотреть историю ')
         self.verticalLayout_8.addWidget(self.pushButton_21)
 
 #if QT_CONFIG(shortcut)
@@ -804,7 +903,6 @@ class MainForm:
         self.stackedWidget.setCurrentIndex(1)
         self.tabWidget.setCurrentIndex(2)
         self.toolBox_not.setCurrentIndex(0)
-
 
     def add_calendar(self):
         self.calendarWidget.setEnabled(True)
@@ -831,82 +929,9 @@ class MainForm:
         self.calendarWidget.setDateEditEnabled(True)
         self.calendarWidget.setDateEditAcceptDelay(1500)
 
-    def retranslateUi(self, Widget):
-        self.label_4.setText(QCoreApplication.translate("Widget", u"\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435:", None))
-        self.label_2.setText(QCoreApplication.translate("Widget", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
-        self.label_3.setText(QCoreApplication.translate("Widget", u"\u041f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442:", None))
-        self.checkBox_nt_add_time.setText(QCoreApplication.translate("Widget", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0440\u043e\u043a", None))
-        self.label.setText(QCoreApplication.translate("Widget", u"\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f:", None))
-        self.label_nt_repeat.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.checkBox_nt_repeat.setText(QCoreApplication.translate("Widget", u"\u041f\u043e\u0432\u0442\u043e\u0440\u044f\u0435\u043c\u0430\u044f \u0437\u0430\u0434\u0430\u0447\u0430", None))
-        self.pushButton_nt_new_cat.setText(QCoreApplication.translate("Widget", u"\u041d\u043e\u0432\u0430\u044f \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f", None))
-        self.pushButton_nt_create_task.setText(QCoreApplication.translate("Widget", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_nt_my_task.setText(QCoreApplication.translate("Widget", u"\u041c\u043e\u0438 \u0437\u0430\u0434\u0430\u0447\u0438", None))
-        self.pushButton_nt_not.setText(QCoreApplication.translate("Widget", u"\u0417\u0430\u043c\u0435\u0442\u043a\u0438", None))
-        self.groupBox_mt.setTitle(QCoreApplication.translate("Widget", u"\u041c\u043e\u0438 \u0437\u0430\u0434\u0430\u0447\u0438:", None))
-        self.label_15.setText(QCoreApplication.translate("Widget", u"\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435:", None))
-        self.label_mt_plan_repeat.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.checkBox_mt_plan_add_repet.setText(QCoreApplication.translate("Widget", u"\u041f\u043e\u0432\u0442\u043e\u0440\u044f\u0435\u043c\u0430\u044f \u0437\u0430\u0434\u0430\u0447\u0430", None))
-        self.pushButton_mt_plan_new_cat.setText(QCoreApplication.translate("Widget", u"\u041d\u043e\u0432\u0430\u044f \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f", None))
-        self.label_13.setText(QCoreApplication.translate("Widget", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
-        self.label_17.setText(QCoreApplication.translate("Widget", u"\u041f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442:", None))
-        self.label_14.setText(QCoreApplication.translate("Widget", u"\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f:", None))
-        self.checkBox_mt_plan_add_timer.setText(QCoreApplication.translate("Widget", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0440\u043e\u043a", None))
-        self.pushButton_mt_plan_change_task.setText(QCoreApplication.translate("Widget", u"\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_mt_plan_start.setText(QCoreApplication.translate("Widget", u"\u041d\u0430\u0447\u0430\u0442\u044c \u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0435", None))
-        self.pushButton_mt_plan_del.setText(QCoreApplication.translate("Widget", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("Widget", u"\u0417\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e", None))
-        self.label_6.setText(QCoreApplication.translate("Widget", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
-        self.label_10.setText(QCoreApplication.translate("Widget", u"\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f:", None))
-        self.label_mt_proc_repeat.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.checkBox_mt_proc_add_repeat.setText(QCoreApplication.translate("Widget", u"\u041f\u043e\u0432\u0442\u043e\u0440\u044f\u0435\u043c\u0430\u044f \u0437\u0430\u0434\u0430\u0447\u0430", None))
-        self.pushButton_mt_proc_new_cat.setText(QCoreApplication.translate("Widget", u"\u041d\u043e\u0432\u0430\u044f \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f", None))
-        self.label_5.setText(QCoreApplication.translate("Widget", u"\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435:", None))
-        self.label_7.setText(QCoreApplication.translate("Widget", u"\u041f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442:", None))
-        self.checkBox_mt_proc_add_time.setText(QCoreApplication.translate("Widget", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0440\u043e\u043a", None))
-        self.groupBox_mt_proc__timer.setTitle(QCoreApplication.translate("Widget", u"\u0422\u0430\u0439\u043c\u0435\u0440 \u0440\u0430\u0431\u043e\u0442\u044b \u043d\u0430\u0434 \u0437\u0430\u0434\u0430\u0447\u0435\u0439", None))
-        self.pushButton_mt_proc_start_timer.setText(QCoreApplication.translate("Widget", u"\u0417\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c", None))
-        self.pushButton_mt_proc_stop_timer.setText(QCoreApplication.translate("Widget", u"\u041e\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c", None))
-        self.pushButton_mt_proc_rem_timer.setText(QCoreApplication.translate("Widget", u"\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c", None))
-        self.label_12.setText(QCoreApplication.translate("Widget", u"\u0412\u0440\u0435\u043c\u044f:", None))
-        self.label_mt_proc_timer.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.pushButton_mt_proc_change_task.setText(QCoreApplication.translate("Widget", u"\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_mt_proc_finish.setText(QCoreApplication.translate("Widget", u"\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_mt_proc_del_task.setText(QCoreApplication.translate("Widget", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("Widget", u"\u0412 \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0435", None))
-        self.pushButton_mt_done_new_cat.setText(QCoreApplication.translate("Widget", u"\u041d\u043e\u0432\u0430\u044f \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f", None))
-        self.checkBox_mt_done_add_timer.setText(QCoreApplication.translate("Widget", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0440\u043e\u043a", None))
-        self.label_20.setText(QCoreApplication.translate("Widget", u"\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435:", None))
-        self.label_24.setText(QCoreApplication.translate("Widget", u"\u041f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442:", None))
-        self.label_22.setText(QCoreApplication.translate("Widget", u"\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435:", None))
-        self.label_mt_done_repeat.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.checkBox_mt_done_add_repeat.setText(QCoreApplication.translate("Widget", u"\u041f\u043e\u0432\u0442\u043e\u0440\u044f\u0435\u043c\u0430\u044f \u0437\u0430\u0434\u0430\u0447\u0430", None))
-        self.label_21.setText(QCoreApplication.translate("Widget", u"\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f:", None))
-        self.label_task_fire.setText(QCoreApplication.translate("Widget", u"\u0417\u0430\u0434\u0430\u0447\u0430 \u043f\u0440\u043e\u0441\u0440\u043e\u0447\u0435\u043d\u0430!", None))
-        self.groupBox_5.setTitle(QCoreApplication.translate("Widget", u"\u0422\u0430\u0439\u043c\u0435\u0440 \u0440\u0430\u0431\u043e\u0442\u044b \u043d\u0430\u0434 \u0437\u0430\u0434\u0430\u0447\u0435\u0439", None))
-        self.label_25.setText(QCoreApplication.translate("Widget", u"\u0412\u0440\u0435\u043c\u044f:", None))
-        self.label_mt_done_timer.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.pushButton_mt_done_recover_task.setText(QCoreApplication.translate("Widget", u"\u0412\u043e\u0441\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_mt_done_del_task.setText(QCoreApplication.translate("Widget", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("Widget", u"\u0412\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u043e", None))
-        self.pushButton_mt_crete_task.setText(QCoreApplication.translate("Widget", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_mt_not.setText(QCoreApplication.translate("Widget", u"\u0417\u0430\u043c\u0435\u0442\u043a\u0438", None))
-        self.label_63.setText(QCoreApplication.translate("Widget", u"\u041f\u0440\u043e\u0446\u0435\u0441<br>\u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u044f:", None))
-        self.groupBox_notices.setTitle(QCoreApplication.translate("Widget", u"\u0417\u0430\u043c\u0435\u0442\u043a\u0438", None))
-        self.pushButton_attach_not.setText(QCoreApplication.translate("Widget", u"\u0417\u0430\u043a\u0440\u0435\u043f\u0438\u0442\u044c", None))
-        self.pushButton_del_not.setText(QCoreApplication.translate("Widget", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c", None))
-        self.pushButton_save_not.setText(QCoreApplication.translate("Widget", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c", None))
-        self.toolBox_not.setItemText(self.toolBox_not.indexOf(self.page_6), QCoreApplication.translate("Widget", u"Page 1", None))
-        self.pushButton_cret_tsk_not.setText(QCoreApplication.translate("Widget", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u0434\u0430\u0447\u0443", None))
-        self.pushButton_my_task_not.setText(QCoreApplication.translate("Widget", u"\u041c\u043e\u0438 \u0437\u0430\u0434\u0430\u0447\u0438", None))
-        self.label_atached_note.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.groupBox_main_timer.setTitle(QCoreApplication.translate("Widget", u"\u0412\u0440\u0435\u043c\u044f \u0440\u0430\u0431\u043e\u0442\u044b", None))
-        self.label_8.setText(QCoreApplication.translate("Widget", u"\u041f\u0440\u043e\u0448\u043b\u043e:", None))
-        self.label_59.setText(QCoreApplication.translate("Widget", u"\u041e\u0441\u0442\u0430\u043b\u043e\u0441\u044c:", None))
-        self.label_main_timer_passed.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.label_main_timer_last.setText(QCoreApplication.translate("Widget", u"TextLabel", None))
-        self.pushButton_19.setText(QCoreApplication.translate("Widget", u"\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c \u0442\u0430\u0439\u043c\u0435\u0440", None))
-        self.pushButton_20.setText(QCoreApplication.translate("Widget", u"\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0442\u0430\u0439\u043c\u0435\u0440", None))
-        self.pushButton_21.setText(QCoreApplication.translate("Widget", u"\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u0438\u0441\u0442\u043e\u0440\u0438\u044e", None))
-    # retranslateUi
+    def retranslateUi(self):
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), 'Запланированно ')
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), 'В процессе')
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), 'Выполнено')
+
 
