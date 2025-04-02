@@ -1,12 +1,7 @@
-
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QComboBox,
+from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow
+from PySide6.QtCore import QCoreApplication, QRect, QSize, Qt
+from PySide6.QtGui import QCursor, QFont
+from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox,
     QDateTimeEdit, QDockWidget, QFormLayout, QFrame,
     QGridLayout, QGroupBox, QHBoxLayout, QLabel,
     QLayout, QLineEdit, QProgressBar, QPushButton,
@@ -14,11 +9,17 @@ from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QComboB
     QTextBrowser, QTextEdit, QToolBox, QVBoxLayout,
     QWidget)
 
+from utils import upload_category, upload_priority
 
-class MainForm:
-    def setup_ui(self, Widget):
-        Widget.resize(933, 548)
-        Widget.setWindowTitle('ТаскТрекер')
+
+class MainForm(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.resize(933, 548)
+        self.setWindowTitle('ТаскТрекер')
 
         self.calendarWidget = QCalendarWidget(Widget)
         self.add_calendar()
@@ -101,16 +102,20 @@ class MainForm:
         self.textEdit_nt_description = QTextEdit(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.textEdit_nt_description, 3, 1, 1, 1)
 
+
+        self.pushButton_nt_my_task = QPushButton(self.page)
+        self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
+        self.pushButton_nt_my_task.setText('Мои задачи')
+
         def buttons():
 
             self.pushButton_nt_create_task = QPushButton(self.groupBox_new_task)
             self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
             self.pushButton_nt_create_task.setText('Создать задачу')
 
-            self.pushButton_nt_my_task = QPushButton(self.page)
-            self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
-            self.pushButton_nt_my_task.setText('Мои задачи')
-            self.pushButton_nt_my_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+
+
+
 
             self.pushButton_nt_not = QPushButton(self.page)
             self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
@@ -163,6 +168,7 @@ class MainForm:
 
             self.comboBox_nt_category = QComboBox(self.gridLayoutWidget)
             self.comboBox_nt_category.setEnabled(True)
+            upload_category(self.comboBox_nt_category)
             self.horizontalLayout.addWidget(self.comboBox_nt_category)
 
             self.horizontalSpacer = QSpacerItem(50, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
@@ -180,6 +186,7 @@ class MainForm:
             self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
 
             self.comboBox_nt_prior = QComboBox(self.gridLayoutWidget)
+            upload_priority(self.comboBox_nt_prior)
             self.gridLayout.addWidget(self.comboBox_nt_prior, 1, 1, 1, 1)
 
 
@@ -322,6 +329,7 @@ class MainForm:
                 self.horizontalLayout_11 = QHBoxLayout()
                 self.horizontalLayout_11.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
                 self.comboBox_mt_plan_cat = QComboBox(self.gridLayoutWidget_3)
+                upload_category(self.comboBox_mt_plan_cat)
                 self.comboBox_mt_plan_cat.setEnabled(False)
 
                 self.horizontalLayout_11.addWidget(self.comboBox_mt_plan_cat)
@@ -521,6 +529,7 @@ class MainForm:
 
                 self.comboBox_mt_proc_cat = QComboBox(self.gridLayoutWidget_2)
                 self.comboBox_mt_proc_cat.setEnabled(False)
+                upload_category(self.comboBox_mt_proc_cat)
                 self.horizontalLayout_5.addWidget(self.comboBox_mt_proc_cat)
 
                 self.horizontalSpacer_2 = QSpacerItem(30, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
@@ -727,6 +736,7 @@ class MainForm:
 
                 self.comboBox_mt_done_cat = QComboBox(self.gridLayoutWidget_4)
                 self.comboBox_mt_done_cat.setEnabled(False)
+                upload_category(self.comboBox_mt_done_cat)
                 self.horizontalLayout_18.addWidget(self.comboBox_mt_done_cat)
 
                 self.horizontalSpacer_6 = QSpacerItem(30, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
@@ -895,5 +905,7 @@ class MainForm:
         self.pushButton_21 = QPushButton(self.verticalLayoutWidget_3)
         self.pushButton_21.setText('Посмотреть историю ')
         self.verticalLayout_8.addWidget(self.pushButton_21)
+
+
 
 

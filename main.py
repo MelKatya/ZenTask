@@ -58,7 +58,7 @@ class Task:
                 """, (self.id,))
 
 
-class Notes:
+class Note:
     def __init__(self, text):
         self.id = None
         self.text = text
@@ -66,18 +66,47 @@ class Notes:
         self.page = None
 
     def save_note(self, cur):
-        ...
+        cur.execute("""
+            INSERT INTO notes 
+            (text, attach, page)
+            VALUES (%s, %s, %s)
+            RETURNING id
+            """, (self.text, self.attach, self.page))
+        self.id = cur.fetchone()[0]
 
     def delete_note(self, cur):
         cur.execute("""
-                DELETE FROM task
-                WHERE id = %s
-                """, (self.id,))
+            DELETE FROM notes
+            WHERE id = %s
+            """, (self.id,))
 
     def attach_note(self, cur):
-        ...
+        cur.execute("""
+            UPDATE notes SET attach = True
+            WHERE id = %s;
+            UPDATE notes SET attach = False
+            WHERE id != %s;
+            """, (self.id,))
 
-def crete_tables(cur):
+
+class TotalTimer:
+    def __init__(self, planned_time):
+        self.id = None
+        self.date = datetime.now()
+        self.planned_time = planned_time
+        self.completed_time = None
+
+    def save_time(self, cur):
+        cur.execute("""
+            INSERT INTO timer 
+            (date, planned_time, completed_time)
+            VALUES (%s, %s, %s)
+            RETURNING id
+            """, (self.date, self.planned_time, self.completed_time))
+        self.id = cur.fetchone()[0]
+
+
+def create_tables(cur):
     cur.execute("""
     CREATE TABLE IF NOT EXISTS task (
     id SERIAL PRIMARY KEY,
@@ -97,6 +126,14 @@ def crete_tables(cur):
     text TEXT,
     attach BOOL,
     page INTEGER);
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS timer (
+    id SERIAL PRIMARY KEY,
+    date DATE,
+    planned_time DATE,
+    completed_time DATE);
     """)
 
     cur.execute("""
@@ -160,11 +197,13 @@ def get_dict_tables(cur):
 
 if __name__ == '__main__':
     cur = conn.cursor()
-    crete_tables(cur)
+    create_tables(cur)
     task_status_dict, task_priority_dict, task_category_dict = get_dict_tables(cur)
 
     task_1 = Task('check time', 'walk in the park')
 
+    note_1 = Note('jjdjdjdj')
+    note_1.save_note(cur)
 
 
 
