@@ -16,10 +16,7 @@ class Base(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.layout = QGridLayout(self)
-
-        self.layout.setGeometry(QRect(10, 20, 511, 361))
-        self.resize(100, 200)
-        self.layout.setContentsMargins(0, 10, 0, 0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         # Название
         self.label_2 = QLabel('Название:', self)
@@ -34,23 +31,25 @@ class Base(QWidget):
         self.label_4 = QLabel('Описание:', self)
         self.verticalLayout_3.addWidget(self.label_4)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 105)
         self.verticalLayout_3.addItem(self.verticalSpacer)
         self.layout.addLayout(self.verticalLayout_3, 3, 0, 1, 1)
 
         self.textEdit_nt_description = QTextEdit(self)
+        self.textEdit_nt_description.setMaximumSize(QSize(499, 110))
         self.layout.addWidget(self.textEdit_nt_description, 3, 1, 1, 1)
+
         self.adding_deadline()
         self.adding_replay()
         self.category()
         self.priority()
+
 
     def category(self):
         self.label = QLabel('Категория:', self)
         self.layout.addWidget(self.label, 2, 0, 1, 1)
 
         self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
 
         self.comboBox_nt_category = QComboBox(self)
         self.comboBox_nt_category.setEnabled(True)
@@ -106,6 +105,42 @@ class Base(QWidget):
 
         self.layout.addLayout(self.horizontalLayout_53, 5, 1, 1, 1)
 
+    def overdue_task(self):
+        self.horizontalLayout_17 = QHBoxLayout()
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_17.addItem(self.horizontalSpacer_8)
+
+        self.label_task_fire = QLabel('Задача просрочена!', self)
+        self.horizontalLayout_17.addWidget(self.label_task_fire)
+
+        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_17.addItem(self.horizontalSpacer_9)
+        self.layout.addLayout(self.horizontalLayout_17, 6, 1, 1, 1)
+
+class Note(QWidget):
+    def __init__(self, toolBox_not, page_number, parent=None):
+        super().__init__(parent)
+        self.page = QWidget(self)
+
+        toolBox_not.addItem(self.page, f'Заметка № {page_number}')
+
+        self.verticalLayoutWidget = QWidget(self.page)
+        self.verticalLayoutWidget.setGeometry(QRect(0, 0, 501, 161))
+        self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
+        self.text_edit_note = QTextEdit(self.verticalLayoutWidget)
+        self.verticalLayout.addWidget(self.text_edit_note)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.pushButton_attach_not = QPushButton('Закрепить', self.verticalLayoutWidget)
+        self.horizontalLayout.addWidget(self.pushButton_attach_not)
+
+        self.pushButton_del_not = QPushButton('Удалить', self.verticalLayoutWidget)
+        self.horizontalLayout.addWidget(self.pushButton_del_not)
+
+        self.pushButton_save_not = QPushButton('Сохранить', self.verticalLayoutWidget)
+        self.horizontalLayout.addWidget(self.pushButton_save_not)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
 
 class MainForm(QMainWindow):
     def __init__(self):
@@ -133,9 +168,9 @@ class MainForm(QMainWindow):
         self.page_my_tasks()
         self.stackedWidget.addWidget(self.page_2)
 
-        self.page_5 = QWidget()
+        self.page_3 = QWidget()
         self.page_notices()
-        self.stackedWidget.addWidget(self.page_5)
+        self.stackedWidget.addWidget(self.page_3)
 
         self.attached_notice(self)
         self.main_timer(self)
@@ -173,38 +208,31 @@ class MainForm(QMainWindow):
         self.gridLayoutWidget = Base(self.groupBox_new_task)
         self.gridLayoutWidget.setGeometry(QRect(10, 20, 511, 361))
 
-        def buttons():
-            self.pushButton_nt_create_task = QPushButton('Создать задачу', self.groupBox_new_task)
-            self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
+        self.pushButton_nt_create_task = QPushButton('Создать задачу', self.groupBox_new_task)
+        self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
 
-            self.pushButton_nt_my_task = QPushButton('Мои задачи', self.page)
-            self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
-            self.pushButton_nt_my_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
+        self.pushButton_nt_my_task = QPushButton('Мои задачи', self.page)
+        self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
+        self.pushButton_nt_my_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
 
-            self.pushButton_nt_not = QPushButton('Заметки', self.page)
-            self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
-
-        buttons()
+        self.pushButton_nt_not = QPushButton('Заметки', self.page)
+        self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
+        self.pushButton_nt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
 
 
     def page_my_tasks(self):
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-
         self.groupBox_mt = QGroupBox('Мои задачи:', self.page_2)
         self.groupBox_mt.setGeometry(QRect(10, 10, 531, 501))
 
         self.tabWidget = QTabWidget(self.groupBox_mt)
         self.tabWidget.setGeometry(QRect(10, 20, 501, 471))
-        self.tabWidget.setMinimumSize(QSize(125, 0))
 
         self.tab = QWidget()
         self.tab_2 = QWidget()
         self.tab_3 = QWidget()
 
         def planned_tab():
-            self.tabWidget.addTab(self.tab, "")
+            self.tabWidget.addTab(self.tab, "Запланированно")
 
             self.horizontalLayoutWidget_6 = QWidget(self.tab)
             self.horizontalLayoutWidget_6.setGeometry(QRect(10, 350, 471, 91))
@@ -257,6 +285,7 @@ class MainForm(QMainWindow):
             lower_bar()
 
         def progress_tab():
+            self.tabWidget.addTab(self.tab_2, "В процессе")
             self.verticalLayoutWidget = QWidget(self.tab_2)
             self.verticalLayoutWidget.setGeometry(QRect(10, 10, 471, 341))
 
@@ -278,7 +307,7 @@ class MainForm(QMainWindow):
             self.gridLayoutWidget_2.setGeometry(QRect(10, 10, 441, 298))
 
             self.verticalLayout_mt_proc.addWidget(self.frame_mt_proc)
-            self.tabWidget.addTab(self.tab_2, "")
+
 
             def lower_bar():
                 self.horizontalLayoutWidget_4 = QWidget(self.tab_2)
@@ -339,6 +368,8 @@ class MainForm(QMainWindow):
             lower_bar()
 
         def done_tab():
+            self.tabWidget.addTab(self.tab_3, "Выполнено")
+
             self.verticalLayoutWidget_6 = QWidget(self.tab_3)
             self.verticalLayoutWidget_6.setGeometry(QRect(10, 10, 471, 341))
             self.verticalLayout_10 = QVBoxLayout(self.verticalLayoutWidget_6)
@@ -356,29 +387,14 @@ class MainForm(QMainWindow):
             self.frame_mt_done.setLineWidth(1)
 
             self.gridLayoutWidget_4 = Base(self.frame_mt_done)
-            self.gridLayoutWidget_4.setGeometry(QRect(10, 10, 441, 311))
-
-            self.horizontalLayout_17 = QHBoxLayout()
-            self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-            self.horizontalLayout_17.addItem(self.horizontalSpacer_8)
-
-            self.label_task_fire = QLabel(self.gridLayoutWidget_4)
-            self.label_task_fire.setText('Задача просрочена! ')
-
-            self.horizontalLayout_17.addWidget(self.label_task_fire)
-
-            self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-            self.horizontalLayout_17.addItem(self.horizontalSpacer_9)
-            self.gridLayoutWidget_4.layout.addLayout(self.horizontalLayout_17, 6, 1, 1, 1)
+            self.gridLayoutWidget_4.setGeometry(QRect(10, 10, 441, 298))
+            self.gridLayoutWidget_4.overdue_task()
 
             self.verticalLayout_10.addWidget(self.frame_mt_done)
 
-            self.horizontalLayoutWidget_7 = QWidget(self.tab_3)
-            self.horizontalLayoutWidget_7.setGeometry(QRect(10, 370, 471, 71))
-
-            self.tabWidget.addTab(self.tab_3, "")
-
             def lower_bar():
+                self.horizontalLayoutWidget_7 = QWidget(self.tab_3)
+                self.horizontalLayoutWidget_7.setGeometry(QRect(10, 370, 471, 71))
                 self.horizontalLayout_22 = QHBoxLayout(self.horizontalLayoutWidget_7)
                 self.horizontalLayout_22.setContentsMargins(0, 0, 0, 0)
 
@@ -433,55 +449,30 @@ class MainForm(QMainWindow):
             self.progressBar.setValue(24)
             self.label_63 = QLabel('Процеcс\nвыполнения:', self.page_2)
             self.label_63.setGeometry(QRect(550, 430, 91, 31))
-            self.label_63.setWordWrap(False)
-            self.label_63.setMargin(0)
-            self.label_63.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+
 
         planned_tab()
         progress_tab()
         done_tab()
         right_bar()
 
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), 'Запланированно')
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), 'В процессе')
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), 'Выполнено')
 
     def page_notices(self):
-        self.groupBox_notices = QGroupBox('Заметки', self.page_5)
+        self.groupBox_notices = QGroupBox('Заметки', self.page_3)
         self.groupBox_notices.setGeometry(QRect(10, 10, 531, 471))
+
         self.toolBox_not = QToolBox(self.groupBox_notices)
+
         self.toolBox_not.setGeometry(QRect(10, 20, 501, 441))
 
-        self.page_6 = QWidget()
-        self.page_6.setObjectName(u"page_6")
-        self.page_6.setGeometry(QRect(0, 0, 501, 411))
-        self.toolBox_not.setItemText(self.toolBox_not.indexOf(self.page_6), "Page 1")
+        Note(self.toolBox_not, 1)
+        Note(self.toolBox_not, 2)
 
-        self.verticalLayoutWidget_5 = QWidget(self.page_6)
-        self.verticalLayoutWidget_5.setObjectName(u"verticalLayoutWidget_5")
-        self.verticalLayoutWidget_5.setGeometry(QRect(0, 0, 501, 161))
-        self.verticalLayout_14 = QVBoxLayout(self.verticalLayoutWidget_5)
-        self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
-        self.textBrowser = QTextBrowser(self.verticalLayoutWidget_5)
-
-        self.verticalLayout_14.addWidget(self.textBrowser)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.pushButton_attach_not = QPushButton('Заметки', self.verticalLayoutWidget_5)
-        self.horizontalLayout_2.addWidget(self.pushButton_attach_not)
-
-        self.pushButton_del_not = QPushButton('Удалить', self.verticalLayoutWidget_5)
-        self.horizontalLayout_2.addWidget(self.pushButton_del_not)
-
-        self.pushButton_save_not = QPushButton('Сохранить', self.verticalLayoutWidget_5)
-        self.horizontalLayout_2.addWidget(self.pushButton_save_not)
-        self.verticalLayout_14.addLayout(self.horizontalLayout_2)
-
-        self.pushButton_cret_tsk_not = QPushButton('Создать задачу', self.page_5)
+        self.pushButton_cret_tsk_not = QPushButton('Создать задачу', self.page_3)
         self.pushButton_cret_tsk_not.setGeometry(QRect(550, 20, 101, 31))
         self.pushButton_cret_tsk_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
-        self.pushButton_my_task_not = QPushButton('Мои задачи', self.page_5)
+        self.pushButton_my_task_not = QPushButton('Мои задачи', self.page_3)
         self.pushButton_my_task_not.setGeometry(QRect(550, 60, 101, 31))
         self.pushButton_my_task_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
 
