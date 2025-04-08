@@ -205,8 +205,6 @@ if __name__ == '__main__':
     note_1 = Note('jjdjdjdj')
     note_1.save_note(cur)
 
-
-
     conn.commit()
 
     conn.close()

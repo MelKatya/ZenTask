@@ -117,6 +117,7 @@ class Base(QWidget):
         self.horizontalLayout_17.addItem(self.horizontalSpacer_9)
         self.layout.addLayout(self.horizontalLayout_17, 6, 1, 1, 1)
 
+
 class Note(QWidget):
     def __init__(self, toolBox_not, page_number, parent=None):
         super().__init__(parent)
@@ -213,11 +214,9 @@ class MainForm(QMainWindow):
 
         self.pushButton_nt_my_task = QPushButton('Мои задачи', self.page)
         self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
-        self.pushButton_nt_my_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
 
         self.pushButton_nt_not = QPushButton('Заметки', self.page)
         self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
-        self.pushButton_nt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
 
 
     def page_my_tasks(self):
@@ -231,230 +230,214 @@ class MainForm(QMainWindow):
         self.tab_2 = QWidget()
         self.tab_3 = QWidget()
 
-        def planned_tab():
-            self.tabWidget.addTab(self.tab, "Запланированно")
+        self.page_planned_tab()
+        self.page_progress_tab()
+        self.page_done_tab()
+        self.right_bar()
 
-            self.horizontalLayoutWidget_6 = QWidget(self.tab)
-            self.horizontalLayoutWidget_6.setGeometry(QRect(10, 350, 471, 91))
+    def page_planned_tab(self):
+        self.tabWidget.addTab(self.tab, "Запланированно")
 
-            self.verticalLayoutWidget_4 = QWidget(self.tab)
-            self.verticalLayoutWidget_4.setGeometry(QRect(10, 10, 471, 341))
+        self.horizontalLayoutWidget_6 = QWidget(self.tab)
+        self.horizontalLayoutWidget_6.setGeometry(QRect(10, 350, 471, 91))
 
-            self.verticalLayout_6 = QVBoxLayout(self.verticalLayoutWidget_4)
-            self.verticalLayout_6.setSpacing(6)
-            self.verticalLayout_6.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
-            self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayoutWidget_4 = QWidget(self.tab)
+        self.verticalLayoutWidget_4.setGeometry(QRect(10, 10, 471, 341))
 
-            self.comboBox_mt_plan_all = QComboBox(self.verticalLayoutWidget_4)
-            self.verticalLayout_6.addWidget(self.comboBox_mt_plan_all)
+        self.verticalLayout_6 = QVBoxLayout(self.verticalLayoutWidget_4)
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
 
-            self.frame_mt_plan = QFrame(self.verticalLayoutWidget_4)
-            self.frame_mt_plan.setEnabled(False)
-            self.frame_mt_plan.setFrameShape(QFrame.Shape.Box)
-            self.frame_mt_plan.setFrameShadow(QFrame.Shadow.Raised)
-            self.frame_mt_plan.setLineWidth(1)
+        self.comboBox_mt_plan_all = QComboBox(self.verticalLayoutWidget_4)
+        self.verticalLayout_6.addWidget(self.comboBox_mt_plan_all)
 
-            self.gridLayoutWidget_3 = Base(self.frame_mt_plan)
-            self.verticalLayout_6.addWidget(self.frame_mt_plan)
+        self.frame_mt_plan = QFrame(self.verticalLayoutWidget_4)
+        self.frame_mt_plan.setEnabled(False)
+        self.frame_mt_plan.setFrameShape(QFrame.Shape.Box)
+        self.frame_mt_plan.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_mt_plan.setLineWidth(1)
 
-            self.gridLayoutWidget_3.setGeometry(QRect(10, 10, 441, 298))
-            self.verticalLayout_7 = QVBoxLayout()
+        self.gridLayoutWidget_3 = Base(self.frame_mt_plan)
+        self.verticalLayout_6.addWidget(self.frame_mt_plan)
 
-            def lower_bar():
-                self.horizontalLayout_15 = QHBoxLayout(self.horizontalLayoutWidget_6)
-                self.horizontalLayout_15.setContentsMargins(0, 0, 0, 0)
-                self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.gridLayoutWidget_3.setGeometry(QRect(10, 10, 441, 298))
+        self.verticalLayout_7 = QVBoxLayout()
 
-                self.horizontalLayout_15.addItem(self.horizontalSpacer_5)
+        # lower_bar
+        self.horizontalLayout_15 = QHBoxLayout(self.horizontalLayoutWidget_6)
+        self.horizontalLayout_15.setContentsMargins(0, 5, 0, 5)
+        self.horizontalSpacer_5 = QSpacerItem(120, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-                self.verticalLayout_9 = QVBoxLayout()
+        self.horizontalLayout_15.addItem(self.horizontalSpacer_5)
 
-                self.pushButton_mt_plan_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_6)
-                self.pushButton_mt_plan_change_task.setMinimumSize(QSize(125, 0))
-                self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
+        self.verticalLayout_9 = QVBoxLayout()
 
-                self.pushButton_mt_plan_start = QPushButton('Начать выполнение', self.horizontalLayoutWidget_6)
-                self.pushButton_mt_plan_start.setMinimumSize(QSize(125, 0))
-                self.verticalLayout_9.addWidget(self.pushButton_mt_plan_start)
+        self.pushButton_mt_plan_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_6)
+        self.pushButton_mt_plan_change_task.setMinimumSize(QSize(125, 0))
+        self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
 
-                self.pushButton_mt_plan_del = QPushButton('Удалить задачу', self.horizontalLayoutWidget_6)
-                self.verticalLayout_9.addWidget(self.pushButton_mt_plan_del)
+        self.pushButton_mt_plan_start = QPushButton('Начать выполнение', self.horizontalLayoutWidget_6)
+        self.verticalLayout_9.addWidget(self.pushButton_mt_plan_start)
 
-                self.horizontalLayout_15.addLayout(self.verticalLayout_9)
+        self.pushButton_mt_plan_del = QPushButton('Удалить задачу', self.horizontalLayoutWidget_6)
+        self.verticalLayout_9.addWidget(self.pushButton_mt_plan_del)
 
-            lower_bar()
+        self.horizontalLayout_15.addLayout(self.verticalLayout_9)
 
-        def progress_tab():
-            self.tabWidget.addTab(self.tab_2, "В процессе")
-            self.verticalLayoutWidget = QWidget(self.tab_2)
-            self.verticalLayoutWidget.setGeometry(QRect(10, 10, 471, 341))
+    def page_progress_tab(self):
+        self.tabWidget.addTab(self.tab_2, "В процессе")
+        self.verticalLayoutWidget = QWidget(self.tab_2)
+        self.verticalLayoutWidget.setGeometry(QRect(10, 10, 471, 341))
 
-            self.verticalLayout_mt_proc = QVBoxLayout(self.verticalLayoutWidget)
-            self.verticalLayout_mt_proc.setSpacing(6)
-            self.verticalLayout_mt_proc.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
-            self.verticalLayout_mt_proc.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_mt_proc = QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout_mt_proc.setContentsMargins(0, 0, 0, 0)
 
-            self.comboBox_mt_proc_all = QComboBox(self.verticalLayoutWidget)
-            self.verticalLayout_mt_proc.addWidget(self.comboBox_mt_proc_all)
+        self.comboBox_mt_proc_all = QComboBox(self.verticalLayoutWidget)
+        self.verticalLayout_mt_proc.addWidget(self.comboBox_mt_proc_all)
 
-            self.frame_mt_proc = QFrame(self.verticalLayoutWidget)
-            self.frame_mt_proc.setEnabled(False)
-            self.frame_mt_proc.setFrameShape(QFrame.Shape.Box)
-            self.frame_mt_proc.setFrameShadow(QFrame.Shadow.Raised)
-            self.frame_mt_proc.setLineWidth(1)
+        self.frame_mt_proc = QFrame(self.verticalLayoutWidget)
+        self.frame_mt_proc.setEnabled(False)
+        self.frame_mt_proc.setFrameShape(QFrame.Shape.Box)
+        self.frame_mt_proc.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_mt_proc.setLineWidth(1)
 
-            self.gridLayoutWidget_2 = Base(self.frame_mt_proc)
-            self.gridLayoutWidget_2.setGeometry(QRect(10, 10, 441, 298))
+        self.gridLayoutWidget_2 = Base(self.frame_mt_proc)
+        self.gridLayoutWidget_2.setGeometry(QRect(10, 10, 441, 298))
 
-            self.verticalLayout_mt_proc.addWidget(self.frame_mt_proc)
+        self.verticalLayout_mt_proc.addWidget(self.frame_mt_proc)
 
+        #lower_bar
+        self.horizontalLayoutWidget_4 = QWidget(self.tab_2)
+        self.horizontalLayoutWidget_4.setGeometry(QRect(10, 350, 471, 91))
 
-            def lower_bar():
-                self.horizontalLayoutWidget_4 = QWidget(self.tab_2)
-                self.horizontalLayoutWidget_4.setGeometry(QRect(10, 350, 471, 91))
+        self.horizontalLayout_9 = QHBoxLayout(self.horizontalLayoutWidget_4)
+        self.horizontalLayout_9.setContentsMargins(0, 5, 0, 5)
 
-                self.horizontalLayout_9 = QHBoxLayout(self.horizontalLayoutWidget_4)
-                self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.groupBox_mt_proc_timer = QGroupBox('Таймер работы над задачей', self.horizontalLayoutWidget_4)
+        self.groupBox_mt_proc_timer.setMinimumSize(QSize(260, 0))
+        self.verticalLayoutWidget_2 = QWidget(self.groupBox_mt_proc_timer)
 
-                self.groupBox_mt_proc_timer = QGroupBox('Таймер работы над задачей', self.horizontalLayoutWidget_4)
-                self.groupBox_mt_proc_timer.setMinimumSize(QSize(260, 0))
-                self.verticalLayoutWidget_2 = QWidget(self.groupBox_mt_proc_timer)
+        self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 71))
+        self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget_2)
+        self.verticalLayout_2.setSpacing(2)
+        self.verticalLayout_2.setContentsMargins(0, 3, 0, -2)
+        self.horizontalLayout_10 = QHBoxLayout()
 
-                self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 71))
-                self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget_2)
-                self.verticalLayout_2.setSpacing(2)
-                self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-                self.horizontalLayout_10 = QHBoxLayout()
+        self.pushButton_mt_proc_start_timer = QPushButton('Запустить', self.verticalLayoutWidget_2)
+        self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_start_timer)
 
-                self.pushButton_mt_proc_start_timer = QPushButton('Запустить', self.verticalLayoutWidget_2)
-                self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_start_timer)
+        self.pushButton_mt_proc_stop_timer = QPushButton('Остановить', self.verticalLayoutWidget_2)
+        self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_stop_timer)
 
-                self.pushButton_mt_proc_stop_timer = QPushButton('Остановить', self.verticalLayoutWidget_2)
-                self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_stop_timer)
+        self.pushButton_mt_proc_rem_timer = QPushButton('Обновить', self.verticalLayoutWidget_2)
+        self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_rem_timer)
 
-                self.pushButton_mt_proc_rem_timer = QPushButton('Обновить', self.verticalLayoutWidget_2)
-                self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_rem_timer)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_10)
 
-                self.verticalLayout_2.addLayout(self.horizontalLayout_10)
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.label_12 = QLabel('Время:', self.verticalLayoutWidget_2)
+        self.horizontalLayout_8.addWidget(self.label_12)
 
-                self.horizontalLayout_8 = QHBoxLayout()
-                self.label_12 = QLabel('Время:', self.verticalLayoutWidget_2)
-                self.horizontalLayout_8.addWidget(self.label_12)
+        self.label_mt_proc_timer = QLabel("TextLabel", self.verticalLayoutWidget_2)
+        self.horizontalLayout_8.addWidget(self.label_mt_proc_timer)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_8)
 
-                self.label_mt_proc_timer = QLabel("TextLabel", self.verticalLayoutWidget_2)
-                self.horizontalLayout_8.addWidget(self.label_mt_proc_timer)
-                self.verticalLayout_2.addLayout(self.horizontalLayout_8)
+        self.horizontalLayout_9.addWidget(self.groupBox_mt_proc_timer)
 
-                self.horizontalLayout_9.addWidget(self.groupBox_mt_proc_timer)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_3)
 
-                self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-                self.horizontalLayout_9.addItem(self.horizontalSpacer_3)
+        # кнопки
+        self.verticalLayout_5 = QVBoxLayout()
+        self.pushButton_mt_proc_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_4)
+        self.pushButton_mt_proc_change_task.setMinimumSize(QSize(125, 0))
+        self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
 
-                # кнопки
-                self.verticalLayout_5 = QVBoxLayout()
-                self.pushButton_mt_proc_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_4)
-                self.pushButton_mt_proc_change_task.setMinimumSize(QSize(125, 0))
-                self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
+        self.pushButton_mt_proc_finish = QPushButton('Завершить задачу', self.horizontalLayoutWidget_4)
+        self.verticalLayout_5.addWidget(self.pushButton_mt_proc_finish)
 
-                self.pushButton_mt_proc_finish = QPushButton('Завершить задачу', self.horizontalLayoutWidget_4)
-                self.pushButton_mt_proc_finish.setMinimumSize(QSize(125, 0))
-                self.verticalLayout_5.addWidget(self.pushButton_mt_proc_finish)
+        self.pushButton_mt_proc_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_4)
+        self.verticalLayout_5.addWidget(self.pushButton_mt_proc_del_task)
 
-                self.pushButton_mt_proc_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_4)
-                self.verticalLayout_5.addWidget(self.pushButton_mt_proc_del_task)
+        self.horizontalLayout_9.addLayout(self.verticalLayout_5)
 
-                self.horizontalLayout_9.addLayout(self.verticalLayout_5)
+    def page_done_tab(self):
+        self.tabWidget.addTab(self.tab_3, "Выполнено")
 
-            lower_bar()
+        self.verticalLayoutWidget_6 = QWidget(self.tab_3)
+        self.verticalLayoutWidget_6.setGeometry(QRect(10, 10, 471, 341))
+        self.verticalLayout_10 = QVBoxLayout(self.verticalLayoutWidget_6)
+        self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
 
-        def done_tab():
-            self.tabWidget.addTab(self.tab_3, "Выполнено")
+        self.comboBox_mt_done_all = QComboBox(self.verticalLayoutWidget_6)
+        self.verticalLayout_10.addWidget(self.comboBox_mt_done_all)
 
-            self.verticalLayoutWidget_6 = QWidget(self.tab_3)
-            self.verticalLayoutWidget_6.setGeometry(QRect(10, 10, 471, 341))
-            self.verticalLayout_10 = QVBoxLayout(self.verticalLayoutWidget_6)
-            self.verticalLayout_10.setSpacing(6)
-            self.verticalLayout_10.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
-            self.verticalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.frame_mt_done = QFrame(self.verticalLayoutWidget_6)
+        self.frame_mt_done.setEnabled(False)
+        self.frame_mt_done.setFrameShape(QFrame.Shape.Box)
+        self.frame_mt_done.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_mt_done.setLineWidth(1)
 
-            self.comboBox_mt_done_all = QComboBox(self.verticalLayoutWidget_6)
-            self.verticalLayout_10.addWidget(self.comboBox_mt_done_all)
+        self.gridLayoutWidget_4 = Base(self.frame_mt_done)
+        self.gridLayoutWidget_4.setGeometry(QRect(10, 10, 441, 298))
+        self.gridLayoutWidget_4.overdue_task()
 
-            self.frame_mt_done = QFrame(self.verticalLayoutWidget_6)
-            self.frame_mt_done.setEnabled(False)
-            self.frame_mt_done.setFrameShape(QFrame.Shape.Box)
-            self.frame_mt_done.setFrameShadow(QFrame.Shadow.Raised)
-            self.frame_mt_done.setLineWidth(1)
+        self.verticalLayout_10.addWidget(self.frame_mt_done)
 
-            self.gridLayoutWidget_4 = Base(self.frame_mt_done)
-            self.gridLayoutWidget_4.setGeometry(QRect(10, 10, 441, 298))
-            self.gridLayoutWidget_4.overdue_task()
+        # lower_bar
+        self.horizontalLayoutWidget_7 = QWidget(self.tab_3)
+        self.horizontalLayoutWidget_7.setGeometry(QRect(10, 350, 471, 91))
+        self.horizontalLayout_22 = QHBoxLayout(self.horizontalLayoutWidget_7)
+        self.horizontalLayout_22.setContentsMargins(0, 5, 0, 0)
 
-            self.verticalLayout_10.addWidget(self.frame_mt_done)
+        self.groupBox_5 = QGroupBox('Таймер работы над задачей', self.horizontalLayoutWidget_7)
+        self.groupBox_5.setMinimumSize(QSize(260, 0))
+        self.verticalLayoutWidget_7 = QWidget(self.groupBox_5)
 
-            def lower_bar():
-                self.horizontalLayoutWidget_7 = QWidget(self.tab_3)
-                self.horizontalLayoutWidget_7.setGeometry(QRect(10, 370, 471, 71))
-                self.horizontalLayout_22 = QHBoxLayout(self.horizontalLayoutWidget_7)
-                self.horizontalLayout_22.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayoutWidget_7.setGeometry(QRect(10, 30, 241, 41))
+        self.verticalLayout_12 = QVBoxLayout(self.verticalLayoutWidget_7)
+        # self.verticalLayout_12.setSpacing(2)
+        # self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
 
-                self.groupBox_5 = QGroupBox('Таймер работы над задачей', self.horizontalLayoutWidget_7)
-                self.groupBox_5.setMinimumSize(QSize(260, 0))
-                self.verticalLayoutWidget_7 = QWidget(self.groupBox_5)
+        self.horizontalLayout_24 = QHBoxLayout()
 
-                self.verticalLayoutWidget_7.setGeometry(QRect(10, 20, 241, 41))
-                self.verticalLayout_12 = QVBoxLayout(self.verticalLayoutWidget_7)
-                self.verticalLayout_12.setSpacing(2)
-                self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.label_25 = QLabel('Время:', self.verticalLayoutWidget_7)
+        self.horizontalLayout_24.addWidget(self.label_25)
 
-                self.horizontalLayout_24 = QHBoxLayout()
+        self.label_mt_done_timer = QLabel("TextLabel", self.verticalLayoutWidget_7)
+        self.horizontalLayout_24.addWidget(self.label_mt_done_timer)
+        self.verticalLayout_12.addLayout(self.horizontalLayout_24)
 
-                self.label_25 = QLabel('Время:', self.verticalLayoutWidget_7)
-                self.horizontalLayout_24.addWidget(self.label_25)
+        self.horizontalLayout_22.addWidget(self.groupBox_5)
 
-                self.label_mt_done_timer = QLabel("TextLabel", self.verticalLayoutWidget_7)
-                self.horizontalLayout_24.addWidget(self.label_mt_done_timer)
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_22.addItem(self.horizontalSpacer_7)
 
-                self.verticalLayout_12.addLayout(self.horizontalLayout_24)
+        # кнопки
+        self.verticalLayout_13 = QVBoxLayout()
 
-                self.horizontalLayout_22.addWidget(self.groupBox_5)
+        self.pushButton_mt_done_recover_task = QPushButton('Восстановить задачу', self.horizontalLayoutWidget_7)
+        self.pushButton_mt_done_recover_task.setMinimumSize(QSize(125, 0))
+        self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
 
-                self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-                self.horizontalLayout_22.addItem(self.horizontalSpacer_7)
-
-                # кнопки
-                self.verticalLayout_13 = QVBoxLayout()
-
-                self.pushButton_mt_done_recover_task = QPushButton('Восстановить задачу', self.horizontalLayoutWidget_7)
-                self.pushButton_mt_done_recover_task.setMinimumSize(QSize(125, 0))
-                self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
-
-                self.pushButton_mt_done_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_7)
-                self.verticalLayout_13.addWidget(self.pushButton_mt_done_del_task)
-                self.horizontalLayout_22.addLayout(self.verticalLayout_13)
-
-            lower_bar()
-
-        def right_bar():
-            self.pushButton_mt_crete_task = QPushButton('Создать задачу', self.page_2)
-            self.pushButton_mt_crete_task.setGeometry(QRect(550, 20, 101, 31))
-            self.pushButton_mt_crete_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
-
-            self.pushButton_mt_not = QPushButton('Заметки', self.page_2)
-            self.pushButton_mt_not.setGeometry(QRect(550, 60, 101, 31))
-            self.pushButton_mt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
-
-            self.progressBar = QProgressBar(self.page_2)
-            self.progressBar.setGeometry(QRect(550, 470, 111, 23))
-            self.progressBar.setValue(24)
-            self.label_63 = QLabel('Процеcс\nвыполнения:', self.page_2)
-            self.label_63.setGeometry(QRect(550, 430, 91, 31))
+        self.pushButton_mt_done_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_7)
+        self.verticalLayout_13.addWidget(self.pushButton_mt_done_del_task)
+        self.horizontalLayout_22.addLayout(self.verticalLayout_13)
 
 
-        planned_tab()
-        progress_tab()
-        done_tab()
-        right_bar()
+    def right_bar(self):
+        self.pushButton_mt_crete_task = QPushButton('Создать задачу', self.page_2)
+        self.pushButton_mt_crete_task.setGeometry(QRect(550, 20, 101, 31))
+        self.pushButton_mt_crete_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+
+        self.pushButton_mt_not = QPushButton('Заметки', self.page_2)
+        self.pushButton_mt_not.setGeometry(QRect(550, 60, 101, 31))
+        self.pushButton_mt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+
+        self.progressBar = QProgressBar(self.page_2)
+        self.progressBar.setGeometry(QRect(550, 470, 111, 23))
+        self.progressBar.setValue(24)
+        self.label_63 = QLabel('Процеcс\nвыполнения:', self.page_2)
+        self.label_63.setGeometry(QRect(550, 430, 91, 31))
 
 
     def page_notices(self):
