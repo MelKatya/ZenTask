@@ -1,10 +1,16 @@
 import copy
+import logging
 from datetime import datetime
 import psycopg2
 import os
 import time
 from dotenv import load_dotenv
 load_dotenv()
+
+logging.basicConfig(level=logging.DEBUG,
+                    filename='log.log',
+                    format="%(asctime)s -- %(levelname)s -- %(message)s")
+logger = logging.getLogger(__name__)
 
 
 conn = psycopg2.connect(database=os.getenv('database'), user=os.getenv('user'), password=os.getenv('password'))
@@ -176,6 +182,18 @@ def create_tables(cur):
         ''', (name, name))
 
 
+def save_category(cur, name):
+    try:
+        logger.info(f'Добавление новой категории {name}')
+        cur.execute('''
+            INSERT INTO task_category (name)
+            SELECT %s
+            WHERE NOT EXISTS (SELECT * FROM task_category WHERE name = %s)
+        ''', (name, name))
+    except Exception as exc:
+        logger.error('Непредвиденная ошибка', exc_info=exc)
+
+
 def get_dict_tables(cur):
     cur.execute("""
     SELECT * FROM task_status
@@ -193,6 +211,7 @@ def get_dict_tables(cur):
     category_dict = dict(cur.fetchall())
 
     return status_dict, priority_dict, category_dict
+
 
 
 if __name__ == '__main__':

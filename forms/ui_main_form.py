@@ -9,8 +9,6 @@ from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox,
     QTextBrowser, QTextEdit, QToolBox, QVBoxLayout,
     QWidget)
 
-from utils import upload_category, upload_priority
-
 
 class Base(QWidget):
     def __init__(self, parent=None):
@@ -22,8 +20,8 @@ class Base(QWidget):
         self.label_2 = QLabel('Название:', self)
         self.layout.addWidget(self.label_2, 0, 0, 1, 1)
 
-        self.lineEdit_nt_name = QLineEdit(self)
-        self.layout.addWidget(self.lineEdit_nt_name, 0, 1, 1, 1)
+        self.line_edit_name = QLineEdit(self)
+        self.layout.addWidget(self.line_edit_name, 0, 1, 1, 1)
 
         # Описание
         self.verticalLayout_3 = QVBoxLayout()
@@ -35,9 +33,9 @@ class Base(QWidget):
         self.verticalLayout_3.addItem(self.verticalSpacer)
         self.layout.addLayout(self.verticalLayout_3, 3, 0, 1, 1)
 
-        self.textEdit_nt_description = QTextEdit(self)
-        self.textEdit_nt_description.setMaximumSize(QSize(499, 110))
-        self.layout.addWidget(self.textEdit_nt_description, 3, 1, 1, 1)
+        self.text_edit_description = QTextEdit(self)
+        self.text_edit_description.setMaximumSize(QSize(499, 110))
+        self.layout.addWidget(self.text_edit_description, 3, 1, 1, 1)
 
         self.adding_deadline()
         self.adding_replay()
@@ -50,58 +48,55 @@ class Base(QWidget):
         self.layout.addWidget(self.label, 2, 0, 1, 1)
 
         self.horizontalLayout = QHBoxLayout()
-
-        self.comboBox_nt_category = QComboBox(self)
-        self.comboBox_nt_category.setEnabled(True)
-        upload_category(self.comboBox_nt_category)
-        self.horizontalLayout.addWidget(self.comboBox_nt_category)
+        self.combo_box_category = QComboBox(self)
+        self.combo_box_category.setEnabled(True)
+        self.horizontalLayout.addWidget(self.combo_box_category)
 
         self.horizontalSpacer = QSpacerItem(50, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(self.horizontalSpacer)
         self.layout.addLayout(self.horizontalLayout, 2, 1, 1, 1)
 
-        self.pushButton_nt_new_cat = QPushButton('Новая категория', self)
-        self.pushButton_nt_new_cat.setMaximumSize(QSize(110, 16777215))
-        self.horizontalLayout.addWidget(self.pushButton_nt_new_cat)
+        self.push_button_new_cat = QPushButton('Новая категория', self)
+        self.push_button_new_cat.setMaximumSize(QSize(110, 16777215))
+        self.horizontalLayout.addWidget(self.push_button_new_cat)
 
     def priority(self):
         self.label_3 = QLabel('Приоритет:', self)
         self.layout.addWidget(self.label_3, 1, 0, 1, 1)
 
-        self.comboBox_nt_prior = QComboBox(self)
-        upload_priority(self.comboBox_nt_prior)
-        self.layout.addWidget(self.comboBox_nt_prior, 1, 1, 1, 1)
+        self.combo_box_prior = QComboBox(self)
+        self.layout.addWidget(self.combo_box_prior, 1, 1, 1, 1)
 
     def adding_deadline(self):
         self.horizontalLayout_50 = QHBoxLayout()
 
-        self.dateTimeEdit_nt = QDateTimeEdit(self)
-        self.dateTimeEdit_nt.setEnabled(False)
-        self.dateTimeEdit_nt.setMinimumSize(QSize(150, 0))
-        self.horizontalLayout_50.addWidget(self.dateTimeEdit_nt)
+        self.datetime_edit = QDateTimeEdit(self)
+        self.datetime_edit.setEnabled(False)
+        self.datetime_edit.setMinimumSize(QSize(150, 0))
+        self.horizontalLayout_50.addWidget(self.datetime_edit)
 
         self.horizontalSpacer_34 = QSpacerItem(10, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.horizontalLayout_50.addItem(self.horizontalSpacer_34)
         self.layout.addLayout(self.horizontalLayout_50, 4, 1, 1, 1)
 
-        self.checkBox_nt_add_time = QCheckBox('Добавить срок', self)
-        self.checkBox_nt_add_time.setMinimumSize(QSize(137, 0))
-        self.horizontalLayout_50.addWidget(self.checkBox_nt_add_time)
+        self.check_box_add_time = QCheckBox('Добавить срок', self)
+        self.check_box_add_time.setMinimumSize(QSize(137, 0))
+        self.horizontalLayout_50.addWidget(self.check_box_add_time)
 
     def adding_replay(self):
         self.horizontalLayout_53 = QHBoxLayout()
 
-        self.label_nt_repeat = QLabel("TextLabel", self)
-        self.label_nt_repeat.setEnabled(False)
-        self.label_nt_repeat.setMinimumSize(QSize(150, 0))
-        self.horizontalLayout_53.addWidget(self.label_nt_repeat)
+        self.label_repeat = QLabel("TextLabel", self)
+        self.label_repeat.setEnabled(False)
+        self.label_repeat.setMinimumSize(QSize(150, 0))
+        self.horizontalLayout_53.addWidget(self.label_repeat)
 
         self.horizontalSpacer_37 = QSpacerItem(10, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.horizontalLayout_53.addItem(self.horizontalSpacer_37)
 
-        self.checkBox_nt_repeat = QCheckBox('Повторяемая задача', self)
-        self.checkBox_nt_repeat.setMinimumSize(QSize(137, 0))
-        self.horizontalLayout_53.addWidget(self.checkBox_nt_repeat)
+        self.check_box_repeat = QCheckBox('Повторяемая задача', self)
+        self.check_box_repeat.setMinimumSize(QSize(137, 0))
+        self.horizontalLayout_53.addWidget(self.check_box_repeat)
 
         self.layout.addLayout(self.horizontalLayout_53, 5, 1, 1, 1)
 
@@ -206,8 +201,8 @@ class MainForm(QMainWindow):
         self.groupBox_new_task = QGroupBox('Новая задача', self.page)
         self.groupBox_new_task.setGeometry(QRect(10, 10, 531, 451))
 
-        self.gridLayoutWidget = Base(self.groupBox_new_task)
-        self.gridLayoutWidget.setGeometry(QRect(10, 20, 511, 361))
+        self.grid_layout_new_task = Base(self.groupBox_new_task)
+        self.grid_layout_new_task.setGeometry(QRect(10, 20, 511, 361))
 
         self.pushButton_nt_create_task = QPushButton('Создать задачу', self.groupBox_new_task)
         self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
@@ -256,10 +251,10 @@ class MainForm(QMainWindow):
         self.frame_mt_plan.setFrameShadow(QFrame.Shadow.Raised)
         self.frame_mt_plan.setLineWidth(1)
 
-        self.gridLayoutWidget_3 = Base(self.frame_mt_plan)
+        self.grid_layout_plan = Base(self.frame_mt_plan)
         self.verticalLayout_6.addWidget(self.frame_mt_plan)
 
-        self.gridLayoutWidget_3.setGeometry(QRect(10, 10, 441, 298))
+        self.grid_layout_plan.setGeometry(QRect(10, 10, 441, 298))
         self.verticalLayout_7 = QVBoxLayout()
 
         # lower_bar
@@ -300,8 +295,8 @@ class MainForm(QMainWindow):
         self.frame_mt_proc.setFrameShadow(QFrame.Shadow.Raised)
         self.frame_mt_proc.setLineWidth(1)
 
-        self.gridLayoutWidget_2 = Base(self.frame_mt_proc)
-        self.gridLayoutWidget_2.setGeometry(QRect(10, 10, 441, 298))
+        self.grid_layout_proc = Base(self.frame_mt_proc)
+        self.grid_layout_proc.setGeometry(QRect(10, 10, 441, 298))
 
         self.verticalLayout_mt_proc.addWidget(self.frame_mt_proc)
 
@@ -377,9 +372,9 @@ class MainForm(QMainWindow):
         self.frame_mt_done.setFrameShadow(QFrame.Shadow.Raised)
         self.frame_mt_done.setLineWidth(1)
 
-        self.gridLayoutWidget_4 = Base(self.frame_mt_done)
-        self.gridLayoutWidget_4.setGeometry(QRect(10, 10, 441, 298))
-        self.gridLayoutWidget_4.overdue_task()
+        self.grid_layout_done = Base(self.frame_mt_done)
+        self.grid_layout_done.setGeometry(QRect(10, 10, 441, 298))
+        self.grid_layout_done.overdue_task()
 
         self.verticalLayout_10.addWidget(self.frame_mt_done)
 
@@ -427,11 +422,9 @@ class MainForm(QMainWindow):
     def right_bar(self):
         self.pushButton_mt_crete_task = QPushButton('Создать задачу', self.page_2)
         self.pushButton_mt_crete_task.setGeometry(QRect(550, 20, 101, 31))
-        self.pushButton_mt_crete_task.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
         self.pushButton_mt_not = QPushButton('Заметки', self.page_2)
         self.pushButton_mt_not.setGeometry(QRect(550, 60, 101, 31))
-        self.pushButton_mt_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
 
         self.progressBar = QProgressBar(self.page_2)
         self.progressBar.setGeometry(QRect(550, 470, 111, 23))
@@ -453,11 +446,9 @@ class MainForm(QMainWindow):
 
         self.pushButton_cret_tsk_not = QPushButton('Создать задачу', self.page_3)
         self.pushButton_cret_tsk_not.setGeometry(QRect(550, 20, 101, 31))
-        self.pushButton_cret_tsk_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
         self.pushButton_my_task_not = QPushButton('Мои задачи', self.page_3)
         self.pushButton_my_task_not.setGeometry(QRect(550, 60, 101, 31))
-        self.pushButton_my_task_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
 
     def attached_notice(self, Widget):
         self.dockWidget_notice = QDockWidget(Widget)
