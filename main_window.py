@@ -2,7 +2,9 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox
 from forms.ui_main_form import MainForm, Base
 from forms.ui_add_category import NewCategory
-from utils import upload_priority, upload_category, save_new_category
+from utils import upload_priority, upload_category, save_new_category, save_task
+from PySide6.QtCore import Qt
+
 
 
 # class BaseF(Base):
@@ -51,6 +53,8 @@ class MainWindow(MainForm):
         self.upload_category()
         self.change_page_buttons()
         self.new_category_button()
+        self.checkbox_deadline()
+        self.pushButton_nt_create_task.clicked.connect(self.save_task_button)
 
     def upload_category(self):
         upload_category(self.grid_layout_new_task.combo_box_category)
@@ -95,4 +99,29 @@ class MainWindow(MainForm):
         else:
             print("Пользователь отменил")
 
+    def checkbox_deadline(self):
+        self.grid_layout_new_task.check_box_add_time.checkStateChanged.connect(self.on_checkbox_state_changed)
 
+    def on_checkbox_state_changed(self, state):
+        if state == Qt.CheckState.Checked:
+            self.grid_layout_new_task.datetime_edit.setEnabled(True)
+        elif state == Qt.CheckState.Unchecked:
+            self.grid_layout_new_task.datetime_edit.setEnabled(False)
+
+    def save_task_button(self):
+        flag = True
+        if not self.grid_layout_new_task.line_edit_name.text():
+            QMessageBox.warning(self, "Ошибка", "Необходимо ввести название задачи.")
+            flag = False
+
+        if not self.grid_layout_new_task.text_edit_description.toPlainText():
+            QMessageBox.warning(self, "Ошибка", "Необходимо ввести описание задачи.")
+            flag = False
+
+        if flag:
+            name = self.grid_layout_new_task.line_edit_name.text()
+            priority = self.grid_layout_new_task.combo_box_prior.currentText()
+            category = self.grid_layout_new_task.combo_box_category.currentText()
+            descrirton = self.grid_layout_new_task.text_edit_description.toPlainText()
+            save_task(name, priority, category, descrirton)
+            QMessageBox.about(self, 'Успех', f'Категория сохранена')

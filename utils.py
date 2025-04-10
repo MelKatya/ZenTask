@@ -1,4 +1,4 @@
-from database import get_dict_tables, save_category
+from database import get_dict_tables, save_category, Task
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -24,10 +24,25 @@ def upload_priority(combobox):
 
 
 def save_new_category(name):
-    conn = psycopg2.connect(database=os.getenv('database'), user=os.getenv('user'), password=os.getenv('password'))
-    cur = conn.cursor()
-    save_category(cur, name)
-    conn.commit()
+    save_category(name)
     global task_category_dict
     _, _, task_category_dict = get_dict_tables(cur)
+
+
+
+def save_task(name, priority, category, descrirton, deadline = None, replay = None):
+    conn = psycopg2.connect(database=os.getenv('database'), user=os.getenv('user'), password=os.getenv('password'))
+    cur = conn.cursor()
+    global task_priority_dict, task_category_dict
+    cat_id = list(filter(lambda x: x[1] == category, task_category_dict.items()))[0][0]
+    prior_id = list(filter(lambda x: x[1] == priority, task_priority_dict.items()))[0][0]
+
+    new_task = Task(name=name, description=descrirton,
+                    priority_id=prior_id, category_id=cat_id)
+    new_task.save_task(cur)
+    conn.commit()
+
     conn.close()
+
+
+
