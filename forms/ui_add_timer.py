@@ -9,14 +9,14 @@ class AddTimer:
 
         Dialog.resize(248, 211)
         Dialog.setWindowTitle('Добавление таймера')
+
         self.buttonBox = QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QRect(0, 170, 231, 32))
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
-        self.groupBox = QGroupBox(Dialog)
+        self.groupBox = QGroupBox('Добавить таймер', Dialog)
         self.groupBox.setGeometry(QRect(10, 10, 221, 151))
-        self.groupBox.setTitle('Добавить таймер')
 
         self.verticalLayoutWidget = QWidget(self.groupBox)
         self.verticalLayoutWidget.setGeometry(QRect(10, 20, 171, 51))
@@ -24,8 +24,7 @@ class AddTimer:
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.label = QLabel(self.verticalLayoutWidget)
-        self.label.setText('Планируемое время работы:')
+        self.label = QLabel('Планируемое время работы:', self.verticalLayoutWidget)
 
         self.verticalLayout.addWidget(self.label)
 
@@ -40,7 +39,6 @@ class AddTimer:
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.verticalLayoutWidget_2 = QWidget(self.groupBox)
@@ -48,8 +46,7 @@ class AddTimer:
         self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
 
-        self.label_2 = QLabel(self.verticalLayoutWidget_2)
-        self.label_2.setText('Окончание работы:')
+        self.label_2 = QLabel('Окончание работы:', self.verticalLayoutWidget_2)
 
         self.verticalLayout_2.addWidget(self.label_2)
 
@@ -68,3 +65,5 @@ class AddTimer:
         th1, tm1 = map(int, data)
         res = (start + datetime.timedelta(hours=th1, minutes=tm1)).strftime('%m.%d в %H:%M')
         self.label_3.setText(str(res))
+
+

@@ -487,8 +487,8 @@ class MainForm(QMainWindow):
         self.verticalLayout_8 = QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
 
-        self.pushButton_19 = QPushButton('Установить таймер', self.verticalLayoutWidget_3)
-        self.verticalLayout_8.addWidget(self.pushButton_19)
+        self.pushButton_set_timer = QPushButton('Установить таймер', self.verticalLayoutWidget_3)
+        self.verticalLayout_8.addWidget(self.pushButton_set_timer)
 
         self.pushButton_20 = QPushButton('Отключить таймер', self.verticalLayoutWidget_3)
         self.verticalLayout_8.addWidget(self.pushButton_20)
