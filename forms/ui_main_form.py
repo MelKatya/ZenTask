@@ -476,10 +476,10 @@ class MainForm(QMainWindow):
         self.label_59.setFrameShadow(QFrame.Shadow.Plain)
         self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_59)
 
-        self.label_main_timer_passed = QLabel("TextLabel", self.formLayoutWidget)
+        self.label_main_timer_passed = QLabel("", self.formLayoutWidget)
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.label_main_timer_passed)
 
-        self.label_main_timer_last = QLabel('TextLabel', self.formLayoutWidget)
+        self.label_main_timer_last = QLabel('', self.formLayoutWidget)
         self.formLayout.setWidget(1, QFormLayout.FieldRole, self.label_main_timer_last)
 
         self.verticalLayoutWidget_3 = QWidget(self.groupBox_main_timer)

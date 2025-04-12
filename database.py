@@ -217,8 +217,8 @@ def create_tables(cur):
        CREATE TABLE IF NOT EXISTS timer (
        id SERIAL PRIMARY KEY,
        date DATE,
-       planned_time DATE,
-       completed_time DATE);
+       planned_time TIME,
+       completed_time TIME);
        """)
 
 

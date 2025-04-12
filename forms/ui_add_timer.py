@@ -1,7 +1,6 @@
 from PySide6.QtCore import QRect, QSize, Qt
 from PySide6.QtWidgets import (QDialogButtonBox, QGroupBox, QHBoxLayout, QLabel, QSizePolicy,
                                QSpacerItem, QTimeEdit, QVBoxLayout, QWidget)
-import datetime
 
 
 class AddTimer:
@@ -31,7 +30,7 @@ class AddTimer:
         self.horizontalLayout = QHBoxLayout()
         self.timeEdit = QTimeEdit(self.verticalLayoutWidget)
         self.timeEdit.setMinimumSize(QSize(75, 0))
-        self.timeEdit.timeChanged.connect(self.onSelectionChanged)
+
 
         self.horizontalLayout.addWidget(self.timeEdit)
 
@@ -56,14 +55,6 @@ class AddTimer:
         self.verticalLayout_2.addWidget(self.label_3)
 
 
-        self.buttonBox.accepted.connect(Dialog.accept)
-        self.buttonBox.rejected.connect(Dialog.reject)
 
-    def onSelectionChanged(self):
-        start = datetime.datetime.now()
-        data = self.timeEdit.text().split(':')
-        th1, tm1 = map(int, data)
-        res = (start + datetime.timedelta(hours=th1, minutes=tm1)).strftime('%m.%d в %H:%M')
-        self.label_3.setText(str(res))
 
 

@@ -1,4 +1,4 @@
-from database import get_dict_tables, save_category, Task
+from database import get_dict_tables, save_category, Task, TotalTimer
 
 
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
@@ -34,6 +34,15 @@ def save_task(name, priority, category, descrirtion, deadline=None, replay=None)
     new_task = Task(name=name, description=descrirtion,
                     priority_id=prior_id, category_id=cat_id, deadline=deadline)
     return new_task.save_task()
+
+
+def save_timer(planned_time):
+    new_timer = TotalTimer(planned_time)
+    new_timer.save_time()
+    return new_timer.id
+
+def stop_timer():
+    ...
 
 
 
