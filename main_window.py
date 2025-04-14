@@ -5,8 +5,9 @@ from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow, QMess
 from forms.ui_main_form import MainForm, Base
 from forms.ui_add_category import NewCategory
 from forms.ui_add_timer import AddTimer
-from utils import upload_priority, upload_category, save_new_category, save_task, save_timer
-from PySide6.QtCore import Qt
+from forms.ui_show_history import ShowTimers
+from utils import upload_priority, upload_category, save_new_category, save_task, save_timer, stop_timer, show_history_time
+from PySide6.QtCore import Signal, Qt
 from psycopg2 import errors
 import psycopg2
 from datetime import datetime, timedelta
@@ -62,9 +63,12 @@ class DialogTimer(QDialog):
 
 
 class MainWindow(MainForm):
+    timer_finished = Signal()
+
     def __init__(self):
         super().__init__()
 
+        self.timer_finished.connect(self.finsh_timer)
         self.upload_priority()
         self.upload_category()
         self.change_page_buttons()
@@ -74,6 +78,8 @@ class MainWindow(MainForm):
         self.grid_layout_new_task.datetime_edit.setDateTime(datetime.now())
         self.pushButton_set_timer.clicked.connect(self.open_timer_form)
         self.pushButton_20.clicked.connect(self.stop_timer)
+        self.pushButton_20.setEnabled(False)
+        self.pushButton_21.clicked.connect(self.open_history_form)
 
     def upload_category(self):
         """Загружает категории из бд"""
@@ -154,40 +160,70 @@ class MainWindow(MainForm):
             elif isinstance(recording_result, psycopg2.errors.UniqueViolation):
                 QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
 
-
     def open_timer_form(self):
+        """Открывает форму добавления нового таймера"""
         dialog = DialogTimer()
         result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
-            dialog.id_timer = save_timer(dialog.ui.timeEdit.text())
-            time_1 = dialog.ui.timeEdit.dateTime().toPython()
-            self.label_main_timer_passed.setText('00:00')
-            self.label_main_timer_last.setText(time_1.strftime('%H:%M'))
-            # self.strat_timer(self.label_main_timer_passed, self.label_main_timer_last, time_1)
-
-            self.p1 = threading.Thread(target=self.strat_timer, args=(self.label_main_timer_passed,
-                                                                      self.label_main_timer_last, time_1), daemon=True)
-            self.p1.start()
-            # self.p1.join()
+            if dialog.ui.timeEdit.text() == '0:00':
+                QMessageBox.warning(self, "Ошибка", "Необходимо указать время.")
+            else:
+                self.total_timer = save_timer(dialog.ui.timeEdit.text())
+                time_1 = dialog.ui.timeEdit.dateTime().toPython()
+                self.label_main_timer_passed.setText('00:00')
+                self.label_main_timer_last.setText(time_1.strftime('%H:%M'))
+                # self.pushButton_set_timer.setVisible(False)
+                self.pushButton_set_timer.setEnabled(False)
+                self.run_time = True
+                self.pushButton_20.setEnabled(True)
+                self.thread_timer = threading.Thread(target=self.strat_timer,
+                                                     args=(self.label_main_timer_passed,
+                                                           self.label_main_timer_last, time_1), daemon=True)
+                self.thread_timer.start()
         else:
             print("Пользователь отменил")
 
     def strat_timer(self, label_passed, label_last, timer):
+        """Запускает таймер"""
         pass_time = (timer - timedelta(minutes=1)).strftime('%H:%M')
-        rest_time = datetime.now().replace(hour=0, minute=0, second=0)
-        while pass_time != '00:00':
+        self.rest_time = datetime.now().replace(hour=0, minute=0, second=0)
+        while pass_time != '00:00' and self.run_time:
             time.sleep(1)
+            if self.run_time == False:
+                break
             timer -= timedelta(minutes=1)
-            rest_time += timedelta(minutes=1)
+            self.rest_time += timedelta(minutes=1)
             pass_time = timer.strftime('%H:%M')
             label_last.setText(pass_time)
-            label_passed.setText(rest_time.strftime('%H:%M'))
+            label_passed.setText(self.rest_time.strftime('%H:%M'))
+        self.timer_finished.emit()
+
+    def finsh_timer(self):
+        """Действия после завершения работы таймера"""
+        stop_timer(self.total_timer, self.rest_time)
+        self.pushButton_set_timer.setEnabled(True)
+        self.pushButton_20.setEnabled(False)
+        QMessageBox.about(self, 'Таймер', f'Таймер закончил работу')
 
     def stop_timer(self):
-        print('stopp')
-        print(self.label_main_timer_passed.text())
-        self.p1.join(0)
-        print(threading.enumerate())
+        """Обрабаотывает кнопку остановки таймера"""
+        self.run_time = False
+        self.thread_timer.join()
+
+    def open_history_form(self):
+        """Открывает форму с историей работы по таймеру"""
+        dialog = QDialog()
+        ui = ShowTimers()
+        ui.setup_ui(dialog)
+        total_time, result = show_history_time()
+        ui.label_2.setText(str(total_time))
+        for timer_data in result:
+            ui.add_row(timer_data)
+        dialog.exec()
+
+
+
+
 
 
 

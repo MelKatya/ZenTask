@@ -139,6 +139,9 @@ class TotalTimer:
         self.planned_time = planned_time
         self.completed_time = None
 
+    # def __getitem__(self, item: str) -> Any:
+    #     return getattr(self, item)
+
     @work_db
     def save_time(self, cur):
         logger.info(f'Сохранение таймера работы: {self}')
@@ -149,6 +152,30 @@ class TotalTimer:
             RETURNING id
             """, (self.date, self.planned_time, self.completed_time))
         self.id = cur.fetchone()[0]
+
+    @work_db
+    def stop_timer(self, cur, completed_time):
+        self.completed_time = completed_time.replace(microsecond=0).time()
+        print(completed_time, type(completed_time))
+        logger.info(f'Остановка работы таймера: {self}')
+        cur.execute("""
+        UPDATE timer
+        SET completed_time = %s
+        WHERE id = %s
+        """, (self.completed_time, self.id))
+
+
+@work_db
+def download_history(cur):
+    logger.info(f'Выгрузка истории таймера')
+    cur.execute("""
+    SELECT * FROM timer 
+    WHERE completed_time IS NOT NULL
+    """)
+    all_timers = cur.fetchall()
+    cur.execute("SELECT sum(completed_time) FROM public.timer")
+    sum_time_work = cur.fetchall()[0][0]
+    return all_timers, sum_time_work
 
 
 @work_db
@@ -260,7 +287,8 @@ def get_dict_tables(cur):
 if __name__ == '__main__':
     # conn = db_pool.getconn()
     # cur = conn.cursor()
-    #
+
+    # print(download_history())
     create_tables()
     task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
     # print(task_status_dict)
@@ -270,8 +298,8 @@ if __name__ == '__main__':
     # tme = datetime.now()
     # # datetime.strptime(tme, "%Y-%m-%d %H:%M:%S")
     # print(datetime.strftime(tme, "%Y-%m-%d %H:%M:%S"))
-    task_1 = Task('check time', 'walk in the park', deadline=datetime.now())
-    task_1.save_task()
+    # task_1 = Task('check time', 'walk in the park', deadline=datetime.now())
+    # task_1.save_task()
     #
     # note_1 = Note('jjdjdjdj')
     # note_1.save_note(cur)
