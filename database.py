@@ -99,11 +99,11 @@ class Task:
 
 
 class Note:
-    def __init__(self, text):
+    def __init__(self, text, page):
         self.id = None
         self.text = text
         self.attach = False
-        self.page = None
+        self.page = page
 
     @work_db
     def save_note(self, cur):
@@ -257,7 +257,6 @@ def save_category(cur, name):
         SELECT %s
         WHERE NOT EXISTS (SELECT * FROM task_category WHERE name = %s)
     ''', (name, name))
-
 
 
 @work_db

@@ -1,4 +1,4 @@
-from database import get_dict_tables, save_category, Task, TotalTimer, download_history
+from database import get_dict_tables, save_category, Task, TotalTimer, download_history, Note
 
 
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
@@ -59,6 +59,12 @@ def show_history_time():
         timer_data.extend([t.strftime("%H:%M:%S") for t in timer[2:]])
         all_timers.append(timer_data)
     return total_time, all_timers
+
+
+def save_note_to_db(text, page):
+    new_note = Note(text, page)
+    new_note.save_note()
+    return new_note
 
 
 

@@ -42,7 +42,6 @@ class Base(QWidget):
         self.category()
         self.priority()
 
-
     def category(self):
         self.label = QLabel('Категория:', self)
         self.layout.addWidget(self.label, 2, 0, 1, 1)
@@ -131,6 +130,7 @@ class Note(QWidget):
         self.horizontalLayout.addWidget(self.pushButton_attach_not)
 
         self.pushButton_del_not = QPushButton('Удалить', self.verticalLayoutWidget)
+        self.pushButton_del_not.setEnabled(False)
         self.horizontalLayout.addWidget(self.pushButton_del_not)
 
         self.pushButton_save_not = QPushButton('Сохранить', self.verticalLayoutWidget)
@@ -441,8 +441,7 @@ class MainForm(QMainWindow):
 
         self.toolBox_not.setGeometry(QRect(10, 20, 501, 441))
 
-        Note(self.toolBox_not, 1)
-        Note(self.toolBox_not, 2)
+
 
         self.pushButton_cret_tsk_not = QPushButton('Создать задачу', self.page_3)
         self.pushButton_cret_tsk_not.setGeometry(QRect(550, 20, 101, 31))
