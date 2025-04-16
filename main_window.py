@@ -7,12 +7,13 @@ from forms.ui_add_category import NewCategory
 from forms.ui_add_timer import AddTimer
 from forms.ui_show_history import ShowTimers
 from utils import (upload_priority, upload_category, save_new_category, save_task, save_timer,
-                   stop_timer, show_history_time, save_note_to_db)
+                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db)
 from PySide6.QtCore import Signal, Qt
 from psycopg2 import errors
 import psycopg2
 from datetime import datetime, timedelta
 import threading
+from database import Note as No
 
 
 class DialogCategory(QDialog):
@@ -63,14 +64,17 @@ class DialogTimer(QDialog):
 
 
 class NoteTask(Note):
-    def __init__(self, toolBox_not, page_number, functons):
+    def __init__(self, toolBox_not, page_number, functons, text=''):
         super().__init__(toolBox_not, page_number)
         self.tb_not = toolBox_not
         self.page_number = page_number
-        self.save, self.delete = functons
+        self.text_edit_note.setText(text)
+        self.save, self.delete, self.attach = functons
         self.pushButton_save_not.clicked.connect(lambda: self.save(text=self.text_edit_note.toPlainText()))
         # print(self.pushButton_save_not.emit())
         self.pushButton_del_not.clicked.connect(lambda: self.delete(page_number=self.page_number))
+        self.pushButton_attach_not.clicked.connect(lambda: self.attach(page_number=self.page_number))
+
 
 class MainWindow(MainForm):
     timer_finished = Signal()
@@ -89,33 +93,56 @@ class MainWindow(MainForm):
         self.pushButton_set_timer.clicked.connect(self.open_timer_form)
         self.pushButton_20.clicked.connect(self.stop_timer)
         self.pushButton_20.setEnabled(False)
+        self.download_note()
         self.pushButton_21.clicked.connect(self.open_history_form)
-        first_note = NoteTask(self.toolBox_not, 1, (self.save_note, self.del_note))
-        self.notes = {1: [first_note]}
 
-    # todo если удалить все заметки, то как добавить еще? номер заметок должен меняться?
-    #  выгружать заметки из бд?
+    def download_note(self):
+        """Выгружает заметки из бд"""
+        self.pages_notes = []
+        self.functions_for_note = (self.save_note, self.del_note, self.attache_notice)
+
+        all_notes = download_noticed_from_db()
+        if not all_notes:
+            self.notes = {}
+            self.pages_notes = [0]
+        else:
+            self.notes = {}
+            for note in all_notes:
+                self.pages_notes.append(note[3])
+                self.notes[note[3]] = [NoteTask(self.toolBox_not, note[3], self.functions_for_note, note[1]),
+                                       No(id=note[0], text=note[1], page=note[3])]
+                self.notes[note[3]][0].pushButton_del_not.setEnabled(True)
+                self.notes[note[3]][0].pushButton_attach_not.setEnabled(True)
+                self.notes[note[3]][0].pushButton_save_not.setEnabled(False)
+
+        first_note = NoteTask(self.toolBox_not, self.pages_notes[-1] + 1, self.functions_for_note)
+        self.notes[self.pages_notes[-1] + 1] = [first_note]
+        self.pages_notes.append(self.pages_notes[-1] + 1)
 
     def save_note(self, text):
         """Сохраняет заметки"""
-        page_number = len(self.notes)
+        page_number = self.pages_notes[-1]
         note = save_note_to_db(text, page_number)
         self.notes[page_number].append(note)
-        self.notes[page_number + 1] = [NoteTask(self.toolBox_not, page_number + 1, (self.save_note, self.del_note))]
+        self.notes[page_number + 1] = [NoteTask(self.toolBox_not, page_number + 1, self.functions_for_note)]
+        self.pages_notes.append(page_number + 1)
         self.notes[page_number][0].pushButton_del_not.setEnabled(True)
+        self.notes[page_number][0].pushButton_attach_not.setEnabled(True)
         self.notes[page_number][0].pushButton_save_not.setEnabled(False)
 
     def del_note(self, page_number):
         """Удаляет заметки"""
-        print(page_number)
-        print(self.notes[page_number])
         self.notes[page_number][1].delete_note()
-        self.toolBox_not.removeItem(page_number - 1)
+        self.toolBox_not.removeItem(self.toolBox_not.currentIndex())
+        self.notes.pop(page_number)
 
-    def attache_notice(self):
+    # todo прикрепление выглядит отстойно
+
+    def attache_notice(self, page_number):
         """Прикрепляет заметку справа"""
-        ...
-
+        self.dockWidget_notice.setVisible(True)
+        self.label_atached_note.setText(f"{self.notes[page_number][1].text}")
+        self.notes[page_number][1].attach_note()
 
     def upload_category(self):
         """Загружает категории из бд"""
@@ -247,7 +274,7 @@ class MainWindow(MainForm):
         self.thread_timer.join()
 
     def open_history_form(self):
-        """Открывает форму с историей работы по таймеру"""
+        """Открывает форму с историей работы таймера"""
         dialog = QDialog()
         ui = ShowTimers()
         ui.setup_ui(dialog)

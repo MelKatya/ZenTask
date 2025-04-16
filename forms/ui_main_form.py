@@ -127,6 +127,7 @@ class Note(QWidget):
 
         self.horizontalLayout = QHBoxLayout()
         self.pushButton_attach_not = QPushButton('Закрепить', self.verticalLayoutWidget)
+        self.pushButton_attach_not.setEnabled(False)
         self.horizontalLayout.addWidget(self.pushButton_attach_not)
 
         self.pushButton_del_not = QPushButton('Удалить', self.verticalLayoutWidget)
@@ -452,6 +453,7 @@ class MainForm(QMainWindow):
     def attached_notice(self, Widget):
         self.dockWidget_notice = QDockWidget(Widget)
         self.dockWidget_notice.setGeometry(QRect(700, 10, 211, 121))
+        self.dockWidget_notice.setVisible(False)
         self.dockWidgetContents = QWidget()
 
         self.label_atached_note = QLabel("TextLabel", self.dockWidgetContents)

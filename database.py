@@ -1,5 +1,6 @@
 import copy
 import logging
+from typing import List, Tuple, Dict, Callable
 from functools import wraps
 from datetime import datetime
 from psycopg2 import pool
@@ -20,7 +21,8 @@ db_pool = pool.SimpleConnectionPool(1, 10, database=os.getenv("database"), user=
                                     password=os.getenv("password"))
 
 
-def work_db(func):
+def work_db(func: Callable) -> Callable:
+    """Декоратор для того, чтобы не строчить везде подключения"""
     @wraps(func)
     def wrapper(*args, **kwargs):
         conn = db_pool.getconn()
@@ -41,8 +43,10 @@ def work_db(func):
 
 
 class Task:
-    def __init__(self, name, description="", priority_id=1, category_id=1, deadline=None, repeat=None):
-        self.id = None
+    """Класс задачи"""
+    def __init__(self, name: str, description: str = "", priority_id: int = 1, category_id: int = 1,
+                 deadline=None, repeat=None, id=None, status_id=None, timer=None):
+        self.id = id
         self.name = name
         self.priority = priority_id
         self.category = category_id
@@ -53,7 +57,7 @@ class Task:
         self.repeat = repeat
         self.timer = None
 
-    def __str__(self):
+    def __repr__(self):
         return (f"Task: name - {self.name} (priority - {task_priority_dict[self.priority]}, "
                 f"status - {task_status_dict[self.status]}, " 
                 f"category - {task_category_dict[self.category]}, "
@@ -61,13 +65,16 @@ class Task:
                 f"repeat - {self.repeat}) -- decription - {self.description}")
 
     def start_timer(self):
+        """Запускает таймер задачи"""
         self.timer = time.time()
 
     def stop_timer(self):
+        """Останавливает таймер задачи"""
         self.timer = round(time.time() - self.timer, 2)
 
     @work_db
-    def save_task(self, cur):
+    def save_task(self, cur: psycopg2.cursor) -> None:
+        """Сохраняет задачу"""
         logger.info(f'Создание задачи: "{self}"')
         cur.execute("""
         INSERT INTO task 
@@ -79,7 +86,8 @@ class Task:
         self.id = cur.fetchone()[0]
 
     @work_db
-    def change_task(self, cur):
+    def change_task(self, cur: psycopg2.cursor) -> None:
+        """Изменяет задачу"""
         logger.info(f'Изменение задачи: {self.id}')
         cur.execute("""
         UPDATE task SET
@@ -90,7 +98,8 @@ class Task:
               self.status, self.deadline, self.repeat, self.timer, self.id))
 
     @work_db
-    def delete_task(self, cur):
+    def delete_task(self, cur: psycopg2.cursor) -> None:
+        """Удаляет задачу"""
         logger.info(f'Удаление задачи: {self.id}')
         cur.execute("""
                 DELETE FROM task
@@ -98,15 +107,37 @@ class Task:
                 """, (self.id,))
 
 
+@work_db
+def download_all_tasks(cur: psycopg2.cursor) -> List[Task]:
+    """Выгружает все задачи из бд и создает объекты задач"""
+    logger.info(f'Выгрузка всех задач из бд')
+    cur.execute("""
+    SELECT * FROM task
+    """)
+    res = cur.fetchall()
+    all_task = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                     status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+                for task in res]
+
+    return all_task
+
+
 class Note:
-    def __init__(self, text, page):
-        self.id = None
+    def __init__(self, text, page, id=None):
+        self.id = id
         self.text = text
         self.attach = False
         self.page = page
 
+    def __repr__(self):
+        return (f"Note: text - {self.text}"
+                f"page - {self.page}, " 
+                f"id - {self.id}")
+
     @work_db
-    def save_note(self, cur):
+    def save_note(self, cur: psycopg2.cursor) -> None:
+        """Сохраняет заметку в бд"""
+        logger.info(f'Сохранение заметки: "{self}"')
         cur.execute("""
             INSERT INTO notes 
             (text, attach, page)
@@ -116,20 +147,34 @@ class Note:
         self.id = cur.fetchone()[0]
 
     @work_db
-    def delete_note(self, cur):
+    def delete_note(self, cur: psycopg2.cursor) -> None:
+        """Удаляет заметку из бд"""
+        logger.info(f'Удаление заметки: "{self}"')
         cur.execute("""
             DELETE FROM notes
             WHERE id = %s
             """, (self.id,))
 
     @work_db
-    def attach_note(self, cur):
+    def attach_note(self, cur: psycopg2.cursor) -> None:
+        """Сохраняет в бд информацию о прикрепленной заметке"""
+        logger.info(f'Прикрепление заметки: "{self}"')
         cur.execute("""
             UPDATE notes SET attach = True
             WHERE id = %s;
             UPDATE notes SET attach = False
             WHERE id != %s;
             """, (self.id,))
+
+
+@work_db
+def download_notes(cur: psycopg2.cursor) -> List[Tuple]:
+    """Выгружает все заметки из бд"""
+    cur.execute("""
+    SELECT * FROM notes
+    ORDER BY page
+    """)
+    return cur.fetchall()
 
 
 class TotalTimer:
@@ -141,9 +186,14 @@ class TotalTimer:
 
     # def __getitem__(self, item: str) -> Any:
     #     return getattr(self, item)
+    def __repr__(self):
+        return (f"TotalTimer: id - {self.id}, "
+                f"date - {self.date}, "
+                f"planned_time - {self.planned_time}, " 
+                f"completed_time - {self.completed_time}")
 
     @work_db
-    def save_time(self, cur):
+    def save_time(self, cur: psycopg2.cursor):
         logger.info(f'Сохранение таймера работы: {self}')
         cur.execute("""
             INSERT INTO timer 
@@ -154,9 +204,8 @@ class TotalTimer:
         self.id = cur.fetchone()[0]
 
     @work_db
-    def stop_timer(self, cur, completed_time):
+    def stop_timer(self, cur: psycopg2.cursor, completed_time: datetime) -> None:
         self.completed_time = completed_time.replace(microsecond=0).time()
-        print(completed_time, type(completed_time))
         logger.info(f'Остановка работы таймера: {self}')
         cur.execute("""
         UPDATE timer
@@ -166,7 +215,7 @@ class TotalTimer:
 
 
 @work_db
-def download_history(cur):
+def download_history(cur: psycopg2.cursor) -> Tuple[List, datetime]:
     logger.info(f'Выгрузка истории таймера')
     cur.execute("""
     SELECT * FROM timer 
@@ -179,7 +228,8 @@ def download_history(cur):
 
 
 @work_db
-def create_tables(cur):
+def create_tables(cur: psycopg2.cursor) -> None:
+    logger.info(f'Создание таблиц')
     cur.execute("""
     CREATE TABLE IF NOT EXISTS task_status (
     id SERIAL PRIMARY KEY,
@@ -250,7 +300,8 @@ def create_tables(cur):
 
 
 @work_db
-def save_category(cur, name):
+def save_category(cur: psycopg2.cursor, name: str) -> None:
+    """Сохраняет новую категорию в бд"""
     logger.info(f'Добавление новой категории {name}')
     cur.execute('''
         INSERT INTO task_category (name)
@@ -260,7 +311,11 @@ def save_category(cur, name):
 
 
 @work_db
-def get_dict_tables(cur):
+def get_dict_tables(cur: psycopg2.cursor) -> Tuple[Dict[int:str], Dict[int:str], Dict[int:str]]:
+    """
+    Выгружает данные из таблиц: статус, приоритет и категория, и возвращает
+    их в виде кортежа словарей
+    """
     logger.info('Выборка всех значений из task_status и сохранение в status_dict')
     cur.execute("""
     SELECT * FROM task_status
@@ -284,22 +339,9 @@ def get_dict_tables(cur):
 
 
 if __name__ == '__main__':
-    # conn = db_pool.getconn()
-    # cur = conn.cursor()
-
-    # print(download_history())
     create_tables()
     task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
-    # print(task_status_dict)
-    # conn.commit()
-    # cur.close()
-    # db_pool.putconn(conn)
-    # tme = datetime.now()
-    # # datetime.strptime(tme, "%Y-%m-%d %H:%M:%S")
-    # print(datetime.strftime(tme, "%Y-%m-%d %H:%M:%S"))
-    # task_1 = Task('check time', 'walk in the park', deadline=datetime.now())
-    # task_1.save_task()
-    #
-    # note_1 = Note('jjdjdjdj')
-    # note_1.save_note(cur)
-    # save_category('work')
+    all_tasks = download_all_tasks()
+    for i in all_tasks:
+        print(i.id, i)
+

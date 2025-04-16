@@ -1,4 +1,4 @@
-from database import get_dict_tables, save_category, Task, TotalTimer, download_history, Note
+from database import get_dict_tables, save_category, Task, TotalTimer, download_history, Note, download_notes
 
 
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
@@ -62,11 +62,21 @@ def show_history_time():
 
 
 def save_note_to_db(text, page):
-    new_note = Note(text, page)
+    """Сохраняет заметки в бд"""
+    new_note = Note(text=text, page=page)
     new_note.save_note()
     return new_note
 
 
+def download_noticed_from_db():
+    """Выгружает все заметки из бд"""
+    all_note = download_notes()
+    return all_note
+
+
+def download_all_tasks_from_db():
+    """Выгружает все задачи из бд"""
+    ...
 
 
 
