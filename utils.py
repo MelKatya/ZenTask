@@ -1,4 +1,4 @@
-from database import get_dict_tables, save_category, Task, TotalTimer, download_history, Note, download_notes
+from database import (get_dict_tables, save_category, Task, TotalTimer, Note)
 
 
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
@@ -51,8 +51,7 @@ def stop_timer(timer, completed_time):
 def show_history_time():
     """Загружает из бд историю и полное время работы с таймером"""
     all_timers = []
-    data_from_db, total_time = download_history()
-    print(data_from_db, total_time)
+    data_from_db, total_time = TotalTimer.download_history()
     for timer in data_from_db:
         timer_data = []
         timer_data.append(timer[1].strftime("%Y-%m-%d"))
@@ -70,13 +69,23 @@ def save_note_to_db(text, page):
 
 def download_noticed_from_db():
     """Выгружает все заметки из бд"""
-    all_note = download_notes()
+    all_note = Note.download_notes()
     return all_note
 
 
 def download_all_tasks_from_db():
     """Выгружает все задачи из бд"""
-    ...
+    planned_tasks = []
+    doing_tasks = []
+    done_task = []
+    for task in Task.download_all_tasks():
+        if task.status == 1:
+            planned_tasks.append(task)
+        elif task.status == 2:
+            doing_tasks.append(task)
+        else:
+            done_task.append(task)
+    return planned_tasks, doing_tasks, done_task
 
 
 

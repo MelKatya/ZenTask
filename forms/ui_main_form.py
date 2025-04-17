@@ -70,7 +70,7 @@ class Base(QWidget):
         self.horizontalLayout_50 = QHBoxLayout()
 
         self.datetime_edit = QDateTimeEdit(self)
-        self.datetime_edit.setEnabled(False)
+        self.datetime_edit.setVisible(False)
         self.datetime_edit.setMinimumSize(QSize(150, 0))
         self.horizontalLayout_50.addWidget(self.datetime_edit)
 

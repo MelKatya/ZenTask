@@ -1,13 +1,13 @@
 import sys
 import time
 
-from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox
+from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox, QDateTimeEdit
 from forms.ui_main_form import MainForm, Base, Note
 from forms.ui_add_category import NewCategory
 from forms.ui_add_timer import AddTimer
 from forms.ui_show_history import ShowTimers
 from utils import (upload_priority, upload_category, save_new_category, save_task, save_timer,
-                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db)
+                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, download_all_tasks_from_db)
 from PySide6.QtCore import Signal, Qt
 from psycopg2 import errors
 import psycopg2
@@ -79,6 +79,7 @@ class NoteTask(Note):
 class MainWindow(MainForm):
     timer_finished = Signal()
 
+
     def __init__(self):
         super().__init__()
 
@@ -95,6 +96,70 @@ class MainWindow(MainForm):
         self.pushButton_20.setEnabled(False)
         self.download_note()
         self.pushButton_21.clicked.connect(self.open_history_form)
+        self.planned_tasks, self.doing_tasks, self.done_tasks = download_all_tasks_from_db()
+        self.upload_all_tasks_with_data()
+        self.pushButton_mt_plan_change_task.clicked.connect(self.change_task)
+
+    def change_task(self):
+        """Обрабатывает кнопку изменения задачи"""
+        print('ggfgf')
+        self.frame_mt_plan.setEnabled(True)
+
+    def upload_all_tasks_with_data(self):
+        """Выгружает все задачи в нужные комбобоксы"""
+        self.upload_planned_task()
+        self.upload_doing_task()
+        self.upload_done_task()
+
+        self.comboBox_mt_plan_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
+            value=self.comboBox_mt_plan_all.currentIndex(),
+            grid_layout=self.grid_layout_plan,
+            combo_box=self.comboBox_mt_plan_all))
+
+        self.comboBox_mt_proc_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
+            value=self.comboBox_mt_proc_all.currentIndex(),
+            grid_layout=self.grid_layout_plan,
+            combo_box=self.comboBox_mt_proc_all))
+
+        self.comboBox_mt_done_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
+            value=self.comboBox_mt_done_all.currentIndex(),
+            grid_layout=self.grid_layout_plan,
+            combo_box=self.comboBox_mt_done_all))
+
+    # todo Сохранять задачи - добавить кнопку, которая будет видна только при изменении.
+    #  изменение видимости фрейма при изменении комбобокса. Сохранение задач сразу же
+
+    def upload_data_to_form(self, value, grid_layout, combo_box):
+        """Подставляет данные выбранной задачи в чекбоксе"""
+        print("Значение ComboBox изменено", value)
+        # изменяет видимость всех полей
+        self.frame_mt_plan.setEnabled(False)
+
+        current_task = combo_box.currentData()
+        grid_layout.line_edit_name.setText(current_task.name)
+        grid_layout.combo_box_prior.setCurrentIndex(current_task.priority - 1)
+        grid_layout.combo_box_category.setCurrentIndex(current_task.category - 1)
+        grid_layout.text_edit_description.setText(current_task.description)
+        if current_task.deadline:
+            grid_layout.check_box_add_time.setChecked(True)
+            date = datetime.strptime(current_task.deadline, "%Y-%m-%d %H:%M:%S")
+            grid_layout.datetime_edit.setVisible(True)
+            grid_layout.datetime_edit.setDateTime(date)
+        else:
+            grid_layout.check_box_add_time.setChecked(False)
+            grid_layout.datetime_edit.setVisible(False)
+
+    def upload_planned_task(self):
+        for task in self.planned_tasks:
+            self.comboBox_mt_plan_all.addItem(task.name, task)
+
+    def upload_doing_task(self):
+        for task in self.doing_tasks:
+            self.comboBox_mt_proc_all.addItem(task.name, task)
+
+    def upload_done_task(self):
+        for task in self.done_tasks:
+            self.comboBox_mt_done_all.addItem(task.name, task)
 
     def download_note(self):
         """Выгружает заметки из бд"""
@@ -191,9 +256,9 @@ class MainWindow(MainForm):
     def on_checkbox_state_changed(self, state):
         """Изменение состояния чекбокса с заданием дедлайна"""
         if state == Qt.CheckState.Checked:
-            self.grid_layout_new_task.datetime_edit.setEnabled(True)
+            self.grid_layout_new_task.datetime_edit.setVisible(True)
         elif state == Qt.CheckState.Unchecked:
-            self.grid_layout_new_task.datetime_edit.setEnabled(False)
+            self.grid_layout_new_task.datetime_edit.setVisible(False)
 
     def save_task_button(self):
         """Обрабатывает кнопку 'Создать задачу' - создает задачу"""
