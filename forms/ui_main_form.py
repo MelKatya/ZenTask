@@ -268,7 +268,7 @@ class MainForm(QMainWindow):
         self.verticalLayout_9 = QVBoxLayout()
 
         self.pushButton_mt_plan_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_6)
-        self.pushButton_mt_plan_change_task.setMinimumSize(QSize(125, 0))
+        self.pushButton_mt_plan_change_task.setMinimumSize(QSize(130, 0))
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
 
         self.pushButton_mt_plan_start = QPushButton('Начать выполнение', self.horizontalLayoutWidget_6)
@@ -345,7 +345,7 @@ class MainForm(QMainWindow):
         # кнопки
         self.verticalLayout_5 = QVBoxLayout()
         self.pushButton_mt_proc_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_4)
-        self.pushButton_mt_proc_change_task.setMinimumSize(QSize(125, 0))
+        self.pushButton_mt_proc_change_task.setMinimumSize(QSize(130, 0))
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
 
         self.pushButton_mt_proc_finish = QPushButton('Завершить задачу', self.horizontalLayoutWidget_4)
@@ -412,7 +412,7 @@ class MainForm(QMainWindow):
         self.verticalLayout_13 = QVBoxLayout()
 
         self.pushButton_mt_done_recover_task = QPushButton('Восстановить задачу', self.horizontalLayoutWidget_7)
-        self.pushButton_mt_done_recover_task.setMinimumSize(QSize(125, 0))
+        self.pushButton_mt_done_recover_task.setMinimumSize(QSize(130, 0))
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
 
         self.pushButton_mt_done_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_7)

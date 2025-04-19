@@ -13,7 +13,7 @@ from psycopg2 import errors
 import psycopg2
 from datetime import datetime, timedelta
 import threading
-from database import Note as No
+from database import Note as No, Task
 
 
 class DialogCategory(QDialog):
@@ -99,11 +99,51 @@ class MainWindow(MainForm):
         self.planned_tasks, self.doing_tasks, self.done_tasks = download_all_tasks_from_db()
         self.upload_all_tasks_with_data()
         self.pushButton_mt_plan_change_task.clicked.connect(self.change_task)
+        self.pushButton_mt_plan_change_task.setEnabled(False)
 
     def change_task(self):
         """Обрабатывает кнопку изменения задачи"""
-        print('ggfgf')
-        self.frame_mt_plan.setEnabled(True)
+        if self.pushButton_mt_plan_change_task.text() == 'Сохранить изменения':
+            print('ggfgf')
+            current_task = self.comboBox_mt_plan_all.currentData()
+            self.change_task_button(grid_layout=self.grid_layout_plan, task=current_task)
+            self.frame_mt_plan.setEnabled(False)
+            self.pushButton_mt_plan_change_task.setText('Изменить задачу')
+
+        else:
+            print('hdhdhhd')
+            self.frame_mt_plan.setEnabled(True)
+            self.pushButton_mt_plan_change_task.setText('Сохранить изменения')
+
+    def change_task_button(self, grid_layout, task):
+        """Обрабатывает кнопку 'Изменить задачу' - изменяет задачу"""
+        flag = True
+        if not grid_layout.line_edit_name.text():
+            QMessageBox.warning(self, "Ошибка", "Необходимо ввести название задачи.")
+            flag = False
+
+        if not grid_layout.text_edit_description.toPlainText():
+            QMessageBox.warning(self, "Ошибка", "Необходимо ввести описание задачи.")
+            flag = False
+
+        if flag:
+            task.name = grid_layout.line_edit_name.text()
+            task.priority = grid_layout.combo_box_prior.currentIndex() + 1
+            task.category = grid_layout.combo_box_category.currentIndex() + 1
+            task.description = grid_layout.text_edit_description.toPlainText()
+
+            if grid_layout.check_box_add_time.checkState() == Qt.CheckState.Checked:
+                deadline = grid_layout.datetime_edit.dateTime()
+                deadline = deadline.toPython()
+            else:
+                deadline = None
+
+            task.deadline = deadline
+            result = task.change_task()
+            if result:
+                QMessageBox.about(self, 'Успех', f'Задача {task.name} изменена')
+            else:
+                QMessageBox.warning(self, "Ошибка", f"Произошла ошибка: {result}")
 
     def upload_all_tasks_with_data(self):
         """Выгружает все задачи в нужные комбобоксы"""
@@ -126,14 +166,14 @@ class MainWindow(MainForm):
             grid_layout=self.grid_layout_plan,
             combo_box=self.comboBox_mt_done_all))
 
-    # todo Сохранять задачи - добавить кнопку, которая будет видна только при изменении.
-    #  изменение видимости фрейма при изменении комбобокса. Сохранение задач сразу же
 
     def upload_data_to_form(self, value, grid_layout, combo_box):
         """Подставляет данные выбранной задачи в чекбоксе"""
         print("Значение ComboBox изменено", value)
         # изменяет видимость всех полей
+        self.pushButton_mt_plan_change_task.setEnabled(True)
         self.frame_mt_plan.setEnabled(False)
+        self.pushButton_mt_plan_change_task.setText('Изменить задачу')
 
         current_task = combo_box.currentData()
         grid_layout.line_edit_name.setText(current_task.name)
@@ -150,14 +190,19 @@ class MainWindow(MainForm):
             grid_layout.datetime_edit.setVisible(False)
 
     def upload_planned_task(self):
+        """Загружает все запланированные задачи в комбобокс"""
+        self.planned_tasks = Task.download_planned_tasks()
+        self.comboBox_mt_plan_all.clear()
         for task in self.planned_tasks:
             self.comboBox_mt_plan_all.addItem(task.name, task)
 
     def upload_doing_task(self):
+        """Загружает все выполняемые задачи в комбобокс"""
         for task in self.doing_tasks:
             self.comboBox_mt_proc_all.addItem(task.name, task)
 
     def upload_done_task(self):
+        """Загружает все выполненные задачи в комбобокс"""
         for task in self.done_tasks:
             self.comboBox_mt_done_all.addItem(task.name, task)
 
@@ -277,13 +322,15 @@ class MainWindow(MainForm):
             category = self.grid_layout_new_task.combo_box_category.currentText()
             descrirton = self.grid_layout_new_task.text_edit_description.toPlainText()
 
-            deadline = None
             if self.grid_layout_new_task.check_box_add_time.checkState() == Qt.CheckState.Checked:
                 deadline = self.grid_layout_new_task.datetime_edit.dateTime()
                 deadline = deadline.toPython()
+            else:
+                deadline = None
 
             recording_result = save_task(name, priority, category, descrirton, deadline)
             if not recording_result:
+                self.upload_planned_task()
                 QMessageBox.about(self, 'Успех', f'задача {name} сохранена')
             elif isinstance(recording_result, psycopg2.errors.UniqueViolation):
                 QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
