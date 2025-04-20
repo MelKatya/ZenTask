@@ -269,12 +269,15 @@ class MainForm(QMainWindow):
 
         self.pushButton_mt_plan_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_6)
         self.pushButton_mt_plan_change_task.setMinimumSize(QSize(130, 0))
+        self.pushButton_mt_plan_change_task.setEnabled(False)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
 
         self.pushButton_mt_plan_start = QPushButton('Начать выполнение', self.horizontalLayoutWidget_6)
+        self.pushButton_mt_plan_start.setEnabled(False)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_start)
 
         self.pushButton_mt_plan_del = QPushButton('Удалить задачу', self.horizontalLayoutWidget_6)
+        self.pushButton_mt_plan_del.setEnabled(False)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_del)
 
         self.horizontalLayout_15.addLayout(self.verticalLayout_9)
@@ -345,13 +348,16 @@ class MainForm(QMainWindow):
         # кнопки
         self.verticalLayout_5 = QVBoxLayout()
         self.pushButton_mt_proc_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_4)
+        self.pushButton_mt_proc_change_task.setEnabled(False)
         self.pushButton_mt_proc_change_task.setMinimumSize(QSize(130, 0))
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
 
         self.pushButton_mt_proc_finish = QPushButton('Завершить задачу', self.horizontalLayoutWidget_4)
+        self.pushButton_mt_proc_finish.setEnabled(False)
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_finish)
 
         self.pushButton_mt_proc_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_4)
+        self.pushButton_mt_proc_del_task.setEnabled(False)
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_del_task)
 
         self.horizontalLayout_9.addLayout(self.verticalLayout_5)

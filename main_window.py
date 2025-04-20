@@ -79,7 +79,6 @@ class NoteTask(Note):
 class MainWindow(MainForm):
     timer_finished = Signal()
 
-
     def __init__(self):
         super().__init__()
 
@@ -96,24 +95,61 @@ class MainWindow(MainForm):
         self.pushButton_20.setEnabled(False)
         self.download_note()
         self.pushButton_21.clicked.connect(self.open_history_form)
-        self.planned_tasks, self.doing_tasks, self.done_tasks = download_all_tasks_from_db()
         self.upload_all_tasks_with_data()
-        self.pushButton_mt_plan_change_task.clicked.connect(self.change_task)
-        self.pushButton_mt_plan_change_task.setEnabled(False)
+        self.pushButton_mt_plan_change_task.clicked.connect(lambda: self.change_task(
+            push_button=self.pushButton_mt_plan_change_task,
+            combobox=self.comboBox_mt_plan_all,
+            frame=self.frame_mt_plan,
+            grid_layout=self.grid_layout_plan))
+        self.pushButton_mt_plan_del.clicked.connect(lambda: self.del_task(
+            combobox=self.comboBox_mt_plan_all,
+            func_update=self.upload_planned_task))
+        self.pushButton_mt_plan_start.clicked.connect(self.start_task)
 
-    def change_task(self):
-        """Обрабатывает кнопку изменения задачи"""
-        if self.pushButton_mt_plan_change_task.text() == 'Сохранить изменения':
-            print('ggfgf')
-            current_task = self.comboBox_mt_plan_all.currentData()
-            self.change_task_button(grid_layout=self.grid_layout_plan, task=current_task)
-            self.frame_mt_plan.setEnabled(False)
-            self.pushButton_mt_plan_change_task.setText('Изменить задачу')
+    # todo вынести обработки кнопок в нижних барах отдельно, настроить видимости кнопок,
+    #  настроить смену в основного окна с задачами при изменения статуса задачи. Настроить автопереход
+    #  на задачу при смене ее статуса.
+    def start_task(self):
+        """Обрабатывает кнопку начала работы над задачей"""
+        current_task = self.comboBox_mt_plan_all.currentData()
+        current_task.change_status(status_id=2)
+        self.upload_planned_task()
+        self.upload_doing_task()
+
+
+    def del_task(self, combobox, func_update):
+        """Обрабатывает кнопку удаления задачи"""
+        current_task = combobox.currentData()
+
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle('Удаление')
+        msgBox.setText(f"Задача {current_task.name} будет удалена.")
+        msgBox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
+        msgBox.setButtonText(QMessageBox.StandardButton.Yes, 'Удалить')
+        msgBox.setButtonText(QMessageBox.StandardButton.Cancel, 'Отмена')
+        result = msgBox.exec()
+
+        if result == QMessageBox.StandardButton.Yes:
+            print("Задача будет удалена")
+            combobox.setCurrentIndex(1)
+            current_task.delete_task()
+            time.sleep(0.5)
+            func_update()
 
         else:
-            print('hdhdhhd')
-            self.frame_mt_plan.setEnabled(True)
-            self.pushButton_mt_plan_change_task.setText('Сохранить изменения')
+            print("Удаление отменено")
+
+    def change_task(self, push_button, combobox, frame, grid_layout):
+        """Обрабатывает кнопку изменения задачи"""
+        if push_button.text() == 'Сохранить изменения':
+            current_task = combobox.currentData()
+            self.change_task_button(grid_layout=grid_layout, task=current_task)
+            frame.setEnabled(False)
+            push_button.setText('Изменить задачу')
+
+        else:
+            frame.setEnabled(True)
+            push_button.setText('Сохранить изменения')
 
     def change_task_button(self, grid_layout, task):
         """Обрабатывает кнопку 'Изменить задачу' - изменяет задачу"""
@@ -151,6 +187,7 @@ class MainWindow(MainForm):
         self.upload_doing_task()
         self.upload_done_task()
 
+        #  Заполняет форму с задачей при изменении задачи в комбобоксе
         self.comboBox_mt_plan_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             value=self.comboBox_mt_plan_all.currentIndex(),
             grid_layout=self.grid_layout_plan,
@@ -158,22 +195,20 @@ class MainWindow(MainForm):
 
         self.comboBox_mt_proc_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             value=self.comboBox_mt_proc_all.currentIndex(),
-            grid_layout=self.grid_layout_plan,
+            grid_layout=self.grid_layout_proc,
             combo_box=self.comboBox_mt_proc_all))
 
         self.comboBox_mt_done_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             value=self.comboBox_mt_done_all.currentIndex(),
-            grid_layout=self.grid_layout_plan,
+            grid_layout=self.grid_layout_done,
             combo_box=self.comboBox_mt_done_all))
-
 
     def upload_data_to_form(self, value, grid_layout, combo_box):
         """Подставляет данные выбранной задачи в чекбоксе"""
-        print("Значение ComboBox изменено", value)
+        print(f"Значение ComboBox изменено {combo_box}", value)
         # изменяет видимость всех полей
-        self.pushButton_mt_plan_change_task.setEnabled(True)
-        self.frame_mt_plan.setEnabled(False)
-        self.pushButton_mt_plan_change_task.setText('Изменить задачу')
+        if grid_layout == self.grid_layout_plan:
+            self.change_visible_planned()
 
         current_task = combo_box.currentData()
         grid_layout.line_edit_name.setText(current_task.name)
@@ -189,20 +224,50 @@ class MainWindow(MainForm):
             grid_layout.check_box_add_time.setChecked(False)
             grid_layout.datetime_edit.setVisible(False)
 
+    def change_visible_planned(self):
+        self.pushButton_mt_plan_change_task.setEnabled(True)
+        self.frame_mt_plan.setEnabled(False)
+        self.pushButton_mt_plan_start.setEnabled(True)
+        self.pushButton_mt_plan_del.setEnabled(True)
+        self.pushButton_mt_plan_change_task.setText('Изменить задачу')
+
+    def change_visible_doing(self):
+        ...
+
+    def change_visible_done(self):
+        ...
+
     def upload_planned_task(self):
         """Загружает все запланированные задачи в комбобокс"""
         self.planned_tasks = Task.download_planned_tasks()
+
+        # Отключает обработку сигналов перед очищением комбобокса
+        self.comboBox_mt_plan_all.blockSignals(True)
         self.comboBox_mt_plan_all.clear()
+        self.comboBox_mt_plan_all.blockSignals(False)
+
         for task in self.planned_tasks:
             self.comboBox_mt_plan_all.addItem(task.name, task)
 
     def upload_doing_task(self):
         """Загружает все выполняемые задачи в комбобокс"""
+        self.doing_tasks = Task.download_doing_tasks()
+
+        self.comboBox_mt_proc_all.blockSignals(True)
+        self.comboBox_mt_proc_all.clear()
+        self.comboBox_mt_proc_all.blockSignals(False)
+
         for task in self.doing_tasks:
             self.comboBox_mt_proc_all.addItem(task.name, task)
 
     def upload_done_task(self):
         """Загружает все выполненные задачи в комбобокс"""
+        self.done_tasks = Task.download_done_tasks()
+
+        self.comboBox_mt_done_all.blockSignals(True)
+        self.comboBox_mt_done_all.clear()
+        self.comboBox_mt_done_all.blockSignals(False)
+
         for task in self.done_tasks:
             self.comboBox_mt_done_all.addItem(task.name, task)
 

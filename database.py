@@ -151,6 +151,38 @@ class Task:
 
         return planned_tasks
 
+    @classmethod
+    @work_db
+    def download_doing_tasks(cls, cur):
+        """Выгружает все выпоняемые задачи из бд и создает объекты задач"""
+        logger.info(f'Выгрузка всех задач из бд')
+        cur.execute("""
+            SELECT * FROM task
+            WHERE status_id = 2
+            """)
+        res = cur.fetchall()
+        planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                         status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+                         for task in res]
+
+        return planned_tasks
+
+    @classmethod
+    @work_db
+    def download_done_tasks(cls, cur):
+        """Выгружает все выполненные задачи из бд и создает объекты задач"""
+        logger.info(f'Выгрузка всех задач из бд')
+        cur.execute("""
+            SELECT * FROM task
+            WHERE status_id = 3
+            """)
+        res = cur.fetchall()
+        planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                         status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+                         for task in res]
+
+        return planned_tasks
+
 
 class Note:
     def __init__(self, text, page, id=None):
