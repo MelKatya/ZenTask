@@ -79,7 +79,7 @@ class Base(QWidget):
         self.layout.addLayout(self.horizontalLayout_50, 4, 1, 1, 1)
 
         self.check_box_add_time = QCheckBox('Добавить срок', self)
-        self.check_box_add_time.setMinimumSize(QSize(137, 0))
+        self.check_box_add_time.setMinimumSize(QSize(137, 25))
         self.horizontalLayout_50.addWidget(self.check_box_add_time)
 
     def adding_replay(self):
@@ -418,10 +418,12 @@ class MainForm(QMainWindow):
         self.verticalLayout_13 = QVBoxLayout()
 
         self.pushButton_mt_done_recover_task = QPushButton('Восстановить задачу', self.horizontalLayoutWidget_7)
+        self.pushButton_mt_done_recover_task.setEnabled(False)
         self.pushButton_mt_done_recover_task.setMinimumSize(QSize(130, 0))
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
 
         self.pushButton_mt_done_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_7)
+        self.pushButton_mt_done_del_task.setEnabled(False)
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_del_task)
         self.horizontalLayout_22.addLayout(self.verticalLayout_13)
 

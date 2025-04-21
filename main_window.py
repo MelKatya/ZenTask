@@ -1,7 +1,9 @@
 import sys
 import time
 
-from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox, QDateTimeEdit
+from PySide6.QtWidgets import (QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox,
+                               QDateTimeEdit, QAbstractButton, QPushButton, QVBoxLayout, QLabel, QHBoxLayout,
+                               QRadioButton, QButtonGroup, QGridLayout, QGroupBox)
 from forms.ui_main_form import MainForm, Base, Note
 from forms.ui_add_category import NewCategory
 from forms.ui_add_timer import AddTimer
@@ -96,25 +98,79 @@ class MainWindow(MainForm):
         self.download_note()
         self.pushButton_21.clicked.connect(self.open_history_form)
         self.upload_all_tasks_with_data()
+        self.lower_bar_buttons()
+
+
+    def lower_bar_buttons(self):
+        """Обрабатывает кнопки нижней панели у поставленных задач"""
         self.pushButton_mt_plan_change_task.clicked.connect(lambda: self.change_task(
             push_button=self.pushButton_mt_plan_change_task,
             combobox=self.comboBox_mt_plan_all,
             frame=self.frame_mt_plan,
             grid_layout=self.grid_layout_plan))
+
+        self.pushButton_mt_proc_change_task.clicked.connect(lambda: self.change_task(
+            push_button=self.pushButton_mt_proc_change_task,
+            combobox=self.comboBox_mt_proc_all,
+            frame=self.frame_mt_proc,
+            grid_layout=self.grid_layout_proc))
+
         self.pushButton_mt_plan_del.clicked.connect(lambda: self.del_task(
             combobox=self.comboBox_mt_plan_all,
             func_update=self.upload_planned_task))
-        self.pushButton_mt_plan_start.clicked.connect(self.start_task)
 
-    # todo вынести обработки кнопок в нижних барах отдельно, настроить видимости кнопок,
-    #  настроить смену в основного окна с задачами при изменения статуса задачи. Настроить автопереход
-    #  на задачу при смене ее статуса.
+        self.pushButton_mt_proc_del_task.clicked.connect(lambda: self.del_task(
+            combobox=self.comboBox_mt_proc_all,
+            func_update=self.upload_doing_task))
+
+        self.pushButton_mt_done_del_task.clicked.connect(lambda: self.del_task(
+            combobox=self.comboBox_mt_done_all,
+            func_update=self.upload_done_task))
+
+        self.pushButton_mt_plan_start.clicked.connect(self.start_task)
+        self.pushButton_mt_proc_finish.clicked.connect(self.finish_task)
+        self.pushButton_mt_done_recover_task.clicked.connect(self.recover_task)
+
+    def finish_task(self):
+        """Обрабатывает кнопку окончания работы над задачей"""
+        current_task = self.comboBox_mt_proc_all.currentData()
+        current_task.change_status(status_id=3)
+        self.upload_doing_task()
+        self.upload_done_task()
+
     def start_task(self):
         """Обрабатывает кнопку начала работы над задачей"""
         current_task = self.comboBox_mt_plan_all.currentData()
         current_task.change_status(status_id=2)
         self.upload_planned_task()
         self.upload_doing_task()
+
+    def recover_task(self):
+        """Восстановление задачи"""
+        current_task = self.comboBox_mt_done_all.currentData()
+        print(current_task)
+
+        ms_box = QDialog()
+        ms_box.resize(312, 142)
+
+        verticalLayoutWidget = QWidget(ms_box)
+        verticalLayoutWidget.setGeometry(10, 10, 291, 121)
+        verticalLayout = QVBoxLayout(verticalLayoutWidget)
+        verticalLayout.setContentsMargins(0, 0, 0, 0)
+        groupBox = QGroupBox('Куда перенести задачу:', verticalLayoutWidget)
+        radioButton = QRadioButton('Запланировано', groupBox)
+        radioButton.setGeometry(10, 20, 150, 20)
+        radioButton_2 = QRadioButton('В процессе', groupBox)
+        radioButton_2.setGeometry(10, 50, 150, 20)
+
+        verticalLayout.addWidget(groupBox)
+
+        buttonBox = QDialogButtonBox(verticalLayoutWidget)
+        buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        verticalLayout.addWidget(buttonBox)
+
+        ms_box.exec()
+
 
 
     def del_task(self, combobox, func_update):
@@ -188,16 +244,19 @@ class MainWindow(MainForm):
         self.upload_done_task()
 
         #  Заполняет форму с задачей при изменении задачи в комбобоксе
+        self.comboBox_mt_plan_all.setCurrentIndex(-1)
         self.comboBox_mt_plan_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             value=self.comboBox_mt_plan_all.currentIndex(),
             grid_layout=self.grid_layout_plan,
             combo_box=self.comboBox_mt_plan_all))
 
+        self.comboBox_mt_proc_all.setCurrentIndex(-1)
         self.comboBox_mt_proc_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             value=self.comboBox_mt_proc_all.currentIndex(),
             grid_layout=self.grid_layout_proc,
             combo_box=self.comboBox_mt_proc_all))
 
+        self.comboBox_mt_done_all.setCurrentIndex(-1)
         self.comboBox_mt_done_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             value=self.comboBox_mt_done_all.currentIndex(),
             grid_layout=self.grid_layout_done,
@@ -209,6 +268,11 @@ class MainWindow(MainForm):
         # изменяет видимость всех полей
         if grid_layout == self.grid_layout_plan:
             self.change_visible_planned()
+        elif grid_layout == self.grid_layout_proc:
+            self.change_visible_going()
+        else:
+            self.pushButton_mt_done_del_task.setEnabled(True)
+            self.pushButton_mt_done_recover_task.setEnabled(True)
 
         current_task = combo_box.currentData()
         grid_layout.line_edit_name.setText(current_task.name)
@@ -232,10 +296,12 @@ class MainWindow(MainForm):
         self.pushButton_mt_plan_change_task.setText('Изменить задачу')
 
     def change_visible_doing(self):
-        ...
+        self.pushButton_mt_proc_change_task.setEnabled(True)
+        self.frame_mt_plan.setEnabled(False)
+        self.pushButton_mt_proc_finish.setEnabled(True)
+        self.pushButton_mt_proc_del_task.setEnabled(True)
+        self.pushButton_mt_proc_change_task.setText('Изменить задачу')
 
-    def change_visible_done(self):
-        ...
 
     def upload_planned_task(self):
         """Загружает все запланированные задачи в комбобокс"""
@@ -460,11 +526,6 @@ class MainWindow(MainForm):
         for timer_data in result:
             ui.add_row(timer_data)
         dialog.exec()
-
-
-
-
-
 
 
 
