@@ -100,7 +100,6 @@ class MainWindow(MainForm):
         self.upload_all_tasks_with_data()
         self.lower_bar_buttons()
 
-
     def lower_bar_buttons(self):
         """Обрабатывает кнопки нижней панели у поставленных задач"""
         self.pushButton_mt_plan_change_task.clicked.connect(lambda: self.change_task(
@@ -131,6 +130,41 @@ class MainWindow(MainForm):
         self.pushButton_mt_proc_finish.clicked.connect(self.finish_task)
         self.pushButton_mt_done_recover_task.clicked.connect(self.recover_task)
 
+        self.pushButton_mt_proc_start_timer.clicked.connect(self.start_task_timer)
+        self.pushButton_mt_proc_stop_timer.clicked.connect(self.stop_task_timer)
+        self.pushButton_mt_proc_rem_timer.clicked.connect(self.remove_task_timer)
+
+    def start_task_timer(self):
+        current_task = self.comboBox_mt_proc_all.currentData()
+        current_task.start_timer()
+
+
+        self.run_time_task = True
+        self.thread = threading.Thread(target=self.timer_task_thread , daemon=True)
+        self.thread.start()
+
+    def timer_task_thread(self):
+        """Запускает таймер задачи"""
+        time_now = datetime.now().replace(hour=0, minute=0, second=0)
+        self.count_second = 0
+        while self.run_time_task:
+            if self.run_time_task == False:
+                break
+            time.sleep(1)
+            self.count_second += 1
+            time_now += timedelta(seconds=1)
+            self.label_mt_proc_timer.setText(str(time_now.replace(microsecond=0).time()))
+
+    def stop_task_timer(self):
+        current_task = self.comboBox_mt_proc_all.currentData()
+        self.run_time_task = False
+        self.thread.join()
+        current_task.stop_timer(count_second=self.count_second)
+
+
+    def remove_task_timer(self):
+        ...
+
     def finish_task(self):
         """Обрабатывает кнопку окончания работы над задачей"""
         current_task = self.comboBox_mt_proc_all.currentData()
@@ -152,25 +186,33 @@ class MainWindow(MainForm):
 
         ms_box = QDialog()
         ms_box.resize(312, 142)
-
         verticalLayoutWidget = QWidget(ms_box)
         verticalLayoutWidget.setGeometry(10, 10, 291, 121)
         verticalLayout = QVBoxLayout(verticalLayoutWidget)
         verticalLayout.setContentsMargins(0, 0, 0, 0)
         groupBox = QGroupBox('Куда перенести задачу:', verticalLayoutWidget)
-        radioButton = QRadioButton('Запланировано', groupBox)
-        radioButton.setGeometry(10, 20, 150, 20)
-        radioButton_2 = QRadioButton('В процессе', groupBox)
-        radioButton_2.setGeometry(10, 50, 150, 20)
-
+        rad_but_planned = QRadioButton('Запланировано', groupBox)
+        rad_but_planned.setChecked(True)
+        rad_but_planned.setGeometry(10, 25, 150, 20)
+        rad_but_doing = QRadioButton('В процессе', groupBox)
+        rad_but_doing.setGeometry(10, 55, 150, 20)
         verticalLayout.addWidget(groupBox)
-
         buttonBox = QDialogButtonBox(verticalLayoutWidget)
         buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
         verticalLayout.addWidget(buttonBox)
+        buttonBox.accepted.connect(ms_box.accept)
+        buttonBox.rejected.connect(ms_box.reject)
 
-        ms_box.exec()
-
+        result = ms_box.exec()
+        if result:
+            if rad_but_planned.isChecked():
+                current_task.change_status(status_id=1)
+                self.upload_planned_task()
+                self.upload_done_task()
+            elif rad_but_doing.isChecked():
+                current_task.change_status(status_id=2)
+                self.upload_doing_task()
+                self.upload_done_task()
 
 
     def del_task(self, combobox, func_update):
@@ -269,7 +311,8 @@ class MainWindow(MainForm):
         if grid_layout == self.grid_layout_plan:
             self.change_visible_planned()
         elif grid_layout == self.grid_layout_proc:
-            self.change_visible_going()
+            self.groupBox_mt_proc_timer.setEnabled(True)
+            self.change_visible_doing()
         else:
             self.pushButton_mt_done_del_task.setEnabled(True)
             self.pushButton_mt_done_recover_task.setEnabled(True)
@@ -302,7 +345,6 @@ class MainWindow(MainForm):
         self.pushButton_mt_proc_del_task.setEnabled(True)
         self.pushButton_mt_proc_change_task.setText('Изменить задачу')
 
-
     def upload_planned_task(self):
         """Загружает все запланированные задачи в комбобокс"""
         self.planned_tasks = Task.download_planned_tasks()
@@ -311,6 +353,11 @@ class MainWindow(MainForm):
         self.comboBox_mt_plan_all.blockSignals(True)
         self.comboBox_mt_plan_all.clear()
         self.comboBox_mt_plan_all.blockSignals(False)
+
+        if not self.planned_tasks:
+            self.pushButton_mt_plan_change_task.setEnabled(False)
+            self.pushButton_mt_plan_start.setEnabled(False)
+            self.pushButton_mt_plan_del.setEnabled(False)
 
         for task in self.planned_tasks:
             self.comboBox_mt_plan_all.addItem(task.name, task)
@@ -323,6 +370,12 @@ class MainWindow(MainForm):
         self.comboBox_mt_proc_all.clear()
         self.comboBox_mt_proc_all.blockSignals(False)
 
+        if not self.doing_tasks:
+            self.pushButton_mt_proc_change_task.setEnabled(False)
+            self.pushButton_mt_proc_finish.setEnabled(False)
+            self.pushButton_mt_proc_del_task.setEnabled(False)
+            self.groupBox_mt_proc_timer.setEnabled(False)
+
         for task in self.doing_tasks:
             self.comboBox_mt_proc_all.addItem(task.name, task)
 
@@ -333,6 +386,10 @@ class MainWindow(MainForm):
         self.comboBox_mt_done_all.blockSignals(True)
         self.comboBox_mt_done_all.clear()
         self.comboBox_mt_done_all.blockSignals(False)
+
+        if not self.done_tasks:
+            self.pushButton_mt_done_recover_task.setEnabled(False)
+            self.pushButton_mt_done_del_task.setEnabled(False)
 
         for task in self.done_tasks:
             self.comboBox_mt_done_all.addItem(task.name, task)

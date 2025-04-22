@@ -41,6 +41,7 @@ class Base(QWidget):
         self.adding_replay()
         self.category()
         self.priority()
+        self.overdue_task()
 
     def category(self):
         self.label = QLabel('Категория:', self)
@@ -105,6 +106,7 @@ class Base(QWidget):
         self.horizontalLayout_17.addItem(self.horizontalSpacer_8)
 
         self.label_task_fire = QLabel('Задача просрочена!', self)
+        self.label_task_fire.setVisible(False)
         self.horizontalLayout_17.addWidget(self.label_task_fire)
 
         self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
@@ -313,6 +315,7 @@ class MainForm(QMainWindow):
 
         self.groupBox_mt_proc_timer = QGroupBox('Таймер работы над задачей', self.horizontalLayoutWidget_4)
         self.groupBox_mt_proc_timer.setMinimumSize(QSize(260, 0))
+        self.groupBox_mt_proc_timer.setEnabled(False)
         self.verticalLayoutWidget_2 = QWidget(self.groupBox_mt_proc_timer)
 
         self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 71))
@@ -381,7 +384,6 @@ class MainForm(QMainWindow):
 
         self.grid_layout_done = Base(self.frame_mt_done)
         self.grid_layout_done.setGeometry(QRect(10, 10, 441, 298))
-        self.grid_layout_done.overdue_task()
 
         self.verticalLayout_10.addWidget(self.frame_mt_done)
 

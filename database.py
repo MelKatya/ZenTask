@@ -2,7 +2,7 @@ import copy
 import logging
 from typing import List, Tuple, Dict, Callable
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 from psycopg2 import pool
 import psycopg2
 from psycopg2 import errors
@@ -68,11 +68,22 @@ class Task:
 
     def start_timer(self):
         """Запускает таймер задачи"""
-        self.timer = time.time()
+        logger.info(f'Запуск таймера: "{self}"')
+        self.timer = datetime.now().replace(hour=0, minute=0, second=0)
 
-    def stop_timer(self):
+    @work_db
+    def stop_timer(self, cur, count_second):
         """Останавливает таймер задачи"""
-        self.timer = round(time.time() - self.timer, 2)
+        logger.info(f'Остановка таймера: "{self}"')
+        total_time = self.timer + timedelta(seconds=count_second)
+        print(total_time, type(total_time))
+        self.timer = (datetime.now() - self.timer).replace(microsecond=0).time()
+        cur.execute("""
+        UPDATE task 
+        SET timer = %s
+        WHERE id = %s
+        """, (self.timer, self.id))
+
 
     @work_db
     def save_task(self, cur) -> None:
@@ -341,7 +352,7 @@ def create_tables(cur) -> None:
        status_id INTEGER REFERENCES task_status(id),
        deadline TIMESTAMP,
        repeat DATE,
-       timer NUMERIC);
+       timer DATE);
        """)
 
     cur.execute("""
