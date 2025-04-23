@@ -47,7 +47,8 @@ def work_db(func: Callable) -> Callable:
 class Task:
     """Класс задачи"""
     def __init__(self, name: str, description: str = "", priority_id: int = 1, category_id: int = 1,
-                 deadline=None, repeat=None, id=None, status_id=None, timer=None):
+                 deadline=None, repeat=None, id=None, status_id=None,
+                 timer=datetime.now().replace(hour=0, minute=0, second=0)):
         self.id = id
         self.name = name
         self.priority = priority_id
@@ -57,7 +58,7 @@ class Task:
         self.deadline = datetime.strftime(deadline, "%Y-%m-%d %H:%M:%S") if deadline else None
         # self.deadline = deadline
         self.repeat = repeat
-        self.timer = None
+        self.timer = timer
 
     def __repr__(self):
         return (f"Task: name - {self.name} (priority - {task_priority_dict[self.priority]}, "
@@ -66,23 +67,32 @@ class Task:
                 f"deadline - {self.deadline}, "
                 f"repeat - {self.repeat}) -- decription - {self.description}")
 
-    def start_timer(self):
-        """Запускает таймер задачи"""
-        logger.info(f'Запуск таймера: "{self}"')
-        self.timer = datetime.now().replace(hour=0, minute=0, second=0)
+    # def start_timer(self):
+    #     """Запускает таймер задачи"""
+    #     logger.info(f'Запуск таймера: "{self}"')
+    #     self.timer = datetime.now().replace(hour=0, minute=0, second=0)
 
     @work_db
-    def stop_timer(self, cur, count_second):
+    def stop_timer(self, cur):
         """Останавливает таймер задачи"""
         logger.info(f'Остановка таймера: "{self}"')
-        total_time = self.timer + timedelta(seconds=count_second)
-        print(total_time, type(total_time))
-        self.timer = (datetime.now() - self.timer).replace(microsecond=0).time()
+        self.timer = self.timer.replace(microsecond=0).time()
         cur.execute("""
         UPDATE task 
         SET timer = %s
         WHERE id = %s
         """, (self.timer, self.id))
+
+    @work_db
+    def remove_timer(self, cur):
+        """Очищает таймер задачи"""
+        logger.info(f'Очистка таймера: "{self}"')
+        self.timer = datetime.now().replace(hour=0, minute=0, second=0)
+        cur.execute("""
+            UPDATE task 
+            SET timer = %s
+            WHERE id = %s
+            """, (self.timer, self.id))
 
 
     @work_db
@@ -173,9 +183,9 @@ class Task:
             """)
         res = cur.fetchall()
         planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+                         status_id=task[5], deadline=task[6], repeat=task[7],
+                         timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second))
                          for task in res]
-
         return planned_tasks
 
     @classmethod
@@ -189,7 +199,8 @@ class Task:
             """)
         res = cur.fetchall()
         planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+                         status_id=task[5], deadline=task[6], repeat=task[7],
+                         timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second))
                          for task in res]
 
         return planned_tasks
@@ -352,7 +363,7 @@ def create_tables(cur) -> None:
        status_id INTEGER REFERENCES task_status(id),
        deadline TIMESTAMP,
        repeat DATE,
-       timer DATE);
+       timer TIME);
        """)
 
     cur.execute("""

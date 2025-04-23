@@ -337,9 +337,10 @@ class MainForm(QMainWindow):
 
         self.horizontalLayout_8 = QHBoxLayout()
         self.label_12 = QLabel('Время:', self.verticalLayoutWidget_2)
+        self.label_12.setMaximumSize(QSize(50, 15))
         self.horizontalLayout_8.addWidget(self.label_12)
 
-        self.label_mt_proc_timer = QLabel("TextLabel", self.verticalLayoutWidget_2)
+        self.label_mt_proc_timer = QLabel("00:00:00", self.verticalLayoutWidget_2)
         self.horizontalLayout_8.addWidget(self.label_mt_proc_timer)
         self.verticalLayout_2.addLayout(self.horizontalLayout_8)
 
@@ -405,9 +406,10 @@ class MainForm(QMainWindow):
         self.horizontalLayout_24 = QHBoxLayout()
 
         self.label_25 = QLabel('Время:', self.verticalLayoutWidget_7)
+        self.label_25.setMaximumSize(QSize(50, 15))
         self.horizontalLayout_24.addWidget(self.label_25)
 
-        self.label_mt_done_timer = QLabel("TextLabel", self.verticalLayoutWidget_7)
+        self.label_mt_done_timer = QLabel("00:00:00", self.verticalLayoutWidget_7)
         self.horizontalLayout_24.addWidget(self.label_mt_done_timer)
         self.verticalLayout_12.addLayout(self.horizontalLayout_24)
 

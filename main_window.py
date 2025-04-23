@@ -96,9 +96,18 @@ class MainWindow(MainForm):
         self.pushButton_20.clicked.connect(self.stop_timer)
         self.pushButton_20.setEnabled(False)
         self.download_note()
+        # потоки для таймера задач
+        self.thread_dict = {}
+        self.flag_time_task = {}
         self.pushButton_21.clicked.connect(self.open_history_form)
         self.upload_all_tasks_with_data()
         self.lower_bar_buttons()
+        self.search_load()
+
+    def search_load(self):
+        """Обновляет процесс-бар выполненных задач"""
+        value = len(self.done_tasks) * 100 / (len(self.planned_tasks) + len(self.doing_tasks) + len(self.done_tasks))
+        self.progressBar.setValue(value)
 
     def lower_bar_buttons(self):
         """Обрабатывает кнопки нижней панели у поставленных задач"""
@@ -135,35 +144,45 @@ class MainWindow(MainForm):
         self.pushButton_mt_proc_rem_timer.clicked.connect(self.remove_task_timer)
 
     def start_task_timer(self):
+        """Запускает таймера задачи"""
         current_task = self.comboBox_mt_proc_all.currentData()
-        current_task.start_timer()
+        if not isinstance(current_task.timer, datetime):
+            current_task.timer = datetime.now().replace(hour=current_task.timer.hour,
+                                                        minute=current_task.timer.minute,
+                                                        second=current_task.timer.second)
+        self.flag_time_task[current_task.id] = True
+        self.thread_dict[current_task.id] = threading.Thread(target=self.timer_task_thread, args=(current_task,), daemon=True)
+        self.pushButton_mt_proc_start_timer.setEnabled(False)
+        self.pushButton_mt_proc_stop_timer.setEnabled(True)
+        self.pushButton_mt_proc_rem_timer.setEnabled(False)
+        self.thread_dict[current_task.id].start()
 
-
-        self.run_time_task = True
-        self.thread = threading.Thread(target=self.timer_task_thread , daemon=True)
-        self.thread.start()
-
-    def timer_task_thread(self):
-        """Запускает таймер задачи"""
-        time_now = datetime.now().replace(hour=0, minute=0, second=0)
-        self.count_second = 0
-        while self.run_time_task:
-            if self.run_time_task == False:
+    def timer_task_thread(self, current_task):
+        """Запускает поток таймера задачи"""
+        while self.flag_time_task[current_task.id]:
+            if self.flag_time_task[current_task.id] == False:
                 break
             time.sleep(1)
-            self.count_second += 1
-            time_now += timedelta(seconds=1)
-            self.label_mt_proc_timer.setText(str(time_now.replace(microsecond=0).time()))
+            current_task.timer += timedelta(seconds=1)
+
+            if current_task == self.comboBox_mt_proc_all.currentData():
+                self.label_mt_proc_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
 
     def stop_task_timer(self):
+        """Останавливает таймер задачи"""
         current_task = self.comboBox_mt_proc_all.currentData()
-        self.run_time_task = False
-        self.thread.join()
-        current_task.stop_timer(count_second=self.count_second)
-
+        self.pushButton_mt_proc_start_timer.setEnabled(True)
+        self.pushButton_mt_proc_stop_timer.setEnabled(False)
+        self.pushButton_mt_proc_rem_timer.setEnabled(True)
+        self.flag_time_task[current_task.id] = False
+        self.thread_dict[current_task.id].join()
+        current_task.stop_timer()
 
     def remove_task_timer(self):
-        ...
+        """Обнуляет таймер работы над задачей"""
+        current_task = self.comboBox_mt_proc_all.currentData()
+        current_task.remove_timer()
+        self.label_mt_proc_timer.setText('00:00:00')
 
     def finish_task(self):
         """Обрабатывает кнопку окончания работы над задачей"""
@@ -214,7 +233,6 @@ class MainWindow(MainForm):
                 self.upload_doing_task()
                 self.upload_done_task()
 
-
     def del_task(self, combobox, func_update):
         """Обрабатывает кнопку удаления задачи"""
         current_task = combobox.currentData()
@@ -228,14 +246,11 @@ class MainWindow(MainForm):
         result = msgBox.exec()
 
         if result == QMessageBox.StandardButton.Yes:
-            print("Задача будет удалена")
             combobox.setCurrentIndex(1)
             current_task.delete_task()
             time.sleep(0.5)
             func_update()
-
-        else:
-            print("Удаление отменено")
+            self.search_load()
 
     def change_task(self, push_button, combobox, frame, grid_layout):
         """Обрабатывает кнопку изменения задачи"""
@@ -307,17 +322,34 @@ class MainWindow(MainForm):
     def upload_data_to_form(self, value, grid_layout, combo_box):
         """Подставляет данные выбранной задачи в чекбоксе"""
         print(f"Значение ComboBox изменено {combo_box}", value)
+        current_task = combo_box.currentData()
         # изменяет видимость всех полей
         if grid_layout == self.grid_layout_plan:
             self.change_visible_planned()
+
         elif grid_layout == self.grid_layout_proc:
             self.groupBox_mt_proc_timer.setEnabled(True)
+            if isinstance(current_task.timer, datetime):
+                current_time = str(current_task.timer.replace(microsecond=0).time())
+            else:
+                current_time = str(current_task.timer)
+            if self.flag_time_task.get(current_task.id):
+                self.pushButton_mt_proc_rem_timer.setEnabled(False)
+                self.pushButton_mt_proc_stop_timer.setEnabled(True)
+                self.pushButton_mt_proc_start_timer.setEnabled(False)
+            else:
+                self.pushButton_mt_proc_rem_timer.setEnabled(True)
+                self.pushButton_mt_proc_stop_timer.setEnabled(False)
+                self.pushButton_mt_proc_start_timer.setEnabled(True)
+            self.label_mt_proc_timer.setText(current_time)
             self.change_visible_doing()
+
         else:
             self.pushButton_mt_done_del_task.setEnabled(True)
             self.pushButton_mt_done_recover_task.setEnabled(True)
+            self.label_mt_done_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
+            # self.label_mt_proc_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
 
-        current_task = combo_box.currentData()
         grid_layout.line_edit_name.setText(current_task.name)
         grid_layout.combo_box_prior.setCurrentIndex(current_task.priority - 1)
         grid_layout.combo_box_category.setCurrentIndex(current_task.category - 1)
@@ -393,6 +425,8 @@ class MainWindow(MainForm):
 
         for task in self.done_tasks:
             self.comboBox_mt_done_all.addItem(task.name, task)
+
+        self.search_load()
 
     def download_note(self):
         """Выгружает заметки из бд"""
@@ -519,9 +553,11 @@ class MainWindow(MainForm):
             recording_result = save_task(name, priority, category, descrirton, deadline)
             if not recording_result:
                 self.upload_planned_task()
+                self.search_load()
                 QMessageBox.about(self, 'Успех', f'задача {name} сохранена')
             elif isinstance(recording_result, psycopg2.errors.UniqueViolation):
                 QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
+
 
     def open_timer_form(self):
         """Открывает форму добавления нового таймера"""
@@ -543,8 +579,6 @@ class MainWindow(MainForm):
                                                      args=(self.label_main_timer_passed,
                                                            self.label_main_timer_last, time_1), daemon=True)
                 self.thread_timer.start()
-        else:
-            print("Пользователь отменил")
 
     def strat_timer(self, label_passed, label_last, timer):
         """Запускает таймер"""
@@ -569,7 +603,7 @@ class MainWindow(MainForm):
         QMessageBox.about(self, 'Таймер', f'Таймер закончил работу')
 
     def stop_timer(self):
-        """Обрабаотывает кнопку остановки таймера"""
+        """Обрабатывает кнопку остановки таймера"""
         self.run_time = False
         self.thread_timer.join()
 
