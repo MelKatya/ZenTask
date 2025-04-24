@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox,
     QWidget)
 
 
+
 class Base(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -132,6 +133,10 @@ class Note(QWidget):
         self.pushButton_attach_not.setEnabled(False)
         self.horizontalLayout.addWidget(self.pushButton_attach_not)
 
+        self.pushButton_change_not = QPushButton('Изменить', self.verticalLayoutWidget)
+        self.pushButton_change_not.setEnabled(False)
+        self.horizontalLayout.addWidget(self.pushButton_change_not)
+
         self.pushButton_del_not = QPushButton('Удалить', self.verticalLayoutWidget)
         self.pushButton_del_not.setEnabled(False)
         self.horizontalLayout.addWidget(self.pushButton_del_not)
@@ -171,7 +176,7 @@ class MainForm(QMainWindow):
         self.page_notices()
         self.stackedWidget.addWidget(self.page_3)
 
-        self.attached_notice(self)
+        self.attached_note(self)
         self.main_timer(self)
 
     def add_calendar(self):
@@ -454,23 +459,51 @@ class MainForm(QMainWindow):
 
         self.toolBox_not.setGeometry(QRect(10, 20, 501, 441))
 
-
-
         self.pushButton_cret_tsk_not = QPushButton('Создать задачу', self.page_3)
         self.pushButton_cret_tsk_not.setGeometry(QRect(550, 20, 101, 31))
 
         self.pushButton_my_task_not = QPushButton('Мои задачи', self.page_3)
         self.pushButton_my_task_not.setGeometry(QRect(550, 60, 101, 31))
 
-    def attached_notice(self, Widget):
-        self.dockWidget_notice = QDockWidget(Widget)
+    def attached_note(self, Widget):
+        self.dockWidget_notice = QDockWidget(Widget, features=QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
         self.dockWidget_notice.setGeometry(QRect(700, 10, 211, 121))
         self.dockWidget_notice.setVisible(False)
+        self.dockWidget_notice.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.dockWidgetContents = QWidget()
 
+        self.dockWidget_notice.setStyleSheet("""
+            QDockWidget {
+                background-color: #ffec80;  /* немного темнее основного стикера */
+                border: 1px solid #d6c757;
+            }
+
+            QDockWidget::title {
+                background-color: #ffe066;
+                padding: 5px;
+                color: black;
+                font-weight: bold;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+        """)
+
         self.label_atached_note = QLabel("TextLabel", self.dockWidgetContents)
-        self.label_atached_note.setGeometry(QRect(10, 10, 191, 71))
+        self.label_atached_note.setGeometry(QRect(0, 0, 211, 71))
+        self.label_atached_note.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.dockWidget_notice.setWidget(self.dockWidgetContents)
+
+        self.label_atached_note.setStyleSheet("""
+            background-color: #fffaa9;  /* светло-жёлтый */
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            padding: 10px;
+            font-family: 'Comic Sans MS';
+            font-size: 14px;
+        """)
+
 
     def main_timer(self, Widget):
         self.groupBox_main_timer = QGroupBox('Время работы', Widget)

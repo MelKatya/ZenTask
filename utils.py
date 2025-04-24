@@ -60,9 +60,9 @@ def show_history_time():
     return total_time, all_timers
 
 
-def save_note_to_db(text, page):
+def save_note_to_db(text):
     """Сохраняет заметки в бд"""
-    new_note = Note(text=text, page=page)
+    new_note = Note(text=text)
     new_note.save_note()
     return new_note
 

@@ -207,15 +207,13 @@ class Task:
 
 
 class Note:
-    def __init__(self, text, page, id=None):
+    def __init__(self, text, id=None):
         self.id = id
         self.text = text
         self.attach = False
-        self.page = page
 
     def __repr__(self):
-        return (f"Note: text - {self.text}"
-                f"page - {self.page}, " 
+        return (f"Note: text - {self.text}, "
                 f"id - {self.id}")
 
     @work_db
@@ -224,10 +222,10 @@ class Note:
         logger.info(f'Сохранение заметки: "{self}"')
         cur.execute("""
             INSERT INTO notes 
-            (text, attach, page)
-            VALUES (%s, %s, %s)
+            (text, attach)
+            VALUES (%s, %s)
             RETURNING id
-            """, (self.text, self.attach, self.page))
+            """, (self.text, self.attach))
         self.id = cur.fetchone()[0]
 
     @work_db
@@ -248,7 +246,17 @@ class Note:
             WHERE id = %s;
             UPDATE notes SET attach = False
             WHERE id != %s;
-            """, (self.id,))
+            """, (self.id, self.id))
+
+    @work_db
+    def change_note(self, cur, text) -> None:
+        """"""
+        self.text = text
+        cur.execute("""
+            UPDATE notes 
+            SET text = %s
+            WHERE id = %s;
+            """, (self.text, self.id))
 
     @classmethod
     @work_db
@@ -256,7 +264,6 @@ class Note:
         """Выгружает все заметки из бд"""
         cur.execute("""
         SELECT * FROM notes
-        ORDER BY page
         """)
         return cur.fetchall()
 

@@ -2,7 +2,7 @@ import sys
 import time
 
 from PySide6.QtWidgets import (QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox,
-                               QDateTimeEdit, QAbstractButton, QPushButton, QVBoxLayout, QLabel, QHBoxLayout,
+                               QDateTimeEdit, QAbstractButton, QPushButton, QVBoxLayout, QLabel, QDockWidget,
                                QRadioButton, QButtonGroup, QGridLayout, QGroupBox)
 from forms.ui_main_form import MainForm, Base, Note
 from forms.ui_add_category import NewCategory
@@ -66,16 +66,20 @@ class DialogTimer(QDialog):
 
 
 class NoteTask(Note):
-    def __init__(self, toolBox_not, page_number, functons, text=''):
+    def __init__(self, toolBox_not, page_number, functions, text='', note=None):
         super().__init__(toolBox_not, page_number)
         self.tb_not = toolBox_not
         self.page_number = page_number
+        self.note = note
+
         self.text_edit_note.setText(text)
-        self.save, self.delete, self.attach = functons
+        self.save, self.delete, self.attach, self.change = functions
         self.pushButton_save_not.clicked.connect(lambda: self.save(text=self.text_edit_note.toPlainText()))
         # print(self.pushButton_save_not.emit())
         self.pushButton_del_not.clicked.connect(lambda: self.delete(page_number=self.page_number))
         self.pushButton_attach_not.clicked.connect(lambda: self.attach(page_number=self.page_number))
+        self.pushButton_change_not.clicked.connect(lambda: self.change(page_number=self.page_number,
+                                                                       text=self.text_edit_note.toPlainText()))
 
 
 class MainWindow(MainForm):
@@ -430,51 +434,56 @@ class MainWindow(MainForm):
 
     def download_note(self):
         """Выгружает заметки из бд"""
-        self.pages_notes = []
-        self.functions_for_note = (self.save_note, self.del_note, self.attache_notice)
+        self.functions_for_note = (self.save_note, self.del_note, self.attache_note, self.change_note)
 
         all_notes = download_noticed_from_db()
-        if not all_notes:
-            self.notes = {}
-            self.pages_notes = [0]
-        else:
-            self.notes = {}
-            for note in all_notes:
-                self.pages_notes.append(note[3])
-                self.notes[note[3]] = [NoteTask(self.toolBox_not, note[3], self.functions_for_note, note[1]),
-                                       No(id=note[0], text=note[1], page=note[3])]
-                self.notes[note[3]][0].pushButton_del_not.setEnabled(True)
-                self.notes[note[3]][0].pushButton_attach_not.setEnabled(True)
-                self.notes[note[3]][0].pushButton_save_not.setEnabled(False)
+        index = 0
+        self.notes = {}
 
-        first_note = NoteTask(self.toolBox_not, self.pages_notes[-1] + 1, self.functions_for_note)
-        self.notes[self.pages_notes[-1] + 1] = [first_note]
-        self.pages_notes.append(self.pages_notes[-1] + 1)
+        for note in all_notes:
+            index += 1
+            self.notes[index] = NoteTask(self.toolBox_not, index, self.functions_for_note, text=note[1],
+                                         note=No(id=note[0], text=note[1]))
+            if note[2]:
+                self.dockWidget_notice.setVisible(True)
+                self.label_atached_note.setText(f"{self.notes[index].note.text}")
+
+            self.notes[index].pushButton_del_not.setEnabled(True)
+            self.notes[index].pushButton_attach_not.setEnabled(True)
+            self.notes[index].pushButton_change_not.setEnabled(True)
+            self.notes[index].pushButton_save_not.setEnabled(False)
+
+        self.notes[index + 1] = NoteTask(self.toolBox_not, index + 1, self.functions_for_note)
 
     def save_note(self, text):
         """Сохраняет заметки"""
-        page_number = self.pages_notes[-1]
-        note = save_note_to_db(text, page_number)
-        self.notes[page_number].append(note)
-        self.notes[page_number + 1] = [NoteTask(self.toolBox_not, page_number + 1, self.functions_for_note)]
-        self.pages_notes.append(page_number + 1)
-        self.notes[page_number][0].pushButton_del_not.setEnabled(True)
-        self.notes[page_number][0].pushButton_attach_not.setEnabled(True)
-        self.notes[page_number][0].pushButton_save_not.setEnabled(False)
+        page_number = max(self.notes)
+        note = save_note_to_db(text)
+
+        self.notes[page_number].note = note
+        self.notes[page_number + 1] = NoteTask(self.toolBox_not, page_number + 1, self.functions_for_note)
+
+        self.notes[page_number].pushButton_del_not.setEnabled(True)
+        self.notes[page_number].pushButton_attach_not.setEnabled(True)
+        self.notes[page_number].pushButton_change_not.setEnabled(True)
+        self.notes[page_number].pushButton_save_not.setEnabled(False)
 
     def del_note(self, page_number):
         """Удаляет заметки"""
-        self.notes[page_number][1].delete_note()
+        self.notes[page_number].note.delete_note()
         self.toolBox_not.removeItem(self.toolBox_not.currentIndex())
         self.notes.pop(page_number)
 
     # todo прикрепление выглядит отстойно
 
-    def attache_notice(self, page_number):
+    def attache_note(self, page_number):
         """Прикрепляет заметку справа"""
         self.dockWidget_notice.setVisible(True)
-        self.label_atached_note.setText(f"{self.notes[page_number][1].text}")
-        self.notes[page_number][1].attach_note()
+        self.label_atached_note.setText(f"{self.notes[page_number].note.text}")
+        self.notes[page_number].note.attach_note()
+
+    def change_note(self, page_number, text):
+        self.notes[page_number].note.change_note(text=text)
 
     def upload_category(self):
         """Загружает категории из бд"""
