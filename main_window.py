@@ -8,6 +8,7 @@ from forms.ui_main_form import MainForm, Base, Note
 from forms.ui_add_category import NewCategory
 from forms.ui_add_timer import AddTimer
 from forms.ui_show_history import ShowTimers
+from forms.ui_add_replay import AddReplay
 from utils import (upload_priority, upload_category, save_new_category, save_task, save_timer,
                    stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, download_all_tasks_from_db)
 from PySide6.QtCore import Signal, Qt
@@ -16,6 +17,13 @@ import psycopg2
 from datetime import datetime, timedelta
 import threading
 from database import Note as No, Task
+
+
+class DialogReplay(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.ui = AddReplay()
+        self.ui.setup_ui(self)
 
 
 class DialogCategory(QDialog):
@@ -107,11 +115,22 @@ class MainWindow(MainForm):
         self.upload_all_tasks_with_data()
         self.lower_bar_buttons()
         self.search_load()
+        self.grid_layout_new_task.check_box_repeat.checkStateChanged.connect(self.on_checkbox_state_changed_reply)
+
+    def on_checkbox_state_changed_reply(self, state):
+        """Изменение состояния чекбокса с заданием повторения задач"""
+        if state == Qt.CheckState.Checked:
+            dialog = DialogReplay()
+            result = dialog.exec()
+            print(result)
+        elif state == Qt.CheckState.Unchecked:
+            self.grid_layout_new_task.datetime_edit.setVisible(False)
 
     def search_load(self):
         """Обновляет процесс-бар выполненных задач"""
-        value = len(self.done_tasks) * 100 / (len(self.planned_tasks) + len(self.doing_tasks) + len(self.done_tasks))
-        self.progressBar.setValue(value)
+        if self.done_tasks or self.planned_tasks or self.doing_tasks:
+            value = len(self.done_tasks) * 100 / (len(self.planned_tasks) + len(self.doing_tasks) + len(self.done_tasks))
+            self.progressBar.setValue(value)
 
     def lower_bar_buttons(self):
         """Обрабатывает кнопки нижней панели у поставленных задач"""
@@ -205,7 +224,6 @@ class MainWindow(MainForm):
     def recover_task(self):
         """Восстановление задачи"""
         current_task = self.comboBox_mt_done_all.currentData()
-        print(current_task)
 
         ms_box = QDialog()
         ms_box.resize(312, 142)
@@ -288,6 +306,8 @@ class MainWindow(MainForm):
             if grid_layout.check_box_add_time.checkState() == Qt.CheckState.Checked:
                 deadline = grid_layout.datetime_edit.dateTime()
                 deadline = deadline.toPython()
+                if deadline > datetime.now():
+                    task.overdue = False
             else:
                 deadline = None
 
@@ -325,7 +345,6 @@ class MainWindow(MainForm):
 
     def upload_data_to_form(self, value, grid_layout, combo_box):
         """Подставляет данные выбранной задачи в чекбоксе"""
-        print(f"Значение ComboBox изменено {combo_box}", value)
         current_task = combo_box.currentData()
         # изменяет видимость всех полей
         if grid_layout == self.grid_layout_plan:
@@ -352,17 +371,31 @@ class MainWindow(MainForm):
             self.pushButton_mt_done_del_task.setEnabled(True)
             self.pushButton_mt_done_recover_task.setEnabled(True)
             self.label_mt_done_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
+            if current_task.overdue:
+                grid_layout.label_task_fire.setVisible(True)
             # self.label_mt_proc_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
 
         grid_layout.line_edit_name.setText(current_task.name)
         grid_layout.combo_box_prior.setCurrentIndex(current_task.priority - 1)
         grid_layout.combo_box_category.setCurrentIndex(current_task.category - 1)
         grid_layout.text_edit_description.setText(current_task.description)
+
         if current_task.deadline:
             grid_layout.check_box_add_time.setChecked(True)
-            date = datetime.strptime(current_task.deadline, "%Y-%m-%d %H:%M:%S")
+            if isinstance(current_task.deadline, str):
+                date = datetime.strptime(current_task.deadline, "%Y-%m-%d %H:%M:%S")
+                grid_layout.datetime_edit.setDateTime(date)
+            else:
+                grid_layout.datetime_edit.setDateTime(current_task.deadline)
             grid_layout.datetime_edit.setVisible(True)
-            grid_layout.datetime_edit.setDateTime(date)
+
+            if grid_layout.datetime_edit.dateTime().toPython() < datetime.now() and \
+                grid_layout != self.grid_layout_done:
+                current_task.overdue = True
+                grid_layout.label_task_fire.setVisible(True)
+            elif grid_layout != self.grid_layout_done:
+                grid_layout.label_task_fire.setVisible(False)
+
         else:
             grid_layout.check_box_add_time.setChecked(False)
             grid_layout.datetime_edit.setVisible(False)
@@ -474,8 +507,6 @@ class MainWindow(MainForm):
         self.toolBox_not.removeItem(self.toolBox_not.currentIndex())
         self.notes.pop(page_number)
 
-    # todo прикрепление выглядит отстойно
-
     def attache_note(self, page_number):
         """Прикрепляет заметку справа"""
         self.dockWidget_notice.setVisible(True)
@@ -525,9 +556,6 @@ class MainWindow(MainForm):
             new_category_name = dialog.ui.lineEdit.text()
             save_new_category(new_category_name)
             self.upload_category()
-            print("Данные получены:", new_category_name)
-        else:
-            print("Пользователь отменил")
 
     def on_checkbox_state_changed(self, state):
         """Изменение состояния чекбокса с заданием дедлайна"""
@@ -566,7 +594,6 @@ class MainWindow(MainForm):
                 QMessageBox.about(self, 'Успех', f'задача {name} сохранена')
             elif isinstance(recording_result, psycopg2.errors.UniqueViolation):
                 QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
-
 
     def open_timer_form(self):
         """Открывает форму добавления нового таймера"""
@@ -626,6 +653,4 @@ class MainWindow(MainForm):
         for timer_data in result:
             ui.add_row(timer_data)
         dialog.exec()
-
-
 

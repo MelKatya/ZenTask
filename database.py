@@ -47,30 +47,28 @@ def work_db(func: Callable) -> Callable:
 class Task:
     """Класс задачи"""
     def __init__(self, name: str, description: str = "", priority_id: int = 1, category_id: int = 1,
-                 deadline=None, repeat=None, id=None, status_id=None,
+                 deadline=None, repeats=None, id_task=None, status_id=1, overdue=False,
                  timer=datetime.now().replace(hour=0, minute=0, second=0)):
-        self.id = id
+        self.id = id_task
         self.name = name
         self.priority = priority_id
         self.category = category_id
         self.description = description
-        self.status = 1
+        self.status = status_id
+        self.overdue = overdue
         self.deadline = datetime.strftime(deadline, "%Y-%m-%d %H:%M:%S") if deadline else None
-        # self.deadline = deadline
-        self.repeat = repeat
+        self.repeats = repeats
         self.timer = timer
 
     def __repr__(self):
         return (f"Task: name - {self.name} (priority - {task_priority_dict[self.priority]}, "
                 f"status - {task_status_dict[self.status]}, " 
                 f"category - {task_category_dict[self.category]}, "
-                f"deadline - {self.deadline}, "
-                f"repeat - {self.repeat}) -- decription - {self.description}")
+                f"deadline - {self.deadline}, overdue - {self.overdue}, "
+                f"repeat - {self.repeats}) -- decription - {self.description}")
 
-    # def start_timer(self):
-    #     """Запускает таймер задачи"""
-    #     logger.info(f'Запуск таймера: "{self}"')
-    #     self.timer = datetime.now().replace(hour=0, minute=0, second=0)
+    def add_repeat(self, repeat):
+        self.repeats.append(repeat)
 
     @work_db
     def stop_timer(self, cur):
@@ -94,18 +92,17 @@ class Task:
             WHERE id = %s
             """, (self.timer, self.id))
 
-
     @work_db
     def save_task(self, cur) -> None:
         """Сохраняет задачу"""
         logger.info(f'Создание задачи: "{self}"')
         cur.execute("""
         INSERT INTO task 
-        (name, priority_id, category_id, description, status_id, deadline, repeat, timer)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        (name, priority_id, category_id, description, status_id, deadline, repeat, timer, overdue)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
         """, (self.name, self.priority, self.category, self.description,
-              self.status, self.deadline, self.repeat, self.timer))
+              self.status, self.deadline, self.repeats, self.timer, self.overdue))
         self.id = cur.fetchone()[0]
 
     @work_db
@@ -115,10 +112,10 @@ class Task:
         cur.execute("""
         UPDATE task SET
         name = %s, priority_id = %s, category_id = %s, description = %s, 
-        deadline = %s, repeat = %s, timer = %s
+        deadline = %s, repeat = %s, timer = %s, overdue = %s
         WHERE id = %s
         """, (self.name, self.priority, self.category, self.description,
-              self.deadline, self.repeat, self.timer, self.id))
+              self.deadline, self.repeats, self.timer, self.overdue, self.id))
         return True
 
     @work_db
@@ -127,9 +124,9 @@ class Task:
         logger.info(f'Изменение статуса задачи: {self.id}')
         cur.execute("""
         UPDATE task SET
-        status_id = %s
+        status_id = %s, overdue = %s
         WHERE id = %s
-        """, (status_id, self.id))
+        """, (status_id, self.overdue, self.id))
 
 
     @work_db
@@ -150,8 +147,8 @@ class Task:
         SELECT * FROM task
         """)
         res = cur.fetchall()
-        all_task = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+        all_task = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                         status_id=task[5], deadline=task[6], repeats=task[7], timer=task[8], overdue=task[9])
                     for task in res]
 
         return all_task
@@ -166,8 +163,11 @@ class Task:
             WHERE status_id = 1
             """)
         res = cur.fetchall()
-        planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeat=task[7], timer=task[7])
+
+        planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                              status_id=task[5], deadline=task[6], repeats=task[7],
+                              timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
+                              overdue=task[9] or task[6] < datetime.now())
                          for task in res]
 
         return planned_tasks
@@ -175,16 +175,17 @@ class Task:
     @classmethod
     @work_db
     def download_doing_tasks(cls, cur):
-        """Выгружает все выпоняемые задачи из бд и создает объекты задач"""
+        """Выгружает все выполняемые задачи из бд и создает объекты задач"""
         logger.info(f'Выгрузка всех задач из бд')
         cur.execute("""
             SELECT * FROM task
             WHERE status_id = 2
             """)
         res = cur.fetchall()
-        planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeat=task[7],
-                         timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second))
+        planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                              status_id=task[5], deadline=task[6], repeats=task[7],
+                              timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
+                              overdue=task[9] or task[6] < datetime.now())
                          for task in res]
         return planned_tasks
 
@@ -198,12 +199,23 @@ class Task:
             WHERE status_id = 3
             """)
         res = cur.fetchall()
-        planned_tasks = [Task(id=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeat=task[7],
-                         timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second))
+        planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
+                              status_id=task[5], deadline=task[6], repeats=task[7],
+                              timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
+                              overdue=task[9])
                          for task in res]
 
         return planned_tasks
+
+
+class TaskRepeat:
+    def __init__(self, task_id, repeat_type, repeat_value, time_of_day=None, id_repeat=None):
+        self.id = id_repeat
+        self.task_id = task_id
+        self.repeat_type = repeat_type
+        self.repeat_value = repeat_value
+        self.time_of_day = time_of_day
+
 
 
 class Note:
@@ -250,7 +262,7 @@ class Note:
 
     @work_db
     def change_note(self, cur, text) -> None:
-        """"""
+        """Изменяет заметку"""
         self.text = text
         cur.execute("""
             UPDATE notes 
@@ -370,7 +382,17 @@ def create_tables(cur) -> None:
        status_id INTEGER REFERENCES task_status(id),
        deadline TIMESTAMP,
        repeat DATE,
-       timer TIME);
+       timer TIME,
+       overdue BOOL);
+       """)
+    #  Добавить каскадное удаление
+    cur.execute("""
+       CREATE TABLE IF NOT EXISTS task_repeat (
+       id SERIAL PRIMARY KEY,
+       task_id INTEGER REFERENCES task(id),
+       repeat_type TEXT,
+       repeat_value TEXT,
+       time_of_day TIME);
        """)
 
     cur.execute("""

@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox,
     QWidget)
 
 
-
 class Base(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -446,7 +445,7 @@ class MainForm(QMainWindow):
 
         self.progressBar = QProgressBar(self.page_2)
         self.progressBar.setGeometry(QRect(550, 470, 111, 23))
-        self.progressBar.setValue(24)
+        self.progressBar.setValue(0)
         self.label_63 = QLabel('Процеcс\nвыполнения:', self.page_2)
         self.label_63.setGeometry(QRect(550, 430, 91, 31))
 
