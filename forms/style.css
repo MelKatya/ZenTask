@@ -1,0 +1,63 @@
+QPushButton {
+    background-color: #4d3f72;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+QPushButton:hover {
+    background-color: #772D6B;
+}
+
+QPushButton:disabled {
+    background-color: #aaa;
+    color: #666;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+QDockWidget {
+        background-color: #ffec80;  /* немного темнее основного стикера */
+        border: 1px solid #d6c757;
+    }
+
+    QDockWidget::title {
+        background-color: #ffe066;
+        padding: 5px;
+        color: black;
+        font-weight: bold;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+QLabel[class="note"] {
+    background-color: #fffaa9;  /* светло-жёлтый */
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    padding: 10px;
+    font-family: 'Comic Sans MS';
+    font-size: 14px;
+}
+
+QGroupBox {
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    margin-top: 10px;
+    padding: 10px;
+
+}
+
+QGroupBox:title {
+    subcontrol-origin: margin;    /* ← чтобы был "на рамке" */
+    subcontrol-position: top left;
+    padding: 0 5px;
+    color: #333;
+
+}
+
+QMainWindow {
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                                      stop: 0 #fffefa, stop: 0.2 #f2ebf9, stop: 0.4 #cee8f7, stop: 0.6 #f2ebf9, stop: 1 #d3d0eb);
+}

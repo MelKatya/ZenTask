@@ -25,6 +25,22 @@ class DialogReplay(QDialog):
         self.ui = AddReplay()
         self.ui.setup_ui(self)
 
+        self.ui.replay_data = []
+        self.ui.tree_view.itemClicked.connect(self.the_button_was_clicked)
+
+        self.ui.buttonBox.accepted.connect(self.accept)
+        self.ui.buttonBox.rejected.connect(self.reject)
+
+    def the_button_was_clicked(self):
+        val = ''
+        for sel in self.ui.tree_view.selectedIndexes():
+            val_2 = "/" + sel.data()
+            while sel.parent().isValid():
+                sel = sel.parent()
+                val += sel.data() + val_2 + '\n'
+                self.ui.replay_data.append((sel.data(), val_2[1:]))
+        self.ui.label_2.setText(val)
+
 
 class DialogCategory(QDialog):
     def __init__(self):
@@ -122,7 +138,8 @@ class MainWindow(MainForm):
         if state == Qt.CheckState.Checked:
             dialog = DialogReplay()
             result = dialog.exec()
-            print(result)
+            if result == QDialog.DialogCode.Accepted:
+                print(dialog.ui.label_2.text())
         elif state == Qt.CheckState.Unchecked:
             self.grid_layout_new_task.datetime_edit.setVisible(False)
 

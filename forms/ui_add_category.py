@@ -26,18 +26,23 @@ class NewCategory:
 
         self.buttonBox = QDialogButtonBox(Dialog)
         # self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setStyleSheet("""
-                            QPushButton {
-                                background-color: #4CAF50;
-                                color: white;
-                                padding: 10px 20px;
-                                border-radius: 5px;
-                            }
-                            
-                            QPushButton:hover {
-                                background-color: #45a049;
-                            }
-                """)
+
+        with open("forms/style.css", "r") as f:
+            style = f.read()
+            self.buttonBox.setStyleSheet(style)
+
+        # self.buttonBox.setStyleSheet("""
+        #                     QPushButton {
+        #                         background-color: #605677;
+        #                         color: white;
+        #                         padding: 5px 15px;
+        #                         border-radius: 5px;
+        #                     }
+        #
+        #                     QPushButton:hover {
+        #                         background-color: #772D6B;
+        #                     }
+        #         """)
         # self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
 

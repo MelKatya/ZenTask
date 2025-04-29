@@ -30,15 +30,14 @@ class AddReplay:
         day = QTreeWidgetItem(self.tree_view, ["День"])
 
         for day_of_month in range(1, 32):
-            child = QTreeWidgetItem(month, [str(day_of_month)])
+            QTreeWidgetItem(month, [str(day_of_month)])
 
         for day_of_week in ("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"):
-            child = QTreeWidgetItem(week, [day_of_week])
+            QTreeWidgetItem(week, [day_of_week])
 
         for hour in range(0, 24):
-            child = QTreeWidgetItem(day, [f'{hour:02d}:00'])
+            QTreeWidgetItem(day, [f'{hour:02d}:00'])
 
-        self.tree_view.itemClicked.connect(self.the_button_was_clicked)
 
         self.label = QLabel(self.groupBox)
         self.label.setText("Задача будет повторяться каждый:")
@@ -48,20 +47,10 @@ class AddReplay:
         self.label_2.setGeometry(QRect(160, 60, 191, 160))
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
         self.label_2.setText('')
-        self.replay_data = []
-
-        self.buttonBox.accepted.connect(Dialog.accept)
-        self.buttonBox.rejected.connect(Dialog.reject)
 
 
 
-    def the_button_was_clicked(self):
-        val = ''
-        for sel in self.tree_view.selectedIndexes():
-            val_2 = "/" + sel.data()
-            while sel.parent().isValid():
-                sel = sel.parent()
-                val += sel.data() + val_2 + '\n'
-                self.replay_data.append((sel.data(), val_2[1:]))
-        self.label_2.setText(val)
+
+
+
 

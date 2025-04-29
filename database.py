@@ -167,7 +167,7 @@ class Task:
         planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
                               status_id=task[5], deadline=task[6], repeats=task[7],
                               timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
-                              overdue=task[9] or task[6] < datetime.now())
+                              overdue=task[9])
                          for task in res]
 
         return planned_tasks
@@ -182,10 +182,11 @@ class Task:
             WHERE status_id = 2
             """)
         res = cur.fetchall()
+        # overdue = task[9] or task[6] < datetime.now()
         planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
                               status_id=task[5], deadline=task[6], repeats=task[7],
                               timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
-                              overdue=task[9] or task[6] < datetime.now())
+                              overdue=task[9])
                          for task in res]
         return planned_tasks
 
@@ -216,6 +217,15 @@ class TaskRepeat:
         self.repeat_value = repeat_value
         self.time_of_day = time_of_day
 
+    @work_db
+    def save_report(self, cur):
+        cur.execute("""
+                INSERT INTO task 
+                (task_id, repeat_type, repeat_value, time_of_day)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id
+                """, (self.task_id, self.repeat_type, self.repeat_value, self.time_of_day))
+        self.id = cur.fetchone()[0]
 
 
 class Note:
