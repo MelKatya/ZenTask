@@ -208,6 +208,16 @@ class Task:
 
         return planned_tasks
 
+    @classmethod
+    @work_db
+    def check_overdue(cls, cur):
+
+        cur.execute("""
+            UPDATE task
+            SET overdue = true
+            WHERE status_id in (1, 2) AND deadline is not null AND deadline < %s
+                    """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ))
+
 
 class TaskRepeat:
     def __init__(self, task_id, repeat_type, repeat_value, time_of_day=None, id_repeat=None):
@@ -466,7 +476,7 @@ task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
 if __name__ == '__main__':
     create_tables()
     task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
-    all_tasks = download_all_tasks()
+    all_tasks = Task.download_all_tasks()
     for i in all_tasks:
         print(i.id, i)
 

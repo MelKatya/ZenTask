@@ -54,17 +54,9 @@ class DialogCategory(QDialog):
 
     def the_button_was_clicked(self):
         user_input = self.ui.lineEdit.text()
+
         if user_input:
             QMessageBox.about(self, 'Успех', f'Категория {user_input} сохранена')
-
-            # msgBox = QMessageBox()
-            # msgBox.setText("The document has been modified.")
-            # msgBox.setInformativeText("Do you want to save your changes?")
-            # msgBox.setStandardButtons(QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
-            # msgBox.setDefaultButton(QMessageBox.StandardButton.Save)
-            # ret = msgBox.exec()
-
-            # QMessageBox.information(self, 'Успех', f'Категория {user_input} сохранена', QDialogButtonBox.StandardButton.Ok)
             self.accept()
         else:
             QMessageBox.warning(self, "Ошибка", "Необходимо ввести новую категорию.")
@@ -111,6 +103,7 @@ class MainWindow(MainForm):
 
     def __init__(self):
         super().__init__()
+        Task.check_overdue()
 
         self.timer_finished.connect(self.finsh_timer)
         self.upload_priority()
@@ -174,6 +167,12 @@ class MainWindow(MainForm):
         self.pushButton_mt_done_del_task.clicked.connect(lambda: self.del_task(
             combobox=self.comboBox_mt_done_all,
             func_update=self.upload_done_task))
+
+        self.grid_layout_plan.check_box_add_time.checkStateChanged.connect(lambda: self.on_checkbox_deadline(
+            grid_layout=self.grid_layout_plan))
+
+        self.grid_layout_proc.check_box_add_time.checkStateChanged.connect(lambda: self.on_checkbox_deadline(
+            grid_layout=self.grid_layout_proc))
 
         self.pushButton_mt_plan_start.clicked.connect(self.start_task)
         self.pushButton_mt_proc_finish.clicked.connect(self.finish_task)
@@ -325,7 +324,13 @@ class MainWindow(MainForm):
                 deadline = deadline.toPython()
                 if deadline > datetime.now():
                     task.overdue = False
+                    grid_layout.task_fire_widget.setVisible(False)
+                else:
+                    task.overdue = True
+                    grid_layout.task_fire_widget.setVisible(True)
             else:
+                grid_layout.task_fire_widget.setVisible(False)
+                task.overdue = False
                 deadline = None
 
             task.deadline = deadline
@@ -363,6 +368,7 @@ class MainWindow(MainForm):
     def upload_data_to_form(self, value, grid_layout, combo_box):
         """Подставляет данные выбранной задачи в чекбоксе"""
         current_task = combo_box.currentData()
+
         # изменяет видимость всех полей
         if grid_layout == self.grid_layout_plan:
             self.change_visible_planned()
@@ -390,14 +396,16 @@ class MainWindow(MainForm):
             self.label_mt_done_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
             if current_task.overdue:
                 grid_layout.label_task_fire.setVisible(True)
-            # self.label_mt_proc_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
+
 
         grid_layout.line_edit_name.setText(current_task.name)
         grid_layout.combo_box_prior.setCurrentIndex(current_task.priority - 1)
         grid_layout.combo_box_category.setCurrentIndex(current_task.category - 1)
         grid_layout.text_edit_description.setText(current_task.description)
 
+        # проверяем, есь и у текущей задачи deadline
         if current_task.deadline:
+
             grid_layout.check_box_add_time.setChecked(True)
             if isinstance(current_task.deadline, str):
                 date = datetime.strptime(current_task.deadline, "%Y-%m-%d %H:%M:%S")
@@ -406,15 +414,21 @@ class MainWindow(MainForm):
                 grid_layout.datetime_edit.setDateTime(current_task.deadline)
             grid_layout.datetime_edit.setVisible(True)
 
-            if grid_layout.datetime_edit.dateTime().toPython() < datetime.now() and \
-                grid_layout != self.grid_layout_done:
-                current_task.overdue = True
-                grid_layout.label_task_fire.setVisible(True)
-            elif grid_layout != self.grid_layout_done:
-                grid_layout.label_task_fire.setVisible(False)
+            if current_task.overdue:
+                grid_layout.task_fire_widget.setVisible(True)
 
         else:
             grid_layout.check_box_add_time.setChecked(False)
+            grid_layout.task_fire_widget.setVisible(False)
+
+    def on_checkbox_deadline(self, grid_layout):
+        """Изменение состояния чекбокса с заданием дедлайна"""
+        state = grid_layout.check_box_add_time.checkState()
+        if state == Qt.CheckState.Checked:
+            if grid_layout.datetime_edit.text() == '01.01.2000 0:00':
+                grid_layout.datetime_edit.setDateTime(datetime.now())
+            grid_layout.datetime_edit.setVisible(True)
+        elif state == Qt.CheckState.Unchecked:
             grid_layout.datetime_edit.setVisible(False)
 
     def change_visible_planned(self):
@@ -612,13 +626,16 @@ class MainWindow(MainForm):
             elif isinstance(recording_result, psycopg2.errors.UniqueViolation):
                 QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
 
+# __________________ TotalTimer_______________________________
     def open_timer_form(self):
         """Открывает форму добавления нового таймера"""
         dialog = DialogTimer()
         result = dialog.exec()
+
         if result == QDialog.DialogCode.Accepted:
             if dialog.ui.timeEdit.text() == '0:00':
                 QMessageBox.warning(self, "Ошибка", "Необходимо указать время.")
+
             else:
                 self.total_timer = save_timer(dialog.ui.timeEdit.text())
                 time_1 = dialog.ui.timeEdit.dateTime().toPython()
@@ -637,15 +654,18 @@ class MainWindow(MainForm):
         """Запускает таймер"""
         pass_time = (timer - timedelta(minutes=1)).strftime('%H:%M')
         self.rest_time = datetime.now().replace(hour=0, minute=0, second=0)
+
         while pass_time != '00:00' and self.run_time:
             time.sleep(1)
             if self.run_time == False:
                 break
+
             timer -= timedelta(minutes=1)
             self.rest_time += timedelta(minutes=1)
             pass_time = timer.strftime('%H:%M')
             label_last.setText(pass_time)
             label_passed.setText(self.rest_time.strftime('%H:%M'))
+
         self.timer_finished.emit()
 
     def finsh_timer(self):
@@ -667,7 +687,9 @@ class MainWindow(MainForm):
         ui.setup_ui(dialog)
         total_time, result = show_history_time()
         ui.label_2.setText(str(total_time))
+
         for timer_data in result:
             ui.add_row(timer_data)
+
         dialog.exec()
 

@@ -1,5 +1,6 @@
 import sys
 from database import create_tables
+import resources_rc
 create_tables()
 from main_window import MainWindow
 from PySide6.QtWidgets import QApplication

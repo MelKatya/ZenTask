@@ -18,6 +18,7 @@ class Base(QWidget):
         with open("forms/style.css", "r") as f:
             self.style = f.read()
 
+        self.setStyleSheet(self.style)
         self.layout = QGridLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
 
@@ -63,7 +64,6 @@ class Base(QWidget):
 
         self.push_button_new_cat = QPushButton('Новая категория', self)
         self.push_button_new_cat.setMaximumSize(QSize(120, 16777215))
-        self.push_button_new_cat.setStyleSheet(self.style)
         self.horizontalLayout.addWidget(self.push_button_new_cat)
 
     def priority(self):
@@ -107,17 +107,20 @@ class Base(QWidget):
         self.layout.addLayout(self.horizontalLayout_53, 5, 1, 1, 1)
 
     def overdue_task(self):
-        self.horizontalLayout_17 = QHBoxLayout()
+        self.task_fire_widget = QWidget(self)
+        self.horizontalLayout_17 = QHBoxLayout(self.task_fire_widget)
         self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.horizontalLayout_17.addItem(self.horizontalSpacer_8)
 
         self.label_task_fire = QLabel('Задача просрочена!', self)
-        self.label_task_fire.setVisible(False)
         self.horizontalLayout_17.addWidget(self.label_task_fire)
 
         self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.horizontalLayout_17.addItem(self.horizontalSpacer_9)
-        self.layout.addLayout(self.horizontalLayout_17, 6, 1, 1, 1)
+        self.layout.addWidget(self.task_fire_widget, 6, 1, 1, 1)
+
+        self.task_fire_widget.setVisible(False)
+
 
 
 class Note(QWidget):
@@ -128,6 +131,7 @@ class Note(QWidget):
             self.style = f.read()
 
         self.page = QWidget(self)
+        self.page.setStyleSheet(self.style)
 
         toolBox_not.addItem(self.page, f'Заметка № {page_number}')
 
@@ -139,23 +143,19 @@ class Note(QWidget):
 
         self.horizontalLayout = QHBoxLayout()
         self.pushButton_attach_not = QPushButton('Закрепить', self.verticalLayoutWidget)
-        self.pushButton_attach_not.setStyleSheet(self.style)
         self.pushButton_attach_not.setEnabled(False)
         self.horizontalLayout.addWidget(self.pushButton_attach_not)
 
         self.pushButton_change_not = QPushButton('Изменить', self.verticalLayoutWidget)
         self.pushButton_change_not.setEnabled(False)
-        self.pushButton_change_not.setStyleSheet(self.style)
         self.horizontalLayout.addWidget(self.pushButton_change_not)
 
         self.pushButton_del_not = QPushButton('Удалить', self.verticalLayoutWidget)
         self.pushButton_del_not.setEnabled(False)
-        self.pushButton_del_not.setStyleSheet(self.style)
         self.horizontalLayout.addWidget(self.pushButton_del_not)
 
         self.pushButton_save_not = QPushButton('Сохранить', self.verticalLayoutWidget)
         self.horizontalLayout.addWidget(self.pushButton_save_not)
-        self.pushButton_save_not.setStyleSheet(self.style)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
 
@@ -163,7 +163,6 @@ class MainForm(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_ui()
-
 
     def setup_ui(self):
 
@@ -234,15 +233,12 @@ class MainForm(QMainWindow):
 
         self.pushButton_nt_create_task = QPushButton('Создать задачу', self.groupBox_new_task)
         self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
-        self.pushButton_nt_create_task.setStyleSheet(self.style)
 
         self.pushButton_nt_my_task = QPushButton('Мои задачи', self.page)
         self.pushButton_nt_my_task.setGeometry(QRect(550, 20, 101, 31))
-        self.pushButton_nt_my_task.setStyleSheet(self.style)
 
         self.pushButton_nt_not = QPushButton('Заметки', self.page)
         self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
-        self.pushButton_nt_not.setStyleSheet(self.style)
 
 
     def page_my_tasks(self):
@@ -298,19 +294,18 @@ class MainForm(QMainWindow):
         self.verticalLayout_9 = QVBoxLayout()
 
         self.pushButton_mt_plan_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_6)
-        self.pushButton_mt_plan_change_task.setMinimumSize(QSize(130, 0))
+        self.pushButton_mt_plan_change_task.setFixedSize(QSize(140, 24))
         self.pushButton_mt_plan_change_task.setEnabled(False)
-        self.pushButton_mt_plan_change_task.setStyleSheet(self.style)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
 
         self.pushButton_mt_plan_start = QPushButton('Начать выполнение', self.horizontalLayoutWidget_6)
+        self.pushButton_mt_plan_start.setFixedSize(QSize(140, 24))
         self.pushButton_mt_plan_start.setEnabled(False)
-        self.pushButton_mt_plan_start.setStyleSheet(self.style)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_start)
 
         self.pushButton_mt_plan_del = QPushButton('Удалить задачу', self.horizontalLayoutWidget_6)
+        self.pushButton_mt_plan_del.setFixedSize(QSize(140, 24))
         self.pushButton_mt_plan_del.setEnabled(False)
-        self.pushButton_mt_plan_del.setStyleSheet(self.style)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_del)
 
         self.horizontalLayout_15.addLayout(self.verticalLayout_9)
@@ -357,15 +352,12 @@ class MainForm(QMainWindow):
 
         self.pushButton_mt_proc_start_timer = QPushButton('Запустить', self.verticalLayoutWidget_2)
         self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_start_timer)
-        self.pushButton_mt_proc_start_timer.setStyleSheet(self.style)
 
         self.pushButton_mt_proc_stop_timer = QPushButton('Остановить', self.verticalLayoutWidget_2)
         self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_stop_timer)
-        self.pushButton_mt_proc_stop_timer.setStyleSheet(self.style)
 
         self.pushButton_mt_proc_rem_timer = QPushButton('Обновить', self.verticalLayoutWidget_2)
         self.horizontalLayout_10.addWidget(self.pushButton_mt_proc_rem_timer)
-        self.pushButton_mt_proc_rem_timer.setStyleSheet(self.style)
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_10)
 
@@ -388,17 +380,14 @@ class MainForm(QMainWindow):
         self.pushButton_mt_proc_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_4)
         self.pushButton_mt_proc_change_task.setEnabled(False)
         self.pushButton_mt_proc_change_task.setMinimumSize(QSize(130, 0))
-        self.pushButton_mt_proc_change_task.setStyleSheet(self.style)
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
 
         self.pushButton_mt_proc_finish = QPushButton('Завершить задачу', self.horizontalLayoutWidget_4)
         self.pushButton_mt_proc_finish.setEnabled(False)
-        self.pushButton_mt_proc_finish.setStyleSheet(self.style)
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_finish)
 
         self.pushButton_mt_proc_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_4)
         self.pushButton_mt_proc_del_task.setEnabled(False)
-        self.pushButton_mt_proc_del_task.setStyleSheet(self.style)
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_del_task)
 
         self.horizontalLayout_9.addLayout(self.verticalLayout_5)
@@ -429,30 +418,25 @@ class MainForm(QMainWindow):
         self.horizontalLayoutWidget_7 = QWidget(self.tab_3)
         self.horizontalLayoutWidget_7.setGeometry(QRect(10, 350, 471, 91))
         self.horizontalLayout_22 = QHBoxLayout(self.horizontalLayoutWidget_7)
-        self.horizontalLayout_22.setContentsMargins(0, 5, 0, 0)
+        self.horizontalLayout_22.setContentsMargins(0, 5, 0, 5)
 
         self.groupBox_5 = QGroupBox('Таймер работы над задачей', self.horizontalLayoutWidget_7)
-        self.groupBox_5.setMinimumSize(QSize(285, 0))
+        self.groupBox_5.setFixedSize(285, 81)
         self.verticalLayoutWidget_7 = QWidget(self.groupBox_5)
 
-        self.verticalLayoutWidget_7.setGeometry(QRect(10, 30, 241, 41))
-        self.verticalLayout_12 = QVBoxLayout(self.verticalLayoutWidget_7)
-        # self.verticalLayout_12.setSpacing(2)
-        # self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
-
-        self.horizontalLayout_24 = QHBoxLayout()
+        self.horizontalLayout_24 = QHBoxLayout(self.groupBox_5)
+        self.horizontalLayout_24.setContentsMargins(0, 0, 0, 0)
 
         self.label_25 = QLabel('Время:', self.verticalLayoutWidget_7)
-        self.label_25.setMaximumSize(QSize(50, 15))
+        self.label_25.setMaximumSize(QSize(40, 15))
         self.horizontalLayout_24.addWidget(self.label_25)
 
         self.label_mt_done_timer = QLabel("00:00:00", self.verticalLayoutWidget_7)
         self.horizontalLayout_24.addWidget(self.label_mt_done_timer)
-        self.verticalLayout_12.addLayout(self.horizontalLayout_24)
 
         self.horizontalLayout_22.addWidget(self.groupBox_5)
 
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_7 = QSpacerItem(10, 10, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.horizontalLayout_22.addItem(self.horizontalSpacer_7)
 
         # кнопки
@@ -461,12 +445,10 @@ class MainForm(QMainWindow):
         self.pushButton_mt_done_recover_task = QPushButton('Восстановить задачу', self.horizontalLayoutWidget_7)
         self.pushButton_mt_done_recover_task.setEnabled(False)
         self.pushButton_mt_done_recover_task.setMinimumSize(QSize(130, 0))
-        self.pushButton_mt_done_recover_task.setStyleSheet(self.style)
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
 
         self.pushButton_mt_done_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_7)
         self.pushButton_mt_done_del_task.setEnabled(False)
-        self.pushButton_mt_done_del_task.setStyleSheet(self.style)
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_del_task)
         self.horizontalLayout_22.addLayout(self.verticalLayout_13)
 
@@ -474,11 +456,9 @@ class MainForm(QMainWindow):
     def right_bar(self):
         self.pushButton_mt_crete_task = QPushButton('Новая задача', self.page_2)
         self.pushButton_mt_crete_task.setGeometry(QRect(550, 20, 101, 31))
-        self.pushButton_mt_crete_task.setStyleSheet(self.style)
 
         self.pushButton_mt_not = QPushButton('Заметки', self.page_2)
         self.pushButton_mt_not.setGeometry(QRect(550, 60, 101, 31))
-        self.pushButton_mt_not.setStyleSheet(self.style)
 
         self.progressBar = QProgressBar(self.page_2)
         self.progressBar.setGeometry(QRect(550, 470, 111, 23))
@@ -496,11 +476,9 @@ class MainForm(QMainWindow):
         self.toolBox_not.setGeometry(QRect(10, 20, 501, 441))
 
         self.pushButton_cret_tsk_not = QPushButton('Новая задача', self.page_3)
-        self.pushButton_cret_tsk_not.setStyleSheet(self.style)
         self.pushButton_cret_tsk_not.setGeometry(QRect(550, 20, 101, 31))
 
         self.pushButton_my_task_not = QPushButton('Мои задачи', self.page_3)
-        self.pushButton_my_task_not.setStyleSheet(self.style)
         self.pushButton_my_task_not.setGeometry(QRect(550, 60, 101, 31))
 
     def attached_note(self, Widget):
@@ -509,8 +487,6 @@ class MainForm(QMainWindow):
         self.dockWidget_notice.setVisible(False)
         self.dockWidget_notice.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.dockWidgetContents = QWidget()
-
-        self.dockWidget_notice.setStyleSheet(self.style)
 
         self.label_atached_note = QLabel("TextLabel", self.dockWidgetContents)
         self.label_atached_note.setGeometry(QRect(0, 0, 211, 71))
@@ -524,7 +500,6 @@ class MainForm(QMainWindow):
     def main_timer(self, Widget):
         self.groupBox_main_timer = QGroupBox('Время работы', Widget)
         self.groupBox_main_timer.setGeometry(QRect(700, 180, 211, 181))
-        self.groupBox_main_timer.setStyleSheet(self.style)
 
         self.formLayoutWidget = QWidget(self.groupBox_main_timer)
         self.formLayoutWidget.setGeometry(QRect(10, 20, 191, 51))
@@ -551,14 +526,11 @@ class MainForm(QMainWindow):
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
 
         self.pushButton_set_timer = QPushButton('Установить таймер', self.verticalLayoutWidget_3)
-        self.pushButton_set_timer.setStyleSheet(self.style)
         self.verticalLayout_8.addWidget(self.pushButton_set_timer)
 
         self.pushButton_20 = QPushButton('Отключить таймер', self.verticalLayoutWidget_3)
-        self.pushButton_20.setStyleSheet(self.style)
         self.verticalLayout_8.addWidget(self.pushButton_20)
 
         self.pushButton_21 = QPushButton('Посмотреть историю', self.verticalLayoutWidget_3)
-        self.pushButton_21.setStyleSheet(self.style)
         self.verticalLayout_8.addWidget(self.pushButton_21)
 
