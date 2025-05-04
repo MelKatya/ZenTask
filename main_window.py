@@ -10,7 +10,7 @@ from forms.ui_add_timer import AddTimer
 from forms.ui_show_history import ShowTimers
 from forms.ui_add_replay import AddReplay
 from utils import (upload_priority, upload_category, save_new_category, save_task, save_timer,
-                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, download_all_tasks_from_db)
+                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, add_new_repeat)
 from PySide6.QtCore import Signal, Qt
 from psycopg2 import errors
 import psycopg2
@@ -25,20 +25,20 @@ class DialogReplay(QDialog):
         self.ui = AddReplay()
         self.ui.setup_ui(self)
 
-        self.ui.replay_data = []
         self.ui.tree_view.itemClicked.connect(self.the_button_was_clicked)
 
         self.ui.buttonBox.accepted.connect(self.accept)
         self.ui.buttonBox.rejected.connect(self.reject)
 
     def the_button_was_clicked(self):
+        """Обрабатывает нажатие на дерево выбора"""
         val = ''
         for sel in self.ui.tree_view.selectedIndexes():
-            val_2 = "/" + sel.data()
+            val_2 = " / " + sel.data()
             while sel.parent().isValid():
                 sel = sel.parent()
                 val += sel.data() + val_2 + '\n'
-                self.ui.replay_data.append((sel.data(), val_2[1:]))
+
         self.ui.label_2.setText(val)
 
 
@@ -125,15 +125,28 @@ class MainWindow(MainForm):
         self.lower_bar_buttons()
         self.search_load()
         self.grid_layout_new_task.check_box_repeat.checkStateChanged.connect(self.on_checkbox_state_changed_reply)
+        self.replay = None
 
     def on_checkbox_state_changed_reply(self, state):
         """Изменение состояния чекбокса с заданием повторения задач"""
         if state == Qt.CheckState.Checked:
             dialog = DialogReplay()
             result = dialog.exec()
+
+            self.replay = None
             if result == QDialog.DialogCode.Accepted:
-                print(dialog.ui.label_2.text())
+                if not dialog.ui.label_2.text():
+                    self.grid_layout_new_task.check_box_repeat.setCheckState(Qt.CheckState.Unchecked)
+                    return
+
+                self.grid_layout_new_task.label_repeat.setText(dialog.ui.label_2.text())
+                self.replay = dialog.ui.label_2.text().splitlines()
+
+            elif result == QDialog.DialogCode.Rejected:
+                self.grid_layout_new_task.check_box_repeat.setCheckState(Qt.CheckState.Unchecked)
+
         elif state == Qt.CheckState.Unchecked:
+            self.grid_layout_new_task.label_repeat.setText('')
             self.grid_layout_new_task.datetime_edit.setVisible(False)
 
     def search_load(self):
@@ -349,23 +362,20 @@ class MainWindow(MainForm):
         #  Заполняет форму с задачей при изменении задачи в комбобоксе
         self.comboBox_mt_plan_all.setCurrentIndex(-1)
         self.comboBox_mt_plan_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
-            value=self.comboBox_mt_plan_all.currentIndex(),
             grid_layout=self.grid_layout_plan,
             combo_box=self.comboBox_mt_plan_all))
 
         self.comboBox_mt_proc_all.setCurrentIndex(-1)
         self.comboBox_mt_proc_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
-            value=self.comboBox_mt_proc_all.currentIndex(),
             grid_layout=self.grid_layout_proc,
             combo_box=self.comboBox_mt_proc_all))
 
         self.comboBox_mt_done_all.setCurrentIndex(-1)
         self.comboBox_mt_done_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
-            value=self.comboBox_mt_done_all.currentIndex(),
             grid_layout=self.grid_layout_done,
             combo_box=self.comboBox_mt_done_all))
 
-    def upload_data_to_form(self, value, grid_layout, combo_box):
+    def upload_data_to_form(self, grid_layout, combo_box):
         """Подставляет данные выбранной задачи в чекбоксе"""
         current_task = combo_box.currentData()
 
@@ -396,7 +406,6 @@ class MainWindow(MainForm):
             self.label_mt_done_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
             if current_task.overdue:
                 grid_layout.label_task_fire.setVisible(True)
-
 
         grid_layout.line_edit_name.setText(current_task.name)
         grid_layout.combo_box_prior.setCurrentIndex(current_task.priority - 1)
@@ -496,57 +505,6 @@ class MainWindow(MainForm):
 
         self.search_load()
 
-    def download_note(self):
-        """Выгружает заметки из бд"""
-        self.functions_for_note = (self.save_note, self.del_note, self.attache_note, self.change_note)
-
-        all_notes = download_noticed_from_db()
-        index = 0
-        self.notes = {}
-
-        for note in all_notes:
-            index += 1
-            self.notes[index] = NoteTask(self.toolBox_not, index, self.functions_for_note, text=note[1],
-                                         note=No(id=note[0], text=note[1]))
-            if note[2]:
-                self.dockWidget_notice.setVisible(True)
-                self.label_atached_note.setText(f"{self.notes[index].note.text}")
-
-            self.notes[index].pushButton_del_not.setEnabled(True)
-            self.notes[index].pushButton_attach_not.setEnabled(True)
-            self.notes[index].pushButton_change_not.setEnabled(True)
-            self.notes[index].pushButton_save_not.setEnabled(False)
-
-        self.notes[index + 1] = NoteTask(self.toolBox_not, index + 1, self.functions_for_note)
-
-    def save_note(self, text):
-        """Сохраняет заметки"""
-        page_number = max(self.notes)
-        note = save_note_to_db(text)
-
-        self.notes[page_number].note = note
-        self.notes[page_number + 1] = NoteTask(self.toolBox_not, page_number + 1, self.functions_for_note)
-
-        self.notes[page_number].pushButton_del_not.setEnabled(True)
-        self.notes[page_number].pushButton_attach_not.setEnabled(True)
-        self.notes[page_number].pushButton_change_not.setEnabled(True)
-        self.notes[page_number].pushButton_save_not.setEnabled(False)
-
-    def del_note(self, page_number):
-        """Удаляет заметки"""
-        self.notes[page_number].note.delete_note()
-        self.toolBox_not.removeItem(self.toolBox_not.currentIndex())
-        self.notes.pop(page_number)
-
-    def attache_note(self, page_number):
-        """Прикрепляет заметку справа"""
-        self.dockWidget_notice.setVisible(True)
-        self.label_atached_note.setText(f"{self.notes[page_number].note.text}")
-        self.notes[page_number].note.attach_note()
-
-    def change_note(self, page_number, text):
-        self.notes[page_number].note.change_note(text=text)
-
     def upload_category(self):
         """Загружает категории из бд"""
         upload_category(self.grid_layout_new_task.combo_box_category)
@@ -598,6 +556,7 @@ class MainWindow(MainForm):
     def save_task_button(self):
         """Обрабатывает кнопку 'Создать задачу' - создает задачу"""
         flag = True
+
         if not self.grid_layout_new_task.line_edit_name.text():
             QMessageBox.warning(self, "Ошибка", "Необходимо ввести название задачи.")
             flag = False
@@ -608,8 +567,8 @@ class MainWindow(MainForm):
 
         if flag:
             name = self.grid_layout_new_task.line_edit_name.text()
-            priority = self.grid_layout_new_task.combo_box_prior.currentText()
-            category = self.grid_layout_new_task.combo_box_category.currentText()
+            priority = self.grid_layout_new_task.combo_box_prior.currentIndex() + 1
+            category = self.grid_layout_new_task.combo_box_category.currentIndex() + 1
             descrirton = self.grid_layout_new_task.text_edit_description.toPlainText()
 
             if self.grid_layout_new_task.check_box_add_time.checkState() == Qt.CheckState.Checked:
@@ -619,12 +578,20 @@ class MainWindow(MainForm):
                 deadline = None
 
             recording_result = save_task(name, priority, category, descrirton, deadline)
-            if not recording_result:
+
+            if isinstance(recording_result, psycopg2.errors.UniqueViolation):
+                QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
+
+            elif recording_result:
+                if self.replay:
+                    for repl in self.replay:
+                        add_new_repeat(recording_result, repl)
+
                 self.upload_planned_task()
                 self.search_load()
                 QMessageBox.about(self, 'Успех', f'задача {name} сохранена')
-            elif isinstance(recording_result, psycopg2.errors.UniqueViolation):
-                QMessageBox.warning(self, "Ошибка", "Задача с таким именем уже есть.")
+
+
 
 # __________________ TotalTimer_______________________________
     def open_timer_form(self):
@@ -693,3 +660,55 @@ class MainWindow(MainForm):
 
         dialog.exec()
 
+# __________________ Note_______________________________
+
+    def download_note(self):
+        """Выгружает заметки из бд"""
+        self.functions_for_note = (self.save_note, self.del_note, self.attache_note, self.change_note)
+
+        all_notes = download_noticed_from_db()
+        index = 0
+        self.notes = {}
+
+        for note in all_notes:
+            index += 1
+            self.notes[index] = NoteTask(self.toolBox_not, index, self.functions_for_note, text=note[1],
+                                         note=No(id=note[0], text=note[1]))
+            if note[2]:
+                self.dockWidget_notice.setVisible(True)
+                self.label_atached_note.setText(f"{self.notes[index].note.text}")
+
+            self.notes[index].pushButton_del_not.setEnabled(True)
+            self.notes[index].pushButton_attach_not.setEnabled(True)
+            self.notes[index].pushButton_change_not.setEnabled(True)
+            self.notes[index].pushButton_save_not.setEnabled(False)
+
+        self.notes[index + 1] = NoteTask(self.toolBox_not, index + 1, self.functions_for_note)
+
+    def save_note(self, text):
+        """Сохраняет заметки"""
+        page_number = max(self.notes)
+        note = save_note_to_db(text)
+
+        self.notes[page_number].note = note
+        self.notes[page_number + 1] = NoteTask(self.toolBox_not, page_number + 1, self.functions_for_note)
+
+        self.notes[page_number].pushButton_del_not.setEnabled(True)
+        self.notes[page_number].pushButton_attach_not.setEnabled(True)
+        self.notes[page_number].pushButton_change_not.setEnabled(True)
+        self.notes[page_number].pushButton_save_not.setEnabled(False)
+
+    def del_note(self, page_number):
+        """Удаляет заметки"""
+        self.notes[page_number].note.delete_note()
+        self.toolBox_not.removeItem(self.toolBox_not.currentIndex())
+        self.notes.pop(page_number)
+
+    def attache_note(self, page_number):
+        """Прикрепляет заметку справа"""
+        self.dockWidget_notice.setVisible(True)
+        self.label_atached_note.setText(f"{self.notes[page_number].note.text}")
+        self.notes[page_number].note.attach_note()
+
+    def change_note(self, page_number, text):
+        self.notes[page_number].note.change_note(text=text)

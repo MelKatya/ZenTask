@@ -22,7 +22,6 @@ db_pool = pool.SimpleConnectionPool(1, 10, database=os.getenv("database"), user=
 
 
 
-
 def work_db(func: Callable) -> Callable:
     """Декоратор для того, чтобы не строчить везде подключения"""
     @wraps(func)
@@ -67,8 +66,6 @@ class Task:
                 f"deadline - {self.deadline}, overdue - {self.overdue}, "
                 f"repeat - {self.repeats}) -- decription - {self.description}")
 
-    def add_repeat(self, repeat):
-        self.repeats.append(repeat)
 
     @work_db
     def stop_timer(self, cur):
@@ -218,24 +215,30 @@ class Task:
             WHERE status_id in (1, 2) AND deadline is not null AND deadline < %s
                     """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ))
 
+    def add_repeat(self, repeat):
+        self.repeats.append(repeat)
+
 
 class TaskRepeat:
-    def __init__(self, task_id, repeat_type, repeat_value, time_of_day=None, id_repeat=None):
+    def __init__(self, task_id, repeat_type, repeat_value, id_repeat=None):
         self.id = id_repeat
         self.task_id = task_id
+        self.start_date = datetime.now()
         self.repeat_type = repeat_type
         self.repeat_value = repeat_value
-        self.time_of_day = time_of_day
 
     @work_db
-    def save_report(self, cur):
+    def save_repeat(self, cur, task_id):
+        self.task_id = task_id
+        """Сохраняет повторение"""
         cur.execute("""
-                INSERT INTO task 
-                (task_id, repeat_type, repeat_value, time_of_day)
+                INSERT INTO task_repeat 
+                (task_id, start_date, repeat_type, repeat_value)
                 VALUES (%s, %s, %s, %s)
                 RETURNING id
-                """, (self.task_id, self.repeat_type, self.repeat_value, self.time_of_day))
+                """, (self.task_id, self.start_date, self.repeat_type, self.repeat_value))
         self.id = cur.fetchone()[0]
+        return self.id
 
 
 class Note:
@@ -405,14 +408,14 @@ def create_tables(cur) -> None:
        timer TIME,
        overdue BOOL);
        """)
-    #  Добавить каскадное удаление
+
     cur.execute("""
        CREATE TABLE IF NOT EXISTS task_repeat (
        id SERIAL PRIMARY KEY,
-       task_id INTEGER REFERENCES task(id),
+       task_id INTEGER REFERENCES task(id) ON DELETE CASCADE,
+       start_date DATE,
        repeat_type TEXT,
-       repeat_value TEXT,
-       time_of_day TIME);
+       repeat_value TEXT);
        """)
 
     cur.execute("""

@@ -1,4 +1,4 @@
-from database import (get_dict_tables, save_category, Task, TotalTimer, Note)
+from database import (get_dict_tables, save_category, Task, TotalTimer, Note, TaskRepeat)
 
 
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
@@ -25,15 +25,15 @@ def save_new_category(name):
     _, _, task_category_dict = get_dict_tables()
 
 
-def save_task(name, priority, category, descrirtion, deadline=None, replay=None):
+def save_task(name, priority, category, descrirtion, deadline=None):
     """Сохраняет новую задачу"""
-    global task_priority_dict, task_category_dict
-    cat_id = list(filter(lambda x: x[1] == category, task_category_dict.items()))[0][0]
-    prior_id = list(filter(lambda x: x[1] == priority, task_priority_dict.items()))[0][0]
 
     new_task = Task(name=name, description=descrirtion,
-                    priority_id=prior_id, category_id=cat_id, deadline=deadline)
-    return new_task.save_task()
+                    priority_id=priority, category_id=category, deadline=deadline)
+
+    result_save = new_task.save_task()
+
+    return new_task.id if not result_save else result_save
 
 
 def save_timer(planned_time):
@@ -86,6 +86,17 @@ def download_all_tasks_from_db():
         else:
             done_task.append(task)
     return planned_tasks, doing_tasks, done_task
+
+
+def add_new_repeat(task_id, replay):
+    """Добавляет новое повторение"""
+    repeat_type, repeat_value = replay.split(' / ')
+    repeat = TaskRepeat(task_id, repeat_type, repeat_value)
+    task_repeat_id = repeat.save_repeat(task_id=task_id)
+
+    if task_repeat_id:
+        return repeat
+
 
 
 

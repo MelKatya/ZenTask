@@ -35,12 +35,12 @@ class Base(QWidget):
         self.label_4 = QLabel('Описание:', self)
         self.verticalLayout_3.addWidget(self.label_4)
 
-        self.verticalSpacer = QSpacerItem(20, 105)
+        self.verticalSpacer = QSpacerItem(10, 0,  QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Expanding)
         self.verticalLayout_3.addItem(self.verticalSpacer)
         self.layout.addLayout(self.verticalLayout_3, 3, 0, 1, 1)
 
         self.text_edit_description = QTextEdit(self)
-        self.text_edit_description.setMaximumSize(QSize(499, 110))
+        self.text_edit_description.setMaximumSize(QSize(499, 130))
         self.layout.addWidget(self.text_edit_description, 3, 1, 1, 1)
 
         self.adding_deadline()
@@ -76,33 +76,36 @@ class Base(QWidget):
     def adding_deadline(self):
         self.horizontalLayout_50 = QHBoxLayout()
 
+        self.check_box_add_time = QCheckBox('Добавить срок', self)
+        self.check_box_add_time.setMinimumSize(QSize(137, 0))
+        self.horizontalLayout_50.addWidget(self.check_box_add_time)
+
+        self.horizontalSpacer_34 = QSpacerItem(10, 20, QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_50.addItem(self.horizontalSpacer_34)
+
         self.datetime_edit = QDateTimeEdit(self)
         self.datetime_edit.setVisible(False)
         self.datetime_edit.setMinimumSize(QSize(150, 0))
         self.horizontalLayout_50.addWidget(self.datetime_edit)
 
-        self.horizontalSpacer_34 = QSpacerItem(10, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_50.addItem(self.horizontalSpacer_34)
         self.layout.addLayout(self.horizontalLayout_50, 4, 1, 1, 1)
 
-        self.check_box_add_time = QCheckBox('Добавить срок', self)
-        self.check_box_add_time.setMinimumSize(QSize(137, 25))
-        self.horizontalLayout_50.addWidget(self.check_box_add_time)
 
     def adding_replay(self):
         self.horizontalLayout_53 = QHBoxLayout()
 
-        self.label_repeat = QLabel("TextLabel", self)
-        self.label_repeat.setEnabled(False)
-        self.label_repeat.setMinimumSize(QSize(150, 0))
-        self.horizontalLayout_53.addWidget(self.label_repeat)
-
-        self.horizontalSpacer_37 = QSpacerItem(10, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_53.addItem(self.horizontalSpacer_37)
-
         self.check_box_repeat = QCheckBox('Повторяемая задача', self)
         self.check_box_repeat.setMinimumSize(QSize(137, 0))
         self.horizontalLayout_53.addWidget(self.check_box_repeat)
+        self.horizontalLayout_53.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        self.horizontalSpacer_37 = QSpacerItem(10, 20,  QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_53.addItem(self.horizontalSpacer_37)
+
+        self.label_repeat = QLabel("", self)
+        self.label_repeat.setEnabled(False)
+        self.label_repeat.setMinimumSize(QSize(150, 0))
+        self.horizontalLayout_53.addWidget(self.label_repeat)
 
         self.layout.addLayout(self.horizontalLayout_53, 5, 1, 1, 1)
 
@@ -230,6 +233,13 @@ class MainForm(QMainWindow):
 
         self.grid_layout_new_task = Base(self.groupBox_new_task)
         self.grid_layout_new_task.setGeometry(QRect(10, 20, 511, 361))
+
+
+        # self.grid_layout_new_task.verticalLayout_3.removeItem(self.grid_layout_new_task.verticalSpacer)
+        # verticalSpacer = QSpacerItem(20, 195)
+        # self.grid_layout_new_task.verticalLayout_3.addItem(verticalSpacer)
+
+        self.grid_layout_new_task.text_edit_description.setMaximumSize(QSize(499, 200))
 
         self.pushButton_nt_create_task = QPushButton('Создать задачу', self.groupBox_new_task)
         self.pushButton_nt_create_task.setGeometry(QRect(370, 400, 151, 31))
