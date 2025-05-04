@@ -90,7 +90,6 @@ class Base(QWidget):
 
         self.layout.addLayout(self.horizontalLayout_50, 4, 1, 1, 1)
 
-
     def adding_replay(self):
         self.horizontalLayout_53 = QHBoxLayout()
 
