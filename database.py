@@ -46,8 +46,8 @@ def work_db(func: Callable) -> Callable:
 class Task:
     """Класс задачи"""
     def __init__(self, name: str, description: str = "", priority_id: int = 1, category_id: int = 1,
-                 deadline=None, repeats=None, id_task=None, status_id=1, overdue=False,
-                 timer=datetime.now().replace(hour=0, minute=0, second=0)):
+                 deadline=None, id_task=None, status_id=1, overdue=False,
+                 timer=datetime.now().replace(hour=0, minute=0, second=0), repeats=None):
         self.id = id_task
         self.name = name
         self.priority = priority_id
@@ -95,11 +95,11 @@ class Task:
         logger.info(f'Создание задачи: "{self}"')
         cur.execute("""
         INSERT INTO task 
-        (name, priority_id, category_id, description, status_id, deadline, repeat, timer, overdue)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (name, priority_id, category_id, description, status_id, deadline, timer, overdue)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
         """, (self.name, self.priority, self.category, self.description,
-              self.status, self.deadline, self.repeats, self.timer, self.overdue))
+              self.status, self.deadline, self.timer, self.overdue))
         self.id = cur.fetchone()[0]
 
     @work_db
@@ -109,10 +109,10 @@ class Task:
         cur.execute("""
         UPDATE task SET
         name = %s, priority_id = %s, category_id = %s, description = %s, 
-        deadline = %s, repeat = %s, timer = %s, overdue = %s
+        deadline = %s, timer = %s, overdue = %s
         WHERE id = %s
         """, (self.name, self.priority, self.category, self.description,
-              self.deadline, self.repeats, self.timer, self.overdue, self.id))
+              self.deadline, self.timer, self.overdue, self.id))
         return True
 
     @work_db
@@ -137,73 +137,30 @@ class Task:
 
     @classmethod
     @work_db
-    def download_all_tasks(cls, cur):
-        """Выгружает все задачи из бд и создает объекты задач"""
-        logger.info(f'Выгрузка всех задач из бд')
+    def download_tasks_by_status(cls, cur, status_id):
+        """Выгружает все задачи из бд со статусом status_id и создает объекты задач"""
+        logger.info(f'Выгрузка всех задач со статусом {status_id}')
         cur.execute("""
-        SELECT * FROM task
-        """)
-        res = cur.fetchall()
-        all_task = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                         status_id=task[5], deadline=task[6], repeats=task[7], timer=task[8], overdue=task[9])
-                    for task in res]
-
-        return all_task
-
-    @classmethod
-    @work_db
-    def download_planned_tasks(cls, cur):
-        """Выгружает все запланированные задачи из бд и создает объекты задач"""
-        logger.info(f'Выгрузка всех задач из бд')
-        cur.execute("""
-            SELECT * FROM task
-            WHERE status_id = 1
-            """)
+            SELECT 
+                t.*, 
+                STRING_AGG(tr.repeat_type, ' ') AS repeat_type, 
+                STRING_AGG(tr.repeat_value, ' ') AS repeat_value
+            FROM task t
+            LEFT JOIN task_repeat tr ON t.id = tr.task_id
+            WHERE t.status_id = %s
+            GROUP BY t.id
+            """, (status_id,))
         res = cur.fetchall()
 
-        planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                              status_id=task[5], deadline=task[6], repeats=task[7],
-                              timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
-                              overdue=task[9])
+        tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3],
+                              description=task[4], status_id=task[5], deadline=task[6],
+                              timer=datetime.now().replace(hour=task[7].hour, minute=task[7].minute, second=task[7].second),
+                              overdue=task[8],
+                              repeats=tuple(zip(task[9].split(), task[10].split())) if task[9] else None)
                          for task in res]
 
-        return planned_tasks
+        return tasks
 
-    @classmethod
-    @work_db
-    def download_doing_tasks(cls, cur):
-        """Выгружает все выполняемые задачи из бд и создает объекты задач"""
-        logger.info(f'Выгрузка всех задач из бд')
-        cur.execute("""
-            SELECT * FROM task
-            WHERE status_id = 2
-            """)
-        res = cur.fetchall()
-        # overdue = task[9] or task[6] < datetime.now()
-        planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                              status_id=task[5], deadline=task[6], repeats=task[7],
-                              timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
-                              overdue=task[9])
-                         for task in res]
-        return planned_tasks
-
-    @classmethod
-    @work_db
-    def download_done_tasks(cls, cur):
-        """Выгружает все выполненные задачи из бд и создает объекты задач"""
-        logger.info(f'Выгрузка всех задач из бд')
-        cur.execute("""
-            SELECT * FROM task
-            WHERE status_id = 3
-            """)
-        res = cur.fetchall()
-        planned_tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3], description=task[4],
-                              status_id=task[5], deadline=task[6], repeats=task[7],
-                              timer=datetime.now().replace(hour=task[8].hour, minute=task[8].minute, second=task[8].second),
-                              overdue=task[9])
-                         for task in res]
-
-        return planned_tasks
 
     @classmethod
     @work_db
@@ -404,7 +361,6 @@ def create_tables(cur) -> None:
        description TEXT,
        status_id INTEGER REFERENCES task_status(id),
        deadline TIMESTAMP,
-       repeat DATE,
        timer TIME,
        overdue BOOL);
        """)

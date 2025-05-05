@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow
 from PySide6.QtCore import QCoreApplication, QRect, QSize, Qt
-from PySide6.QtGui import QCursor, QFont
+from PySide6.QtGui import QCursor, QFont, QIcon
 from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox,
     QDateTimeEdit, QDockWidget, QFormLayout, QFrame,
     QGridLayout, QGroupBox, QHBoxLayout, QLabel,
@@ -174,7 +174,10 @@ class MainForm(QMainWindow):
 
         self.resize(933, 548)
         self.setWindowTitle('ТаскТрекер')
+        self.setWindowIcon(QIcon(':/images/icon.png'))
+
         self.setStyleSheet(self.style)
+        self.setWindowFlags(Qt.WindowType.MSWindowsFixedSizeDialogHint)
 
         self.calendarWidget = QCalendarWidget(self)
         self.add_calendar()
@@ -205,25 +208,12 @@ class MainForm(QMainWindow):
         self.calendarWidget.setGeometry(QRect(700, 370, 211, 161))
         font = QFont()
         font.setFamilies([u"Calibri"])
-        font.setPointSize(9)
-        font.setBold(False)
+        font.setPointSize(8)
         self.calendarWidget.setFont(font)
-        self.calendarWidget.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-        self.calendarWidget.setMouseTracking(False)
-        self.calendarWidget.setTabletTracking(False)
-        self.calendarWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
-        self.calendarWidget.setAcceptDrops(False)
-        self.calendarWidget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.calendarWidget.setAutoFillBackground(True)
-        self.calendarWidget.setInputMethodHints(Qt.InputMethodHint.ImhNone)
-        self.calendarWidget.setFirstDayOfWeek(Qt.DayOfWeek.Monday)
-        self.calendarWidget.setGridVisible(False)
-        self.calendarWidget.setSelectionMode(QCalendarWidget.SelectionMode.SingleSelection)
-        self.calendarWidget.setHorizontalHeaderFormat(QCalendarWidget.HorizontalHeaderFormat.ShortDayNames)
         self.calendarWidget.setVerticalHeaderFormat(QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader)
-        self.calendarWidget.setNavigationBarVisible(True)
-        self.calendarWidget.setDateEditEnabled(True)
-        self.calendarWidget.setDateEditAcceptDelay(1500)
+
+
+
 
 
     def page_new_task(self):

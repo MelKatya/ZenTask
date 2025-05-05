@@ -456,7 +456,7 @@ class MainWindow(MainForm):
 
     def upload_planned_task(self):
         """Загружает все запланированные задачи в комбобокс"""
-        self.planned_tasks = Task.download_planned_tasks()
+        self.planned_tasks = Task.download_tasks_by_status(status_id=1)
 
         # Отключает обработку сигналов перед очищением комбобокса
         self.comboBox_mt_plan_all.blockSignals(True)
@@ -473,7 +473,7 @@ class MainWindow(MainForm):
 
     def upload_doing_task(self):
         """Загружает все выполняемые задачи в комбобокс"""
-        self.doing_tasks = Task.download_doing_tasks()
+        self.doing_tasks = Task.download_tasks_by_status(status_id=2)
 
         self.comboBox_mt_proc_all.blockSignals(True)
         self.comboBox_mt_proc_all.clear()
@@ -490,7 +490,7 @@ class MainWindow(MainForm):
 
     def upload_done_task(self):
         """Загружает все выполненные задачи в комбобокс"""
-        self.done_tasks = Task.download_done_tasks()
+        self.done_tasks = Task.download_tasks_by_status(status_id=3)
 
         self.comboBox_mt_done_all.blockSignals(True)
         self.comboBox_mt_done_all.clear()
