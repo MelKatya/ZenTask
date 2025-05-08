@@ -1,3 +1,6 @@
+import copy
+from datetime import datetime
+
 from database import (get_dict_tables, save_category, Task, TotalTimer, Note, TaskRepeat)
 
 
@@ -98,7 +101,29 @@ def add_new_repeat(task_id, replay):
         return repeat
 
 
+def return_task():
+    all_task = Task.download_all_tasks()
+    week = dict(zip(("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"), range(7)))
+    for task in all_task:
+        if task.repeats:
+            for rep in task.repeats:
+                if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) > datetime.strptime(rep[0],
+                                                                                                         '%Y-%m-%d'):
+                    new_task = copy.copy(task)
+                    flag_create = False
 
+                    if rep[1] == 'Месяц' and datetime.now().strftime("%m") == rep[2]:
+                        flag_create = True
+                    elif rep[1] == 'Неделя' and datetime.now().weekday() == week[rep[2]]:
+                        flag_create = True
+                    elif rep[1] == 'День' and datetime.now() > datetime.now().replace(hour=int(rep[2].split(':')[0]),
+                                                                                      minute=0):
+                        flag_create = True
 
+                    if flag_create:
+                        new_task.name = new_task.name + f' {datetime.now().strftime("%Y-%m-%d")}'
+                        new_task.status = 1
+                        new_task.save_task()
+                        break
 
 

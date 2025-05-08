@@ -1,3 +1,4 @@
+import copy
 import sys
 import time
 
@@ -10,7 +11,8 @@ from forms.ui_add_timer import AddTimer
 from forms.ui_show_history import ShowTimers
 from forms.ui_add_replay import AddReplay
 from utils import (upload_priority, upload_category, save_new_category, save_task, save_timer,
-                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, add_new_repeat)
+                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, add_new_repeat,
+                   return_task)
 from PySide6.QtCore import Signal, Qt
 from psycopg2 import errors
 import psycopg2
@@ -22,6 +24,10 @@ from database import Note as No, Task
 class DialogReplay(QDialog):
     def __init__(self):
         super().__init__()
+        with open("forms/style.css", "r") as f:
+            self.style = f.read()
+        self.setStyleSheet(self.style)
+
         self.ui = AddReplay()
         self.ui.setup_ui(self)
 
@@ -45,6 +51,10 @@ class DialogReplay(QDialog):
 class DialogCategory(QDialog):
     def __init__(self):
         super().__init__()
+        with open("forms/style.css", "r") as f:
+            self.style = f.read()
+        self.setStyleSheet(self.style)
+
         self.ui = NewCategory()
         self.ui.setup_ui(self)
 
@@ -65,6 +75,10 @@ class DialogCategory(QDialog):
 class DialogTimer(QDialog):
     def __init__(self):
         super().__init__()
+        with open("forms/style.css", "r") as f:
+            self.style = f.read()
+        self.setStyleSheet(self.style)
+
         self.ui = AddTimer()
         self.ui.setup_ui(self)
 
@@ -106,6 +120,7 @@ class MainWindow(MainForm):
         Task.check_overdue()
 
         self.timer_finished.connect(self.finsh_timer)
+        return_task()
         self.upload_priority()
         self.upload_category()
         self.change_page_buttons()
@@ -126,6 +141,7 @@ class MainWindow(MainForm):
         self.search_load()
         self.grid_layout_new_task.check_box_repeat.checkStateChanged.connect(self.on_checkbox_state_changed_reply)
         self.replay = None
+
 
     def on_checkbox_state_changed_reply(self, state):
         """Изменение состояния чекбокса с заданием повторения задач"""
@@ -429,6 +445,12 @@ class MainWindow(MainForm):
         else:
             grid_layout.check_box_add_time.setChecked(False)
             grid_layout.task_fire_widget.setVisible(False)
+
+        if current_task.repeats:
+            grid_layout.check_box_repeat.setChecked(True)
+            repeat_text = '\n'.join((f'{rep[0]} / {rep[1]}' for rep in current_task.repeats))
+            grid_layout.label_repeat.setText(repeat_text)
+
 
     def on_checkbox_deadline(self, grid_layout):
         """Изменение состояния чекбокса с заданием дедлайна"""

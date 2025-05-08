@@ -27,9 +27,7 @@ class NewCategory:
         self.buttonBox = QDialogButtonBox(Dialog)
         # self.buttonBox.setObjectName(u"buttonBox")
 
-        with open("forms/style.css", "r") as f:
-            style = f.read()
-            self.buttonBox.setStyleSheet(style)
+
 
         # self.buttonBox.setStyleSheet("""
         #                     QPushButton {

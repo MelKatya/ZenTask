@@ -213,9 +213,6 @@ class MainForm(QMainWindow):
         self.calendarWidget.setVerticalHeaderFormat(QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader)
 
 
-
-
-
     def page_new_task(self):
         self.groupBox_new_task = QGroupBox('Новая задача', self.page)
         self.groupBox_new_task.setGeometry(QRect(10, 10, 531, 451))
@@ -293,17 +290,15 @@ class MainForm(QMainWindow):
         self.verticalLayout_9 = QVBoxLayout()
 
         self.pushButton_mt_plan_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_6)
-        self.pushButton_mt_plan_change_task.setFixedSize(QSize(140, 24))
+        self.pushButton_mt_plan_change_task.setFixedSize(QSize(150, 24))
         self.pushButton_mt_plan_change_task.setEnabled(False)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_change_task)
 
         self.pushButton_mt_plan_start = QPushButton('Начать выполнение', self.horizontalLayoutWidget_6)
-        self.pushButton_mt_plan_start.setFixedSize(QSize(140, 24))
         self.pushButton_mt_plan_start.setEnabled(False)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_start)
 
         self.pushButton_mt_plan_del = QPushButton('Удалить задачу', self.horizontalLayoutWidget_6)
-        self.pushButton_mt_plan_del.setFixedSize(QSize(140, 24))
         self.pushButton_mt_plan_del.setEnabled(False)
         self.verticalLayout_9.addWidget(self.pushButton_mt_plan_del)
 
@@ -378,7 +373,7 @@ class MainForm(QMainWindow):
         self.verticalLayout_5 = QVBoxLayout()
         self.pushButton_mt_proc_change_task = QPushButton('Изменить задачу', self.horizontalLayoutWidget_4)
         self.pushButton_mt_proc_change_task.setEnabled(False)
-        self.pushButton_mt_proc_change_task.setMinimumSize(QSize(130, 0))
+        self.pushButton_mt_proc_change_task.setFixedSize(QSize(150, 24))
         self.verticalLayout_5.addWidget(self.pushButton_mt_proc_change_task)
 
         self.pushButton_mt_proc_finish = QPushButton('Завершить задачу', self.horizontalLayoutWidget_4)
@@ -443,7 +438,7 @@ class MainForm(QMainWindow):
 
         self.pushButton_mt_done_recover_task = QPushButton('Восстановить задачу', self.horizontalLayoutWidget_7)
         self.pushButton_mt_done_recover_task.setEnabled(False)
-        self.pushButton_mt_done_recover_task.setMinimumSize(QSize(130, 0))
+        self.pushButton_mt_done_recover_task.setFixedSize(QSize(150, 24))
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_recover_task)
 
         self.pushButton_mt_done_del_task = QPushButton('Удалить задачу', self.horizontalLayoutWidget_7)

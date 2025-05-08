@@ -19,7 +19,7 @@ class AddReplay:
 
         self.tree_view = QTreeWidget(self.groupBox)
         self.tree_view.setHeaderHidden(True)
-        self.tree_view.setAlternatingRowColors(True)
+        # self.tree_view.setAlternatingRowColors(True)
         self.tree_view.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.tree_view.setAnimated(True)
         self.tree_view.setAllColumnsShowFocus(True)

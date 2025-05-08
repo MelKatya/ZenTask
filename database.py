@@ -161,6 +161,31 @@ class Task:
 
         return tasks
 
+    @classmethod
+    @work_db
+    def download_all_tasks(cls, cur):
+        """Выгружает все задачи из бд со статусом status_id и создает объекты задач"""
+        logger.info(f'Выгрузка всех задач')
+        cur.execute("""
+            SELECT 
+                t.*, 
+                STRING_AGG(CAST(tr.start_date AS Text), ' ') AS start_date,
+                STRING_AGG(tr.repeat_type, ' ') AS repeat_type, 
+                STRING_AGG(tr.repeat_value, ' ') AS repeat_value
+            FROM task t
+            LEFT JOIN task_repeat tr ON t.id = tr.task_id
+            GROUP BY t.id
+            """,)
+        res = cur.fetchall()
+
+        tasks = [Task(id_task=task[0], name=task[1], priority_id=task[2], category_id=task[3],
+                      description=task[4], status_id=task[5], deadline=task[6],
+                      timer=datetime.now().replace(hour=task[7].hour, minute=task[7].minute, second=task[7].second),
+                      overdue=task[8],
+                      repeats=tuple(zip(task[9].split(), task[10].split(), task[11].split())) if task[9] else None)
+                 for task in res]
+
+        return tasks
 
     @classmethod
     @work_db
