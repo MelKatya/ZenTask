@@ -18,7 +18,7 @@ from psycopg2 import errors
 import psycopg2
 from datetime import datetime, timedelta
 import threading
-from database import Note as No, Task
+from database import Note as No, Task, TaskRepeat
 
 
 class DialogReplay(QDialog):
@@ -139,31 +139,36 @@ class MainWindow(MainForm):
         self.upload_all_tasks_with_data()
         self.lower_bar_buttons()
         self.search_load()
-        self.grid_layout_new_task.check_box_repeat.checkStateChanged.connect(self.on_checkbox_state_changed_reply)
+        self.grid_layout_new_task.check_box_repeat.checkStateChanged.connect(lambda: self.on_checkbox_state_changed_reply(
+            grid_layout=self.grid_layout_new_task))
         self.replay = None
+        self.last_check = Qt.CheckState.Unchecked
 
 
-    def on_checkbox_state_changed_reply(self, state):
+    def on_checkbox_state_changed_reply(self, grid_layout):
         """Изменение состояния чекбокса с заданием повторения задач"""
-        if state == Qt.CheckState.Checked:
+        state = grid_layout.check_box_repeat.checkState()
+        if state == Qt.CheckState.Checked and grid_layout.check_box_repeat.checkState() != self.last_check:
+            self.last_check = Qt.CheckState.Checked
             dialog = DialogReplay()
             result = dialog.exec()
 
             self.replay = None
             if result == QDialog.DialogCode.Accepted:
                 if not dialog.ui.label_2.text():
-                    self.grid_layout_new_task.check_box_repeat.setCheckState(Qt.CheckState.Unchecked)
+                    grid_layout.check_box_repeat.setCheckState(Qt.CheckState.Unchecked)
                     return
 
-                self.grid_layout_new_task.label_repeat.setText(dialog.ui.label_2.text())
+                grid_layout.label_repeat.setText(dialog.ui.label_2.text())
                 self.replay = dialog.ui.label_2.text().splitlines()
 
             elif result == QDialog.DialogCode.Rejected:
-                self.grid_layout_new_task.check_box_repeat.setCheckState(Qt.CheckState.Unchecked)
+                grid_layout.check_box_repeat.setCheckState(Qt.CheckState.Unchecked)
 
         elif state == Qt.CheckState.Unchecked:
-            self.grid_layout_new_task.label_repeat.setText('')
-            self.grid_layout_new_task.datetime_edit.setVisible(False)
+            self.last_check = Qt.CheckState.Unchecked
+            grid_layout.label_repeat.setText('')
+            grid_layout.datetime_edit.setVisible(False)
 
     def search_load(self):
         """Обновляет процесс-бар выполненных задач"""
@@ -331,6 +336,7 @@ class MainWindow(MainForm):
             frame.setEnabled(True)
             push_button.setText('Сохранить изменения')
 
+
     def change_task_button(self, grid_layout, task):
         """Обрабатывает кнопку 'Изменить задачу' - изменяет задачу"""
         flag = True
@@ -364,6 +370,18 @@ class MainWindow(MainForm):
 
             task.deadline = deadline
             result = task.change_task()
+
+            # grid_layout.check_box_repeat.checkState() != self.last_check
+
+            if self.replay:
+                self.last_check = Qt.CheckState.Checked
+                for repl in self.replay:
+                    add_new_repeat(task.id, repl)
+            else:
+                self.last_check=Qt.CheckState.Unchecked
+                TaskRepeat.del_repeat(task_id=task.id)
+                grid_layout.label_repeat.setText('')
+
             if result:
                 QMessageBox.about(self, 'Успех', f'Задача {task.name} изменена')
             else:
@@ -385,6 +403,12 @@ class MainWindow(MainForm):
         self.comboBox_mt_proc_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
             grid_layout=self.grid_layout_proc,
             combo_box=self.comboBox_mt_proc_all))
+
+        self.grid_layout_plan.check_box_repeat.checkStateChanged.connect(lambda: self.on_checkbox_state_changed_reply(
+            grid_layout=self.grid_layout_plan))
+
+        self.grid_layout_proc.check_box_repeat.checkStateChanged.connect(lambda: self.on_checkbox_state_changed_reply(
+            grid_layout=self.grid_layout_proc))
 
         self.comboBox_mt_done_all.setCurrentIndex(-1)
         self.comboBox_mt_done_all.currentIndexChanged.connect(lambda: self.upload_data_to_form(
@@ -447,9 +471,14 @@ class MainWindow(MainForm):
             grid_layout.task_fire_widget.setVisible(False)
 
         if current_task.repeats:
+            self.last_check = Qt.CheckState.Checked
             grid_layout.check_box_repeat.setChecked(True)
             repeat_text = '\n'.join((f'{rep[0]} / {rep[1]}' for rep in current_task.repeats))
             grid_layout.label_repeat.setText(repeat_text)
+        else:
+            self.last_check = Qt.CheckState.Unchecked
+            grid_layout.check_box_repeat.setChecked(False)
+            grid_layout.label_repeat.setText('')
 
 
     def on_checkbox_deadline(self, grid_layout):
@@ -592,6 +621,7 @@ class MainWindow(MainForm):
             priority = self.grid_layout_new_task.combo_box_prior.currentIndex() + 1
             category = self.grid_layout_new_task.combo_box_category.currentIndex() + 1
             descrirton = self.grid_layout_new_task.text_edit_description.toPlainText()
+
 
             if self.grid_layout_new_task.check_box_add_time.checkState() == Qt.CheckState.Checked:
                 deadline = self.grid_layout_new_task.datetime_edit.dateTime()

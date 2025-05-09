@@ -95,6 +95,7 @@ def add_new_repeat(task_id, replay):
     """Добавляет новое повторение"""
     repeat_type, repeat_value = replay.split(' / ')
     repeat = TaskRepeat(task_id, repeat_type, repeat_value)
+    TaskRepeat.del_repeat(task_id=task_id)
     task_repeat_id = repeat.save_repeat(task_id=task_id)
 
     if task_repeat_id:

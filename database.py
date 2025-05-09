@@ -209,6 +209,16 @@ class TaskRepeat:
         self.repeat_type = repeat_type
         self.repeat_value = repeat_value
 
+    @classmethod
+    @work_db
+    def del_repeat(cls, cur, task_id):
+        """Удаляет повторение"""
+        cur.execute("""
+                DELETE FROM task_repeat 
+                WHERE task_id = %s
+                """, (task_id, ))
+
+
     @work_db
     def save_repeat(self, cur, task_id):
         self.task_id = task_id
