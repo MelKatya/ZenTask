@@ -25,36 +25,9 @@ class NewCategory:
         self.verticalLayout.addWidget(self.groupBox)
 
         self.buttonBox = QDialogButtonBox(Dialog)
-        # self.buttonBox.setObjectName(u"buttonBox")
 
-
-
-        # self.buttonBox.setStyleSheet("""
-        #                     QPushButton {
-        #                         background-color: #605677;
-        #                         color: white;
-        #                         padding: 5px 15px;
-        #                         border-radius: 5px;
-        #                     }
-        #
-        #                     QPushButton:hover {
-        #                         background-color: #772D6B;
-        #                     }
-        #         """)
-        # self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
-
         self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText("ОК")
         self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Отмена")
 
         self.verticalLayout.addWidget(self.buttonBox)
-
-        # lambda создает "обертку", которая вызывает метод только когда сигнал сработает.
-        # self.buttonBox.accepted.connect(Dialog.accept)
-        # self.buttonBox.rejected.connect(Dialog.reject)
-
-        # автоматизация нажатия кнопок без вызова connect()
-        # QMetaObject.connectSlotsByName(Dialog)
-
-
-

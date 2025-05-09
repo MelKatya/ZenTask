@@ -17,7 +17,7 @@ class ShowTimers:
         self.tableWidget.setHorizontalHeaderLabels(['Дата запуска', 'Запланированное время ', 'Отработанное время'])
         self.tableWidget.resizeColumnsToContents()
 
-        self.tableWidget.setGeometry(QRect(10, 30, 381, 311))
+        self.tableWidget.setGeometry(QRect(8, 30, 385, 311))
 
         self.horizontalLayoutWidget = QWidget(Dialog)
         self.horizontalLayoutWidget.setGeometry(QRect(10, 360, 401, 41))
@@ -33,17 +33,13 @@ class ShowTimers:
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Close)
         self.buttonBox.rejected.connect(Dialog.close)
         self.horizontalLayout.addWidget(self.buttonBox)
-
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Close).setText("Закрыть")
 
     def add_row(self, timer_data):
-        # i = QTableWidgetItem('gg')
-        # self.tableWidget.setRowCount(2)
-        # self.tableWidget.setItem(1, 1, i)
         row_position = self.tableWidget.rowCount()
         self.tableWidget.insertRow(row_position)
         for row, data in zip((0, 1, 2), timer_data):
             item = QTableWidgetItem(data)
-            # item.setTextAlignment()
             self.tableWidget.setItem(row_position, row, item)
 
 

@@ -276,6 +276,7 @@ class MainWindow(MainForm):
         current_task = self.comboBox_mt_done_all.currentData()
 
         ms_box = QDialog()
+        ms_box.setStyleSheet(self.style)
         ms_box.resize(312, 142)
         verticalLayoutWidget = QWidget(ms_box)
         verticalLayoutWidget.setGeometry(10, 10, 291, 121)
@@ -288,8 +289,12 @@ class MainWindow(MainForm):
         rad_but_doing = QRadioButton('В процессе', groupBox)
         rad_but_doing.setGeometry(10, 55, 150, 20)
         verticalLayout.addWidget(groupBox)
+
         buttonBox = QDialogButtonBox(verticalLayoutWidget)
         buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText("ОК")
+        buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Отмена")
+
         verticalLayout.addWidget(buttonBox)
         buttonBox.accepted.connect(ms_box.accept)
         buttonBox.rejected.connect(ms_box.reject)
@@ -335,7 +340,6 @@ class MainWindow(MainForm):
         else:
             frame.setEnabled(True)
             push_button.setText('Сохранить изменения')
-
 
     def change_task_button(self, grid_layout, task):
         """Обрабатывает кнопку 'Изменить задачу' - изменяет задачу"""
@@ -702,6 +706,7 @@ class MainWindow(MainForm):
     def open_history_form(self):
         """Открывает форму с историей работы таймера"""
         dialog = QDialog()
+        dialog.setStyleSheet(self.style)
         ui = ShowTimers()
         ui.setup_ui(dialog)
         total_time, result = show_history_time()

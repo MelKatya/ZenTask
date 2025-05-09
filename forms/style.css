@@ -1,7 +1,15 @@
+QMainWindow {
+    border-radius: 5px;
+    border: 2px solid #cccccc;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                                        stop: 0 #fffefa, stop: 0.2 #f6f6fa, stop: 0.4 #f3effe,  stop: 1 #f8f5fc);
+}
+
+/* __________Кнопки____________ */
 QPushButton {
     background-color: #4d3f72;
     color: white;
-    padding: 5px 15px;
+    padding: 5px 10px;
     border-radius: 5px;
 }
 
@@ -12,12 +20,14 @@ QPushButton:hover {
 QPushButton:disabled {
     background-color: #aaa;
     color: #666;
-    padding: 5px 15px;
+    padding: 5px 10px;
     border-radius: 5px;
 }
 
+/* __________Стикер____________ */
+
 QDockWidget {
-        background-color: #ffec80;  /* немного темнее основного стикера */
+        background-color: #ffec80;
         border: 1px solid #d6c757;
     }
 
@@ -31,7 +41,7 @@ QDockWidget {
     }
 
 QLabel[class="note"] {
-    background-color: #fffaa9;  /* светло-жёлтый */
+    background-color: #fffaa9;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
     border-top-left-radius: 0px;
@@ -41,45 +51,48 @@ QLabel[class="note"] {
     font-size: 14px;
 }
 
+/* __________GroupBox____________ */
+
 QGroupBox {
     border: 1px solid #cccccc;
     border-radius: 4px;
     margin-top: 10px;
     padding: 10px;
-
 }
 
 QGroupBox:title {
-    subcontrol-origin: margin;    /* ← чтобы был "на рамке" */
+    subcontrol-origin: margin;
     subcontrol-position: top left;
-    padding: 0 5px;
+    padding: 0 1px;
     color: #333;
-
 }
 
-QMainWindow {
-    background-color: #ffffff;
-    border-radius: 5px;
-    border: 2px solid #cccccc;
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
-                                        stop: 0 #fffefa, stop: 0.2 #f6f6fa, stop: 0.4 #f3effe,  stop: 1 #f8f5fc);
-}
+/* __________Заметки____________ */
 
 QToolBox {
-    border-radius: 4px;
+    border-radius: 10px;
 }
+
 QToolBox::tab {
-background: #c496ca;
+    background: #c496ca;
     border-radius: 4px;
     margin-right: 20px;
 }
 
 QToolBox::tab:selected {
-     border: 3px solid #d9d9d9;
+    border: 3px solid #dfe0e5;
     border-top-color: transparent;
-    border-bottom-color: #333;
-
+    border-bottom-color: #7f728e;
 }
+QToolBox::tab:hover {
+    border: 3px solid #dfe0e5;
+    border-top-color: transparent;
+    border-bottom-color: #7f728e;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #dfe0e5, stop: 1.0 #c496ca);
+}
+
+/* __________QCheckBox____________ */
 
 QCheckBox::indicator:unchecked {
     image: url(:/images/checkbox_unchecked.png);
@@ -265,3 +278,11 @@ QTimeEdit, QDateTimeEdit {
     border-radius: 5px;
     padding: 1px 2px;
 }
+
+
+QTableWidget {
+    border: 1px solid #C4C4C3;
+    border-radius: 5px;
+    padding: 1px 2px;
+}
+

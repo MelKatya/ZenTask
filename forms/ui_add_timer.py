@@ -12,7 +12,9 @@ class AddTimer:
         self.buttonBox = QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QRect(0, 170, 231, 32))
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText("ОК")
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Отмена")
 
         self.groupBox = QGroupBox('Добавить таймер', Dialog)
         self.groupBox.setGeometry(QRect(10, 10, 221, 151))
