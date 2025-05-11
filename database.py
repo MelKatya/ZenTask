@@ -1,29 +1,31 @@
-import copy
 import logging
-from typing import List, Tuple, Dict, Callable
+from typing import List, Tuple, Dict, Callable, Any, Optional
 from functools import wraps
-from datetime import datetime, timedelta
-from psycopg2 import pool
-import psycopg2
-from psycopg2 import errors
+from datetime import datetime
+from psycopg2 import pool, errors
+from psycopg2.extensions import cursor
 import os
-import time
 from dotenv import load_dotenv
 load_dotenv()
 
 logging.basicConfig(level=logging.DEBUG,
                     filename='log.log',
                     format="%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
-logger = logging.getLogger('database')
+
+logger = logging.getLogger(__name__)
 
 
 db_pool = pool.SimpleConnectionPool(1, 10, database=os.getenv("database"), user=os.getenv("user"),
                                     password=os.getenv("password"))
 
 
-
 def work_db(func: Callable) -> Callable:
-    """Декоратор для того, чтобы не строчить везде подключения"""
+    """
+    Декоратор, который автоматически управляет подключением к базе данных:
+    получает соединение и курсор, коммитит изменения, закрывает соединение.
+
+    Обрабатывает ошибки и логирует исключения.
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         conn = db_pool.getconn()
@@ -32,11 +34,14 @@ def work_db(func: Callable) -> Callable:
             result = func(cur=cur, *args, **kwargs)
             conn.commit()
             return result
+
         except errors.UniqueViolation as exc:
             logger.error(f'Возникла ошибка в функции {func.__name__}', exc_info=exc)
             return exc
+
         except Exception as exc:
             logger.error(f'Возникла ошибка в функции {func.__name__}', exc_info=exc)
+
         finally:
             cur.close()
             db_pool.putconn(conn)
@@ -44,10 +49,27 @@ def work_db(func: Callable) -> Callable:
 
 
 class Task:
-    """Класс задачи"""
+    """
+    Представляет задачу, хранящуюся в БД.
+
+    Args:
+        name (str): Название задачи.
+        description (str): Описание задачи.
+        priority_id (int): Приоритет задачи.
+        category_id (int): Категория задачи.
+        deadline Any: Дата и время дедлайна.
+        id_task (Optional[int]): ID задачи в базе.
+        status_id (int): Статус выполнения.
+        overdue (bool): Просрочена ли задача.
+        timer (datetime, time): Время, затраченное на выполнение.
+        repeats (Optional[tuple["TaskRepeat"]]): Повторения задачи.
+    """
     def __init__(self, name: str, description: str = "", priority_id: int = 1, category_id: int = 1,
-                 deadline=None, id_task=None, status_id=1, overdue=False,
-                 timer=datetime.now().replace(hour=0, minute=0, second=0), repeats=None):
+                 deadline: Any = None, id_task: Optional[int] = None, status_id: int = 1,
+                 overdue: bool = False,
+                 timer=datetime.now().replace(hour=0, minute=0, second=0),
+                 repeats: Optional[tuple["TaskRepeat"]] = None):
+
         self.id = id_task
         self.name = name
         self.priority = priority_id
@@ -59,18 +81,20 @@ class Task:
         self.repeats = repeats
         self.timer = timer
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"Task: name - {self.name} (priority - {task_priority_dict[self.priority]}, "
                 f"status - {task_status_dict[self.status]}, " 
                 f"category - {task_category_dict[self.category]}, "
                 f"deadline - {self.deadline}, overdue - {self.overdue}, "
-                f"repeat - {self.repeats}) -- decription - {self.description}")
-
+                f"repeat - {self.repeats}) -- description - {self.description}")
 
     @work_db
-    def stop_timer(self, cur):
-        """Останавливает таймер задачи"""
+    def stop_timer(self, cur: cursor) -> None:
+        """
+        Останавливает таймер задачи и сохраняет в базу.
+        """
         logger.info(f'Остановка таймера: "{self}"')
+
         self.timer = self.timer.replace(microsecond=0).time()
         cur.execute("""
         UPDATE task 
@@ -79,9 +103,12 @@ class Task:
         """, (self.timer, self.id))
 
     @work_db
-    def remove_timer(self, cur):
-        """Очищает таймер задачи"""
+    def remove_timer(self, cur: cursor) -> None:
+        """
+        Очищает таймер задачи.
+        """
         logger.info(f'Очистка таймера: "{self}"')
+
         self.timer = datetime.now().replace(hour=0, minute=0, second=0)
         cur.execute("""
             UPDATE task 
@@ -90,9 +117,12 @@ class Task:
             """, (self.timer, self.id))
 
     @work_db
-    def save_task(self, cur) -> None:
-        """Сохраняет задачу"""
+    def save_task(self, cur: cursor) -> None:
+        """
+        Сохраняет новую задачу в базу данных.
+        """
         logger.info(f'Создание задачи: "{self}"')
+
         cur.execute("""
         INSERT INTO task 
         (name, priority_id, category_id, description, status_id, deadline, timer, overdue)
@@ -103,9 +133,12 @@ class Task:
         self.id = cur.fetchone()[0]
 
     @work_db
-    def change_task(self, cur) -> bool:
-        """Изменяет задачу"""
+    def change_task(self, cur: cursor) -> bool:
+        """
+        Обновляет существующую задачу в базе данных.
+        """
         logger.info(f'Изменение задачи: {self.id}')
+
         cur.execute("""
         UPDATE task SET
         name = %s, priority_id = %s, category_id = %s, description = %s, 
@@ -116,20 +149,25 @@ class Task:
         return True
 
     @work_db
-    def change_status(self, cur, status_id) -> None:
-        """Изменяет статус выполнения задачи"""
+    def change_status(self, cur: cursor, status_id: int) -> None:
+        """
+        Меняет статус выполнения задачи.
+        """
         logger.info(f'Изменение статуса задачи: {self.id}')
+
         cur.execute("""
         UPDATE task SET
         status_id = %s, overdue = %s
         WHERE id = %s
         """, (status_id, self.overdue, self.id))
 
-
     @work_db
-    def delete_task(self, cur) -> None:
-        """Удаляет задачу"""
+    def delete_task(self, cur: cursor) -> None:
+        """
+        Удаляет задачу из базы данных.
+        """
         logger.info(f'Удаление задачи: {self.id}')
+
         cur.execute("""
                 DELETE FROM task
                 WHERE id = %s
@@ -137,8 +175,15 @@ class Task:
 
     @classmethod
     @work_db
-    def download_tasks_by_status(cls, cur, status_id):
-        """Выгружает все задачи из бд со статусом status_id и создает объекты задач"""
+    def download_tasks_by_status(cls, cur: cursor, status_id: int) -> List["Task"]:
+        """
+        Выгружает все задачи из бд со статусом status_id и создает объекты задач
+
+        Args:
+            cur (cursor): Курсор БД.
+            status_id (int): Статус выполнения.
+        """
+
         logger.info(f'Выгрузка всех задач со статусом {status_id}')
         cur.execute("""
             SELECT 
@@ -163,9 +208,12 @@ class Task:
 
     @classmethod
     @work_db
-    def download_all_tasks(cls, cur):
-        """Выгружает все задачи из бд со статусом status_id и создает объекты задач"""
+    def download_all_tasks(cls, cur: cursor) -> List["Task"]:
+        """
+        Выгружает все задачи из базы данных и создает объекты задач.
+        """
         logger.info(f'Выгрузка всех задач')
+
         cur.execute("""
             SELECT 
                 t.*, 
@@ -189,7 +237,11 @@ class Task:
 
     @classmethod
     @work_db
-    def check_overdue(cls, cur):
+    def check_overdue(cls, cur: cursor) -> None:
+        """
+        Проверяет, просрочена ли задача, и обновляет флаг 'overdue'.
+        """
+        logger.info(f'Проверка просроченных задач')
 
         cur.execute("""
             UPDATE task
@@ -197,12 +249,31 @@ class Task:
             WHERE status_id in (1, 2) AND deadline is not null AND deadline < %s
                     """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ))
 
-    def add_repeat(self, repeat):
+    def add_repeat(self, repeat: "TaskRepeat") -> None:
+        """
+        Добавляет повторение задачи в список.
+
+        Args:
+            repeat ("TaskRepeat"): экземпляр повторения задачи.
+        """
+        logger.info(f'добавлено повторение {repeat} в задачу {self.id}')
+
+        if self.repeats is None:
+            self.repeats = []
         self.repeats.append(repeat)
 
 
 class TaskRepeat:
-    def __init__(self, task_id, repeat_type, repeat_value, id_repeat=None):
+    """
+    Класс, представляющий повторение задачи
+
+    Args:
+        task_id (int): ID задачи.
+        repeat_type (str): Тип повтора (День, Неделя, Месяц).
+        repeat_value (str): Значение повтора (например, 'Пн' для Неделя).
+        id_repeat (Optional[int]): ID повтора.
+    """
+    def __init__(self, task_id: int, repeat_type: str, repeat_value: str, id_repeat: Optional[int] = None) -> None:
         self.id = id_repeat
         self.task_id = task_id
         self.start_date = datetime.now()
@@ -211,18 +282,33 @@ class TaskRepeat:
 
     @classmethod
     @work_db
-    def del_repeat(cls, cur, task_id):
-        """Удаляет повторение"""
+    def del_repeat(cls, cur: cursor, task_id: int) -> None:
+        """
+         Удаляет повторение задачи из базы данных по ID задачи.
+
+        Args:
+            cur (cursor): Курсор БД.
+            task_id (int): ID задачи.
+        """
+        logger.info(f'Повторение у задачи {task_id} удалено из бд')
+
         cur.execute("""
                 DELETE FROM task_repeat 
                 WHERE task_id = %s
                 """, (task_id, ))
 
-
     @work_db
-    def save_repeat(self, cur, task_id):
+    def save_repeat(self, cur: cursor, task_id: int) -> int:
+        """
+        Сохраняет повторение задачи в базу данных.
+
+        Args:
+            cur (cursor): Курсор БД.
+            task_id (int): ID задачи.
+        """
+        logger.info(f'Повторение у задачи {task_id} добавлено в бд')
+
         self.task_id = task_id
-        """Сохраняет повторение"""
         cur.execute("""
                 INSERT INTO task_repeat 
                 (task_id, start_date, repeat_type, repeat_value)
@@ -234,19 +320,28 @@ class TaskRepeat:
 
 
 class Note:
-    def __init__(self, text, id=None):
-        self.id = id
+    """
+    Класс заметки.
+
+    Args:
+        text (str): Текст заметки.
+        id_note (Optional[int]): ID заметки в базе данных.
+    """
+    def __init__(self, text: str, id_note: Optional[int] = None):
+        self.id = id_note
         self.text = text
         self.attach = False
 
-    def __repr__(self):
-        return (f"Note: text - {self.text}, "
-                f"id - {self.id}")
+    def __repr__(self) -> str:
+        return f"Note: text - {self.text}, id - {self.id}, attach={self.attach}"
 
     @work_db
-    def save_note(self, cur) -> None:
-        """Сохраняет заметку в бд"""
+    def save_note(self, cur: cursor) -> None:
+        """
+        Сохраняет заметку в базу данных и присваивает ей ID.
+        """
         logger.info(f'Сохранение заметки: "{self}"')
+
         cur.execute("""
             INSERT INTO notes 
             (text, attach)
@@ -256,18 +351,24 @@ class Note:
         self.id = cur.fetchone()[0]
 
     @work_db
-    def delete_note(self, cur) -> None:
-        """Удаляет заметку из бд"""
+    def delete_note(self, cur: cursor) -> None:
+        """
+        Удаляет заметку из базы данных.
+        """
         logger.info(f'Удаление заметки: "{self}"')
+
         cur.execute("""
             DELETE FROM notes
             WHERE id = %s
             """, (self.id,))
 
     @work_db
-    def attach_note(self, cur) -> None:
-        """Сохраняет в бд информацию о прикрепленной заметке"""
+    def attach_note(self, cur: cursor) -> None:
+        """
+        Закрепляет заметку, открепляя все остальные.
+        """
         logger.info(f'Прикрепление заметки: "{self}"')
+
         cur.execute("""
             UPDATE notes SET attach = True
             WHERE id = %s;
@@ -276,8 +377,16 @@ class Note:
             """, (self.id, self.id))
 
     @work_db
-    def change_note(self, cur, text) -> None:
-        """Изменяет заметку"""
+    def edit_note(self, cur: cursor, text: str) -> None:
+        """
+        Изменяет текст заметки.
+
+        Args:
+            cur (cursor): Курсор БД.
+            text (str): Измененный текст заметки.
+        """
+        logger.info(f'Изменение заметки: "{self}"')
+
         self.text = text
         cur.execute("""
             UPDATE notes 
@@ -287,8 +396,13 @@ class Note:
 
     @classmethod
     @work_db
-    def download_notes(cls, cur) -> List[Tuple]:
-        """Выгружает все заметки из бд"""
+    def download_notes(cls, cur: cursor) -> List[Tuple]:
+        # todo
+        """
+        Загружает все заметки из базы данных и возвращает список объектов Note.
+        """
+        logger.info('Заметки выгружаются')
+
         cur.execute("""
         SELECT * FROM notes
         """)
@@ -296,23 +410,31 @@ class Note:
 
 
 class TotalTimer:
-    def __init__(self, planned_time):
+    """
+    Класс таймера для отслеживания общего времени работы.
+
+    Args:
+        planned_time (str): Запланированное время (например, "08:00").
+    """
+    def __init__(self, planned_time: str):
         self.id = None
         self.date = datetime.now()
         self.planned_time = planned_time
         self.completed_time = None
 
-    # def __getitem__(self, item: str) -> Any:
-    #     return getattr(self, item)
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"TotalTimer: id - {self.id}, "
                 f"date - {self.date}, "
                 f"planned_time - {self.planned_time}, " 
                 f"completed_time - {self.completed_time}")
 
     @work_db
-    def save_time(self, cur):
+    def save_time(self, cur: cursor) -> None:
+        """
+        Сохраняет таймер работы в базу данных.
+        """
         logger.info(f'Сохранение таймера работы: {self}')
+
         cur.execute("""
             INSERT INTO timer 
             (date, planned_time, completed_time)
@@ -322,9 +444,17 @@ class TotalTimer:
         self.id = cur.fetchone()[0]
 
     @work_db
-    def stop_timer(self, cur, completed_time: datetime) -> None:
-        self.completed_time = completed_time.replace(microsecond=0).time()
+    def stop_timer(self, cur: cursor, completed_time: datetime) -> None:
+        """
+        Сохраняет время завершения таймера.
+
+        Args:
+            cur (cursor): Курсор БД.
+            completed_time (datetime): Отработанное время.
+        """
         logger.info(f'Остановка работы таймера: {self}')
+
+        self.completed_time = completed_time.replace(microsecond=0).time()
         cur.execute("""
         UPDATE timer
         SET completed_time = %s
@@ -334,12 +464,17 @@ class TotalTimer:
     @classmethod
     @work_db
     def download_history(cls, cur) -> Tuple[List, datetime]:
+        """
+        Выгружает из базы данных всю историю таймеров.
+        """
         logger.info(f'Выгрузка истории таймера')
+
         cur.execute("""
         SELECT * FROM timer 
         WHERE completed_time IS NOT NULL
         """)
         all_timers = cur.fetchall()
+
         cur.execute("SELECT sum(completed_time) FROM public.timer")
         sum_time_work = cur.fetchall()[0][0]
         return all_timers, sum_time_work

@@ -730,7 +730,7 @@ class MainWindow(MainForm):
         for note in all_notes:
             index += 1
             self.notes[index] = NoteTask(self.toolBox_not, index, self.functions_for_note, text=note[1],
-                                         note=No(id=note[0], text=note[1]))
+                                         note=No(id_note=note[0], text=note[1]))
             if note[2]:
                 self.dockWidget_notice.setVisible(True)
                 self.label_atached_note.setText(f"{self.notes[index].note.text}")
@@ -768,4 +768,4 @@ class MainWindow(MainForm):
         self.notes[page_number].note.attach_note()
 
     def change_note(self, page_number, text):
-        self.notes[page_number].note.change_note(text=text)
+        self.notes[page_number].note.edit_note(text=text)

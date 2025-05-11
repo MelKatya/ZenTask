@@ -71,25 +71,22 @@ QGroupBox:title {
 
 QToolBox {
     border-radius: 10px;
+    background:
 }
 
 QToolBox::tab {
-    background: #c496ca;
+    font-size: 14px;
+    color: white;
+    background: #4462ad;
     border-radius: 4px;
-    margin-right: 20px;
+    border: 3px solid #dfe0e5;
+    border-top-color: transparent;
+    border-bottom-color: #040d4d;
 }
 
-QToolBox::tab:selected {
-    border: 3px solid #dfe0e5;
-    border-top-color: transparent;
-    border-bottom-color: #7f728e;
-}
-QToolBox::tab:hover {
-    border: 3px solid #dfe0e5;
-    border-top-color: transparent;
-    border-bottom-color: #7f728e;
+QToolBox::tab:selected, QToolBox::tab:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #dfe0e5, stop: 1.0 #c496ca);
+                                 stop: 0.1 #b6c0d8, stop: 0.3 #4462ad, stop: 0.6 #4462ad, stop: 1.0 #040d4d);
 }
 
 /* __________QCheckBox____________ */
@@ -102,12 +99,6 @@ QCheckBox::indicator:checked {
     image: url(:/images/checkbox_checked.png);
 }
 
-QCheckBox:disabled {
-    background-color: #aaa;
-    color: #666;
-    padding: 5px 15px;
-    border-radius: 5px;
-}
 
 QComboBox {
     border: 1px solid gray;
