@@ -71,7 +71,8 @@ QGroupBox:title {
 
 QToolBox {
     border-radius: 10px;
-    background:
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                                        stop: 0 #fffefa, stop: 0.2 #f6f6fa, stop: 0.4 #f3effe,  stop: 1 #f8f5fc);
 }
 
 QToolBox::tab {
@@ -88,7 +89,6 @@ QToolBox::tab:selected, QToolBox::tab:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0.1 #b6c0d8, stop: 0.3 #4462ad, stop: 0.6 #4462ad, stop: 1.0 #040d4d);
 }
-
 /* __________QCheckBox____________ */
 
 QCheckBox::indicator:unchecked {

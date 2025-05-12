@@ -7,31 +7,48 @@ from database import (get_dict_tables, save_category, Task, TotalTimer, Note, Ta
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
 
 
-def upload_category(combobox):
-    """Загружает все категории из бд в combobox"""
+def load_stylesheet(path: str = "forms/style.css") -> str:
+    """
+    Загружает и возвращает CSS-стили из файла.
+    """
+    with open(path, "r") as f:
+        return f.read()
+
+
+def upload_category(combobox) -> None:
+    """
+    Загружает все категории из бд в combobox
+    """
     combobox.clear()
     for category in task_category_dict.values():
         combobox.addItem(category)
 
 
-def upload_priority(combobox):
-    """Загружает все приоритеты из бд в combobox"""
+def upload_priority(combobox) -> None:
+    """
+    Загружает все приоритеты из бд в combobox
+    """
     combobox.clear()
     for priority in task_priority_dict.values():
         combobox.addItem(priority)
 
 
-def save_new_category(name):
-    """Сохраняет новую категорию в бд"""
+def save_new_category(name: str) -> None:
+    """
+    Сохраняет новую категорию в бд
+    """
+
     save_category(name=name)
     global task_category_dict
     _, _, task_category_dict = get_dict_tables()
 
 
-def save_task(name, priority, category, descrirtion, deadline=None):
-    """Сохраняет новую задачу"""
+def save_task(name, priority, category, description, deadline=None):
+    """
+    Сохраняет новую задачу
+    """
 
-    new_task = Task(name=name, description=descrirtion,
+    new_task = Task(name=name, description=description,
                     priority_id=priority, category_id=category, deadline=deadline)
 
     result_save = new_task.save_task()
@@ -40,19 +57,25 @@ def save_task(name, priority, category, descrirtion, deadline=None):
 
 
 def save_timer(planned_time):
-    """Сохраняет запланированное время работы"""
+    """
+    Сохраняет запланированное время работы
+    """
     new_timer = TotalTimer(planned_time)
     new_timer.save_time()
     return new_timer
 
 
 def stop_timer(timer, completed_time):
-    """Останавливает таймер, передает в бд отработанное время"""
+    """
+    Останавливает таймер, передает в бд отработанное время
+    """
     timer.stop_timer(completed_time=completed_time)
 
 
 def show_history_time():
-    """Загружает из бд историю и полное время работы с таймером"""
+    """
+    Загружает из бд историю и полное время работы с таймером
+    """
     all_timers = []
     data_from_db, total_time = TotalTimer.download_history()
     for timer in data_from_db:
@@ -64,7 +87,8 @@ def show_history_time():
 
 
 def save_note_to_db(text):
-    """Сохраняет заметки в бд"""
+    """
+    Сохраняет заметки в бд"""
     new_note = Note(text=text)
     new_note.save_note()
     return new_note

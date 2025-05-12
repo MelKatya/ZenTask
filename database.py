@@ -481,8 +481,22 @@ class TotalTimer:
 
 
 @work_db
-def create_tables(cur) -> None:
-    logger.info(f'Создание таблиц')
+def create_tables(cur: cursor) -> None:
+    """
+    Создаёт таблицы базы данных, если они не существуют:
+
+    - task_status
+    - task_priority
+    - task_category
+    - task
+    - task_repeat
+    - notes
+    - timer
+
+    Также заполняет справочные таблицы начальными значениями.
+    """
+    logger.info(f'Проверка и создание таблиц')
+
     cur.execute("""
     CREATE TABLE IF NOT EXISTS task_status (
     id SERIAL PRIMARY KEY,
@@ -562,9 +576,16 @@ def create_tables(cur) -> None:
 
 
 @work_db
-def save_category(cur, name: str) -> None:
-    """Сохраняет новую категорию в бд"""
+def save_category(cur: cursor, name: str) -> None:
+    """
+    Сохраняет новую категорию в базу данных
+
+    Args:
+        cur (cursor): Курсор БД.
+        name (str): название новой категории.
+    """
     logger.info(f'Добавление новой категории {name}')
+
     cur.execute('''
         INSERT INTO task_category (name)
         SELECT %s
@@ -573,24 +594,27 @@ def save_category(cur, name: str) -> None:
 
 
 @work_db
-def get_dict_tables(cur):
+def get_dict_tables(cur: cursor) -> Tuple[Dict[int, str], Dict[int, str], Dict[int, str]]:
     """
     Выгружает данные из таблиц: статус, приоритет и категория, и возвращает
-    их в виде кортежа словарей
+    их в виде кортежа словарей.
     """
     logger.info('Выборка всех значений из task_status и сохранение в status_dict')
+
     cur.execute("""
     SELECT * FROM task_status
     """)
     status_dict = dict(cur.fetchall())
 
     logger.info('Выборка всех значений из task_priority и сохранение в priority_dict')
+
     cur.execute("""
     SELECT * FROM task_priority
     """)
     priority_dict = dict(cur.fetchall())
 
     logger.info('Выборка всех значений из task_category и сохранение в category_dict')
+
     cur.execute("""
     SELECT * FROM task_category
     """)

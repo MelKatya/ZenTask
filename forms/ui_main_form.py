@@ -124,7 +124,6 @@ class Base(QWidget):
         self.task_fire_widget.setVisible(False)
 
 
-
 class Note(QWidget):
     def __init__(self, toolBox_not, page_number, parent=None):
         super().__init__(parent)
@@ -212,18 +211,12 @@ class MainForm(QMainWindow):
         self.calendarWidget.setFont(font)
         self.calendarWidget.setVerticalHeaderFormat(QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader)
 
-
     def page_new_task(self):
         self.groupBox_new_task = QGroupBox('Новая задача', self.page)
         self.groupBox_new_task.setGeometry(QRect(10, 10, 531, 451))
 
         self.grid_layout_new_task = Base(self.groupBox_new_task)
         self.grid_layout_new_task.setGeometry(QRect(10, 20, 511, 361))
-
-
-        # self.grid_layout_new_task.verticalLayout_3.removeItem(self.grid_layout_new_task.verticalSpacer)
-        # verticalSpacer = QSpacerItem(20, 195)
-        # self.grid_layout_new_task.verticalLayout_3.addItem(verticalSpacer)
 
         self.grid_layout_new_task.text_edit_description.setMaximumSize(QSize(499, 200))
 
@@ -235,7 +228,6 @@ class MainForm(QMainWindow):
 
         self.pushButton_nt_not = QPushButton('Заметки', self.page)
         self.pushButton_nt_not.setGeometry(QRect(550, 60, 101, 31))
-
 
     def page_my_tasks(self):
         self.groupBox_mt = QGroupBox('Мои задачи:', self.page_2)
@@ -522,8 +514,8 @@ class MainForm(QMainWindow):
         self.pushButton_set_timer = QPushButton('Установить таймер', self.verticalLayoutWidget_3)
         self.verticalLayout_8.addWidget(self.pushButton_set_timer)
 
-        self.pushButton_20 = QPushButton('Отключить таймер', self.verticalLayoutWidget_3)
-        self.verticalLayout_8.addWidget(self.pushButton_20)
+        self.pushButton_stop_timer = QPushButton('Отключить таймер', self.verticalLayoutWidget_3)
+        self.verticalLayout_8.addWidget(self.pushButton_stop_timer)
 
         self.pushButton_21 = QPushButton('Посмотреть историю', self.verticalLayoutWidget_3)
         self.verticalLayout_8.addWidget(self.pushButton_21)
