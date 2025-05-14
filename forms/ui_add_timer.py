@@ -33,7 +33,6 @@ class AddTimer:
         self.timeEdit = QTimeEdit(self.verticalLayoutWidget)
         self.timeEdit.setMinimumSize(QSize(75, 0))
 
-
         self.horizontalLayout.addWidget(self.timeEdit)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
@@ -55,8 +54,3 @@ class AddTimer:
         self.label_3.setText('')
 
         self.verticalLayout_2.addWidget(self.label_3)
-
-
-
-
-

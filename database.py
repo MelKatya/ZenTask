@@ -397,9 +397,8 @@ class Note:
     @classmethod
     @work_db
     def download_notes(cls, cur: cursor) -> List[Tuple]:
-        # todo
         """
-        Загружает все заметки из базы данных и возвращает список объектов Note.
+        Загружает все заметки из базы данных и возвращает список.
         """
         logger.info('Заметки выгружаются')
 
@@ -625,11 +624,4 @@ def get_dict_tables(cur: cursor) -> Tuple[Dict[int, str], Dict[int, str], Dict[i
 
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
 
-
-if __name__ == '__main__':
-    create_tables()
-    task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
-    all_tasks = Task.download_all_tasks()
-    for i in all_tasks:
-        print(i.id, i)
 

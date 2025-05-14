@@ -1,18 +1,17 @@
 import time
-from typing import Tuple, Optional, Callable, Any, Protocol
+from typing import Tuple, Optional, Callable, Any
 
-from PyQt6.QtWidgets import QToolBox
-from PySide6.QtWidgets import (QApplication, QWidget, QDialog, QMainWindow, QMessageBox, QDialogButtonBox,
-                               QDateTimeEdit, QAbstractButton, QPushButton, QVBoxLayout, QLabel, QDockWidget,
-                               QRadioButton, QButtonGroup, QGridLayout, QGroupBox, QComboBox)
-from forms.ui_main_form import MainForm, Base, Note
+from PySide6.QtWidgets import (QWidget, QDialog, QMessageBox, QDialogButtonBox, QVBoxLayout, QLabel,
+                               QRadioButton, QGroupBox, QComboBox, QToolBox)
+
+from forms.ui_main_form import MainForm, Note
 from forms.ui_add_category import NewCategory
 from forms.ui_add_timer import AddTimer
 from forms.ui_show_history import ShowTimers
 from forms.ui_add_replay import AddReplay
 from utils import (upload_priority, upload_category, save_new_category, save_task, save_timer,
-                   stop_timer, show_history_time, save_note_to_db, download_noticed_from_db, add_new_repeat,
-                   return_task, load_stylesheet)
+                   stop_timer, show_history_time, save_note_to_db, add_new_repeat, return_task, load_stylesheet)
+
 from PySide6.QtCore import Signal, Qt
 from psycopg2 import errors
 import psycopg2
@@ -123,11 +122,11 @@ class NoteTask(Note):
         functions (Tuple[Callable, Callable, Callable, Callable]):
             Кортеж из четырёх функций: (save, delete, attach, change).
         text (str, optional): Начальный текст заметки.
-        note (Note, optional): Объект заметки, если уже существует.
+        note (No, optional): Объект заметки, если уже существует.
     """
     def __init__(self, toolBox_not: QToolBox, page_number: int,
                  functions: Tuple[Callable, Callable, Callable, Callable],
-                 text: str = '', note: Optional[Note] = None) -> None:
+                 text: str = '', note: Optional[No] = None) -> None:
 
         super().__init__(toolBox_not, page_number)
         self.tb_not = toolBox_not
@@ -431,9 +430,9 @@ class MainWindow(MainForm):
         self.pushButton_my_task_not.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
 
 # ___________________Upload_data_____________________________
-    def upload_planned_task(self):
+    def upload_planned_task(self) -> None:
         """
-        Загружает все запланированные задачи в комбобокс
+        Загружает задачи со статусом "Запланировано" в комбобокс и обновляет состояние кнопок.
         """
         self.planned_tasks = Task.download_tasks_by_status(status_id=1)
 
@@ -450,9 +449,9 @@ class MainWindow(MainForm):
         for task in self.planned_tasks:
             self.comboBox_mt_plan_all.addItem(task.name, task)
 
-    def upload_doing_task(self):
+    def upload_doing_task(self) -> None:
         """
-        Загружает все выполняемые задачи в комбобокс
+        Загружает задачи со статусом "Выполняется" в комбобокс и обновляет интерфейс.
         """
         self.doing_tasks = Task.download_tasks_by_status(status_id=2)
 
@@ -469,9 +468,9 @@ class MainWindow(MainForm):
         for task in self.doing_tasks:
             self.comboBox_mt_proc_all.addItem(task.name, task)
 
-    def upload_done_task(self):
+    def upload_done_task(self) -> None:
         """
-        Загружает все выполненные задачи в комбобокс
+        Загружает задачи со статусом "Выполнено" в комбобокс, обновляет кнопки и вызывает обновление поиска.
         """
         self.done_tasks = Task.download_tasks_by_status(status_id=3)
 
@@ -488,9 +487,9 @@ class MainWindow(MainForm):
 
         self.search_load()
 
-    def upload_category(self):
+    def upload_category(self) -> None:
         """
-        Загружает категории из бд
+        Загружает список категорий из базы данных во все комбобоксы категорий.
         """
         upload_category(self.grid_layout_new_task.combo_box_category)
 
@@ -500,9 +499,9 @@ class MainWindow(MainForm):
 
         upload_category(self.grid_layout_done.combo_box_category)
 
-    def upload_priority(self):
+    def upload_priority(self) -> None:
         """
-        Загружает приоритет в комбобокс из бд
+        Загружает список приоритетов из базы данных во все комбобоксы приоритета.
         """
         upload_priority(self.grid_layout_new_task.combo_box_prior)
 
@@ -513,9 +512,9 @@ class MainWindow(MainForm):
         upload_priority(self.grid_layout_done.combo_box_prior)
 
 # ___________________TotalTimer_______________________________
-    def total_timer_buttons(self):
+    def total_timer_buttons(self) -> None:
         """
-        Обрабатывает кнопки общего таймера
+        Подключает обработчики событий для общего таймера: запуск, остановка и история.
         """
         self.pushButton_set_timer.clicked.connect(self.open_timer_form)
         self.pushButton_stop_timer.clicked.connect(self.stop_timer)
@@ -523,8 +522,11 @@ class MainWindow(MainForm):
         self.pushButton_21.clicked.connect(self.open_history_form)
         self.timer_finished.connect(self.finsh_timer)
 
-    def open_timer_form(self):
-        """Открывает форму добавления нового таймера"""
+    def open_timer_form(self) -> None:
+        """
+        Открывает диалоговое окно для создания таймера.
+        При подтверждении запускает таймер в отдельном потоке.
+        """
         dialog = DialogTimer()
         result = dialog.exec()
 
@@ -545,38 +547,49 @@ class MainWindow(MainForm):
                                                            self.label_main_timer_last, time_1), daemon=True)
                 self.thread_timer.start()
 
-    def strat_timer(self, label_passed, label_last, timer):
-        """Запускает таймер"""
-        pass_time = (timer - timedelta(minutes=1)).strftime('%H:%M')
+    def strat_timer(self, label_passed: QLabel, label_last: QLabel, timer: datetime) -> None:
+        """
+        Цикл работы таймера: обновляет оставшееся и прошедшее время каждую минуту.
+        Работает в отдельном потоке. Завершается по окончании времени или остановке вручную.
+        """
+        pass_time = timer.strftime('%H:%M')
         self.rest_time = datetime.now().replace(hour=0, minute=0, second=0)
 
         while pass_time != '00:00' and self.run_time:
-            time.sleep(1)
-            if self.run_time == False:
-                break
-
-            timer -= timedelta(minutes=1)
-            self.rest_time += timedelta(minutes=1)
-            pass_time = timer.strftime('%H:%M')
-            label_last.setText(pass_time)
-            label_passed.setText(self.rest_time.strftime('%H:%M'))
+            for sec in range(30):
+                time.sleep(2)
+                if self.run_time == False:
+                    break
+            else:
+                timer -= timedelta(minutes=1)
+                self.rest_time += timedelta(minutes=1)
+                pass_time = timer.strftime('%H:%M')
+                label_last.setText(pass_time)
+                label_passed.setText(self.rest_time.strftime('%H:%M'))
 
         self.timer_finished.emit()
 
-    def finsh_timer(self):
-        """Действия после завершения работы таймера"""
+    def finsh_timer(self) -> None:
+        """
+        Обновляет интерфейс после завершения таймера, сохраняет результат и уведомляет пользователя.
+        """
         stop_timer(self.total_timer, self.rest_time)
         self.pushButton_set_timer.setEnabled(True)
         self.pushButton_stop_timer.setEnabled(False)
         QMessageBox.about(self, 'Таймер', f'Таймер закончил работу')
 
-    def stop_timer(self):
-        """Обрабатывает кнопку остановки таймера"""
+    def stop_timer(self) -> None:
+        """
+        Останавливает таймер, завершая поток.
+        """
         self.run_time = False
         self.thread_timer.join()
 
-    def open_history_form(self):
-        """Открывает форму с историей работы таймера"""
+    def open_history_form(self) -> None:
+        """
+        Открывает окно с историей использования таймера и общим временем.
+        Загружает данные из базы и отображает их в таблице.
+        """
         dialog = QDialog()
         dialog.setStyleSheet(self.style)
         ui = ShowTimers()
@@ -590,8 +603,11 @@ class MainWindow(MainForm):
         dialog.exec()
 
 # ___________________Task buttons_______________________________
-    def lower_bar_buttons(self):
-        """Обрабатывает кнопки нижней панели у поставленных задач"""
+    def lower_bar_buttons(self) -> None:
+        """
+        Устанавливает обработчики для кнопок управления задачами на нижней панели:
+        изменение, удаление, запуск, завершение, восстановление и таймер.
+        """
         self.pushButton_mt_plan_change_task.clicked.connect(lambda: self.change_task(
             push_button=self.pushButton_mt_plan_change_task,
             combobox=self.comboBox_mt_plan_all,
@@ -630,27 +646,27 @@ class MainWindow(MainForm):
         self.pushButton_mt_proc_stop_timer.clicked.connect(self.stop_task_timer)
         self.pushButton_mt_proc_rem_timer.clicked.connect(self.remove_task_timer)
 
-    def finish_task(self):
+    def finish_task(self) -> None:
         """
-        Обрабатывает кнопку окончания работы над задачей
+        Устанавливает обработчик для кнопки окончания работы над задачей.
         """
         current_task = self.comboBox_mt_proc_all.currentData()
         current_task.change_status(status_id=3)
         self.upload_doing_task()
         self.upload_done_task()
 
-    def start_task(self):
+    def start_task(self) -> None:
         """
-        Обрабатывает кнопку начала работы над задачей
+        Устанавливает обработчик для кнопки начала работы над задачей.
         """
         current_task = self.comboBox_mt_plan_all.currentData()
         current_task.change_status(status_id=2)
         self.upload_planned_task()
         self.upload_doing_task()
 
-    def recover_task(self):
+    def recover_task(self) -> None:
         """
-        Восстановление задачи
+        Восстанавливает задачу.
         """
         current_task = self.comboBox_mt_done_all.currentData()
 
@@ -684,14 +700,14 @@ class MainWindow(MainForm):
                 current_task.change_status(status_id=1)
                 self.upload_planned_task()
                 self.upload_done_task()
-            elif rad_but_doing.isChecked():
+            else:
                 current_task.change_status(status_id=2)
                 self.upload_doing_task()
                 self.upload_done_task()
 
-    def del_task(self, combobox, func_update):
+    def del_task(self, combobox: QComboBox, func_update: Callable) -> None:
         """
-        Обрабатывает кнопку удаления задачи
+        Устанавливает обработчик для кнопки удаления задачи.
         """
         current_task = combobox.currentData()
 
@@ -706,13 +722,12 @@ class MainWindow(MainForm):
         if result == QMessageBox.StandardButton.Yes:
             combobox.setCurrentIndex(1)
             current_task.delete_task()
-            time.sleep(0.5)
             func_update()
             self.search_load()
 
-    def change_task(self, push_button, combobox, frame, grid_layout):
+    def change_task(self, push_button: Any, combobox: Any, frame, grid_layout) -> None:
         """
-        Обрабатывает кнопку изменения задачи
+        Устанавливает обработчик для кнопки изменения задачи.
         """
         if push_button.text() == 'Сохранить изменения':
             current_task = combobox.currentData()
@@ -724,9 +739,10 @@ class MainWindow(MainForm):
             frame.setEnabled(True)
             push_button.setText('Сохранить изменения')
 
-    def change_task_button(self, grid_layout, task):
+    def change_task_button(self, grid_layout, task: Task) -> None:
         """
-        Обрабатывает кнопку 'Изменить задачу' - изменяет задачу
+        Изменяет данные задачи по введенным пользователем значениям и сохраняет изменения.
+        Также обрабатывает дедлайн и параметры повторений.
         """
         flag = True
         if not grid_layout.line_edit_name.text():
@@ -775,9 +791,9 @@ class MainWindow(MainForm):
                 QMessageBox.warning(self, "Ошибка", f"Произошла ошибка: {result}")
 
 # ___________________Task timer_______________________________
-    def start_task_timer(self):
+    def start_task_timer(self) -> None:
         """
-        Запускает таймера задачи
+        Запускает таймер для выбранной задачи и запускает отдельный поток отсчета времени.
         """
         current_task = self.comboBox_mt_proc_all.currentData()
         if not isinstance(current_task.timer, datetime):
@@ -785,28 +801,29 @@ class MainWindow(MainForm):
                                                         minute=current_task.timer.minute,
                                                         second=current_task.timer.second)
         self.flag_time_task[current_task.id] = True
-        self.thread_dict[current_task.id] = threading.Thread(target=self.timer_task_thread, args=(current_task,), daemon=True)
+        self.thread_dict[current_task.id] = threading.Thread(target=self.timer_task_thread,
+                                                             args=(current_task,),
+                                                             daemon=True)
         self.pushButton_mt_proc_start_timer.setEnabled(False)
         self.pushButton_mt_proc_stop_timer.setEnabled(True)
         self.pushButton_mt_proc_rem_timer.setEnabled(False)
         self.thread_dict[current_task.id].start()
 
-    def timer_task_thread(self, current_task):
+    def timer_task_thread(self, current_task: Task) -> None:
         """
-        Запускает поток таймера задачи
+        Цикл, увеличивающий таймер задачи на секунду каждую секунду.
+        Обновляет отображение таймера, если задача выбрана.
         """
         while self.flag_time_task[current_task.id]:
-            if self.flag_time_task[current_task.id] == False:
-                break
             time.sleep(1)
             current_task.timer += timedelta(seconds=1)
 
             if current_task == self.comboBox_mt_proc_all.currentData():
                 self.label_mt_proc_timer.setText(str(current_task.timer.replace(microsecond=0).time()))
 
-    def stop_task_timer(self):
+    def stop_task_timer(self) -> None:
         """
-        Останавливает таймер задачи
+        Останавливает таймер задачи.
         """
         current_task = self.comboBox_mt_proc_all.currentData()
 
@@ -818,9 +835,9 @@ class MainWindow(MainForm):
         self.thread_dict[current_task.id].join()
         current_task.stop_timer()
 
-    def remove_task_timer(self):
+    def remove_task_timer(self) -> None:
         """
-        Обнуляет таймер работы над задачей
+        Обнуляет таймер работы над задачей.
         """
         current_task = self.comboBox_mt_proc_all.currentData()
         current_task.remove_timer()
@@ -828,14 +845,17 @@ class MainWindow(MainForm):
 
 # __________________ Note_______________________________
 
-    def download_note(self):
-        """Выгружает заметки из бд"""
+    def download_note(self) -> None:
+        """
+        Загружает заметки из базы данных, создает элементы NoteTask и
+        отображает прикреплённую заметку, если она есть.
+        """
         self.functions_for_note = (self.save_note, self.del_note, self.attache_note, self.change_note)
 
-        all_notes = download_noticed_from_db()
-        index = 0
+        all_notes = No.download_notes()
         self.notes = {}
 
+        index = 0
         for note in all_notes:
             index += 1
             self.notes[index] = NoteTask(self.toolBox_not, index, self.functions_for_note, text=note[1],
@@ -851,8 +871,10 @@ class MainWindow(MainForm):
 
         self.notes[index + 1] = NoteTask(self.toolBox_not, index + 1, self.functions_for_note)
 
-    def save_note(self, text):
-        """Сохраняет заметки"""
+    def save_note(self, text: str) -> None:
+        """
+        Сохраняет заметку в базу данных и добавляет ее в интерфейс.
+        """
         page_number = max(self.notes)
         note = save_note_to_db(text)
 
@@ -864,17 +886,24 @@ class MainWindow(MainForm):
         self.notes[page_number].pushButton_change_not.setEnabled(True)
         self.notes[page_number].pushButton_save_not.setEnabled(False)
 
-    def del_note(self, page_number):
-        """Удаляет заметки"""
+    def del_note(self, page_number: int) -> None:
+        """
+        Удаляет заметку.
+        """
         self.notes[page_number].note.delete_note()
         self.toolBox_not.removeItem(self.toolBox_not.currentIndex())
         self.notes.pop(page_number)
 
-    def attache_note(self, page_number):
-        """Прикрепляет заметку справа"""
+    def attache_note(self, page_number: int) -> None:
+        """
+        Прикрепляет заметку справа.
+        """
         self.dockWidget_notice.setVisible(True)
         self.label_atached_note.setText(f"{self.notes[page_number].note.text}")
         self.notes[page_number].note.attach_note()
 
-    def change_note(self, page_number, text):
+    def change_note(self, page_number: int, text: str) -> None:
+        """
+        Изменяет заметку.
+        """
         self.notes[page_number].note.edit_note(text=text)

@@ -11,11 +11,10 @@ class AddReplay:
         self.buttonBox = QDialogButtonBox(Dialog)
         self.buttonBox.setGeometry(QRect(30, 260, 341, 32))
         self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
         self.groupBox = QGroupBox(Dialog)
         self.groupBox.setTitle('Добавить повтор')
         self.groupBox.setGeometry(QRect(10, 10, 361, 241))
-
 
         self.tree_view = QTreeWidget(self.groupBox)
         self.tree_view.setHeaderHidden(True)
@@ -38,7 +37,6 @@ class AddReplay:
         for hour in range(0, 24):
             QTreeWidgetItem(day, [f'{hour:02d}:00'])
 
-
         self.label = QLabel(self.groupBox)
         self.label.setText("Задача будет повторяться каждый:")
         self.label.setGeometry(QRect(160, 30, 191, 31))
@@ -47,10 +45,3 @@ class AddReplay:
         self.label_2.setGeometry(QRect(160, 60, 191, 160))
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
         self.label_2.setText('')
-
-
-
-
-
-
-

@@ -1,4 +1,3 @@
-
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import (QDialogButtonBox, QGroupBox, QHBoxLayout, QLabel,
                                QTableWidget, QTableWidgetItem, QWidget)
@@ -41,7 +40,3 @@ class ShowTimers:
         for row, data in zip((0, 1, 2), timer_data):
             item = QTableWidgetItem(data)
             self.tableWidget.setItem(row_position, row, item)
-
-
-
-

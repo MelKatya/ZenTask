@@ -1,11 +1,8 @@
-from PySide6.QtCore import (QCoreApplication, QMetaObject, Qt)
-from PySide6.QtWidgets import (QDialogButtonBox, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout,)
+from PySide6.QtWidgets import QDialogButtonBox, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout
 
 
 class NewCategory:
     def setup_ui(self, Dialog):
-        # if not Dialog.objectName():
-        #     Dialog.setObjectName(u"MyDialog")
 
         Dialog.setWindowTitle("Добавить новую категорию")
         Dialog.resize(318, 124)

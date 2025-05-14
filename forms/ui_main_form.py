@@ -1,13 +1,10 @@
-from PySide6.QtWidgets import QApplication, QWidget, QDialog, QMainWindow
-from PySide6.QtCore import QCoreApplication, QRect, QSize, Qt
-from PySide6.QtGui import QCursor, QFont, QIcon
-from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox,
-    QDateTimeEdit, QDockWidget, QFormLayout, QFrame,
-    QGridLayout, QGroupBox, QHBoxLayout, QLabel,
-    QLayout, QLineEdit, QProgressBar, QPushButton,
-    QSizePolicy, QSpacerItem, QStackedWidget, QTabWidget,
-    QTextBrowser, QTextEdit, QToolBox, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtCore import QRect, QSize, Qt
+from PySide6.QtGui import QFont, QIcon
+from PySide6.QtWidgets import (QCalendarWidget, QCheckBox, QComboBox, QDateTimeEdit, QDockWidget, QFormLayout,
+                               QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QProgressBar,
+                               QPushButton, QSizePolicy, QSpacerItem, QStackedWidget, QTabWidget,
+                               QTextEdit, QToolBox, QVBoxLayout, QWidget)
 
 
 class Base(QWidget):
@@ -438,7 +435,6 @@ class MainForm(QMainWindow):
         self.verticalLayout_13.addWidget(self.pushButton_mt_done_del_task)
         self.horizontalLayout_22.addLayout(self.verticalLayout_13)
 
-
     def right_bar(self):
         self.pushButton_mt_crete_task = QPushButton('Новая задача', self.page_2)
         self.pushButton_mt_crete_task.setGeometry(QRect(550, 20, 101, 31))
@@ -451,7 +447,6 @@ class MainForm(QMainWindow):
         self.progressBar.setValue(0)
         self.label_63 = QLabel('Процеcс\nвыполнения:', self.page_2)
         self.label_63.setGeometry(QRect(550, 430, 91, 31))
-
 
     def page_notices(self):
         self.groupBox_notices = QGroupBox('Заметки', self.page_3)
@@ -482,7 +477,6 @@ class MainForm(QMainWindow):
         self.label_atached_note.setProperty("class", "note")
         self.label_atached_note.setStyleSheet(self.style)
 
-
     def main_timer(self, Widget):
         self.groupBox_main_timer = QGroupBox('Время работы', Widget)
         self.groupBox_main_timer.setGeometry(QRect(700, 180, 211, 181))
@@ -493,18 +487,18 @@ class MainForm(QMainWindow):
         self.formLayout.setContentsMargins(0, 0, 0, 0)
 
         self.label_8 = QLabel('Прошло:', self.formLayoutWidget)
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label_8)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.label_8)
 
         self.label_59 = QLabel('Осталось:', self.formLayoutWidget)
         self.label_59.setFrameShape(QFrame.Shape.NoFrame)
         self.label_59.setFrameShadow(QFrame.Shadow.Plain)
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_59)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.label_59)
 
         self.label_main_timer_passed = QLabel("", self.formLayoutWidget)
-        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.label_main_timer_passed)
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.label_main_timer_passed)
 
         self.label_main_timer_last = QLabel('', self.formLayoutWidget)
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.label_main_timer_last)
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.label_main_timer_last)
 
         self.verticalLayoutWidget_3 = QWidget(self.groupBox_main_timer)
         self.verticalLayoutWidget_3.setGeometry(QRect(40, 80, 160, 86))
@@ -519,4 +513,3 @@ class MainForm(QMainWindow):
 
         self.pushButton_21 = QPushButton('Посмотреть историю', self.verticalLayoutWidget_3)
         self.verticalLayout_8.addWidget(self.pushButton_21)
-
