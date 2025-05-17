@@ -9,7 +9,7 @@ import psycopg2.errors
 task_status_dict, task_priority_dict, task_category_dict = get_dict_tables()
 
 
-def load_stylesheet(path: str = "forms/style.css") -> str:
+def load_stylesheet(path: str = "style.css") -> str:
     """
     Загружает и возвращает CSS-стили из файла.
     """

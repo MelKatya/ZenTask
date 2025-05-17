@@ -5,6 +5,22 @@ QMainWindow {
                                         stop: 0 #fffefa, stop: 0.2 #f6f6fa, stop: 0.4 #f3effe,  stop: 1 #f8f5fc);
 }
 
+QTextEdit, QLineEdit, QStackedWidget {
+    border: 1px solid grey;
+    border-radius: 3px;
+}
+
+QTimeEdit, QDateTimeEdit, QTableWidge {
+    border: 1px solid #C4C4C3;
+    border-radius: 5px;
+    padding: 1px 2px;
+}
+
+QTabWidget::pane {
+    border-top-radius: 3px;
+    padding: 0 1px;
+}
+
 /* __________Кнопки____________ */
 QPushButton {
     background-color: #4d3f72;
@@ -99,6 +115,7 @@ QCheckBox::indicator:checked {
     image: url(:/images/checkbox_checked.png);
 }
 
+/* __________QComboBox____________ */
 
 QComboBox {
     border: 1px solid gray;
@@ -107,46 +124,44 @@ QComboBox {
     min-width: 7em;
 }
 
-
 QComboBox:!editable, QComboBox::drop-down:editable {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
                                  stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
 }
 
-/* QComboBox gets the "on" state when the popup is open */
 QComboBox:!editable:on, QComboBox::drop-down:editable:on {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #D3D3D3, stop: 0.4 #D8D8D8,
                                 stop: 0.5 #DDDDDD, stop: 1.0 #E1E1E1);
 }
 
-QComboBox:on { /* shift the text when the popup opens */
+QComboBox:on {
     padding-top: 3px;
     padding-left: 3px;
 }
 
 QComboBox::drop-down {
     width: 30px;
-
     border-left-width: 1 px;
     border-left-color: darkgray;
-    border-left-style: solid; /* just a single line */
-    border-top-right-radius: 0px; /* same radius as the QComboBox */
+    border-left-style: solid;
+    border-top-right-radius: 0px;
     border-bottom-right-radius:1px;
 
 }
 QComboBox::down-arrow {
-top: -1px;
+    top: -1px;
     image: url(:/images/combobox_down.png);
 }
 
-QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+QComboBox::down-arrow:on {
     image: url(:/images/combobox_up.png);
     top: 1px;
     left: 1px;
 }
 
+/* __________QProgressBar____________ */
 
 QProgressBar {
     border: 2px solid grey;
@@ -158,19 +173,7 @@ QProgressBar::chunk {
     background-color: #CD96CD;
 }
 
-QTextEdit, QLineEdit, QStackedWidget {
-    border: 1px solid grey;
-    border-radius: 3px;
-}
-
-
-
-
-QTabWidget::pane { /* The tab widget frame */
-    border-top-radius: 3px;
-    padding: 0 1px;
-}
-
+/* __________QTabBar____________ */
 QTabBar::tab {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
@@ -189,43 +192,44 @@ QTabBar::tab:selected, QTabBar::tab:hover {
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
 }
 
+/* __________QCalendarWidget____________ */
 
 QCalendarWidget QWidget {
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: #e1ddec;
+    color: #2c2441;
     font-family: Calibri;
     font-size: 10pt;
     border-radius: 3px;
 }
 
 QCalendarWidget QAbstractItemView {
-    selection-background-color: #0078d7;
+    selection-background-color: #4d3f72;
     selection-color: white;
+    border: none;
+    outline: none;
 }
 
-QCalendarWidget QToolButton {
-    background-color: #0078d7;
-    color: white;
-    border: none;
+QCalendarWidget QAbstractItemView:item:hover,
+ QCalendarWidget QToolButton:hover{
+    background-color: #e6e6fa;
+    border: 1px solid #ccc;
+    color: #000;
+}
+
+QCalendarWidget QAbstractItemView:disabled {
+    color: #aaa;
 }
 
 QCalendarWidget QToolButton::menu-indicator {
     image: none;
 }
 
-QCalendarWidget QToolButton::left-arrow,
-QCalendarWidget QToolButton::right-arrow {
-    width: 20px;
-    height: 20px;
-}
-
-
+/* __________QTreeView____________ */
 QTreeView {
     border: 2px solid #C4C4C3;
     show-decoration-selected: 1;
     border-radius: 2px;
 }
-
 
 QTreeView::item:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
@@ -253,27 +257,14 @@ QTreeView::branch:!has-children:!has-siblings:adjoins-item {
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
-        border-image: none;
-        image: url(:/images/branch_closed.png);
+    border-image: none;
+    image: url(:/images/branch_closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  {
-        border-image: none;
-        image: url(:/images/branch_open.png);
+    border-image: none;
+    image: url(:/images/branch_open.png);
 }
 
-
-QTimeEdit, QDateTimeEdit {
-    border: 1px solid #C4C4C3;
-    border-radius: 5px;
-    padding: 1px 2px;
-}
-
-
-QTableWidget {
-    border: 1px solid #C4C4C3;
-    border-radius: 5px;
-    padding: 1px 2px;
-}
 

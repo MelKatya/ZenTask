@@ -12,7 +12,7 @@ class Base(QWidget):
         super().__init__(parent)
 
         self.style = None
-        with open("forms/style.css", "r") as f:
+        with open("style.css", "r") as f:
             self.style = f.read()
 
         self.setStyleSheet(self.style)
@@ -125,7 +125,7 @@ class Note(QWidget):
     def __init__(self, toolBox_not, page_number, parent=None):
         super().__init__(parent)
         self.style = None
-        with open("forms/style.css", "r") as f:
+        with open("style.css", "r") as f:
             self.style = f.read()
 
         self.page = QWidget(self)
@@ -165,7 +165,7 @@ class MainForm(QMainWindow):
     def setup_ui(self):
 
         self.style = None
-        with open("forms/style.css", "r") as f:
+        with open("style.css", "r") as f:
             self.style = f.read()
 
         self.resize(933, 548)
